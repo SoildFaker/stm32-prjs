@@ -1,9 +1,9 @@
-# Makefile for the STM32F103C8 blink program
+# Makefile for the STM32F103C8
 #
-# Kevin Cuzner
+# Modified from Kevin Cuzner by Enbin Li
 #
 
-PROJECT = blink
+PROJECT = copter
 
 # Project Structure
 SRCDIR = src
