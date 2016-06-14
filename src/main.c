@@ -4,11 +4,11 @@
 #include "main.h"
 
 /*************************** 宏定义***********************************************/
-#define  USARTx                     USART2
-#define  GPIOx                      GPIOA
-#define  RCC_APB2Periph_GPIOx       RCC_APB2Periph_GPIOA
-#define  GPIO_RxPin                 GPIO_Pin_3
-#define  GPIO_TxPin                 GPIO_Pin_2
+#define  USARTx           USART2
+#define  GPIOx            GPIOA
+#define  RCC_APB2Periph_GPIOx     RCC_APB2Periph_GPIOA
+#define  GPIO_RxPin         GPIO_Pin_3
+#define  GPIO_TxPin         GPIO_Pin_2
 
 /******************************** 变量定义 ------------------------------------*/
 ErrorStatus HSEStartUpStatus;
@@ -40,8 +40,7 @@ int main(void)
   int k =0;
   long i = 0;
     
-  while (1)
-  {  
+  while (1) {  
     printf("Num:%d.\r\n",i);
     k = msr_dist();
     i++;
@@ -51,27 +50,28 @@ int main(void)
 
 int msr_dist(void)
 {
-    int length;
-    printf("Send sound.\r\n",1);
-    GPIO_WriteBit(GPIOA,GPIO_Pin_1,1);
-    delay_us(20);
-    GPIO_WriteBit(GPIOA,GPIO_Pin_1,0);
-    //计数器清0
-    counter = 0;
-    while(!GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0));
-    TIM_Cmd(TIM2, ENABLE);// TIM2 enable counter [允许tim2计数]
-    while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0)){
-      if(counter>90000){
-        printf(">>>ERROR:timeout_echo.\r\n",1);
-    delay_ms(0x2fffff);
-        break;
-      }
+  int length;
+  
+  printf("Send sound.\r\n",1);
+  GPIO_WriteBit(GPIOA,GPIO_Pin_1,1);
+  delay_us(20);
+  GPIO_WriteBit(GPIOA,GPIO_Pin_1,0);
+  //计数器清0
+  counter = 0;
+  while(!GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0));
+  TIM_Cmd(TIM2, ENABLE);// TIM2 enable counter [允许tim2计数]
+  while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0)){
+    if(counter>90000){
+      printf(">>>ERROR:timeout_echo.\r\n",1);
+      delay_ms(0x2fffff);
+      break;
     }
-    TIM_Cmd(TIM2, DISABLE);
-    
-    length=counter/26.3;
-    printf("trick: %d \r\nDistance:%d cm\r\n-----------------------\r\n",counter,length);
-    return length;
+  }
+  TIM_Cmd(TIM2, DISABLE);
+  
+  length=counter/26.3;
+  printf("trick: %d \r\nDistance:%d cm\r\n-----------------------\r\n",counter,length);
+  return length;
 }
 
 void delay_ms(u32 nms)
@@ -93,54 +93,54 @@ void delay_us(u32 nus)
 //以指定的宽度发送十进制数的ascii码。
 int usart_send_num(uint32_t num)
 {
-    int data[5]={0};
-    int tmp = num;
-    int r = 0, i;
-    while(tmp>0){
-        data[r] = tmp % 10;
-        r++;
-        tmp /= 10;
-    }
-    for (i = r-1; i >= 0; --i) {
-        Uartx_PutChar(data[i]+'0');
-    }
-    if(r==0){
-        Uartx_PutChar('0');
-    }
-    return 0;
+  int data[5]={0};
+  int tmp = num;
+  int r = 0, i;
+  while(tmp>0){
+    data[r] = tmp % 10;
+    r++;
+    tmp /= 10;
+  }
+  for (i = r-1; i >= 0; --i) {
+    Uartx_PutChar(data[i]+'0');
+  }
+  if(r==0){
+    Uartx_PutChar('0');
+  }
+  return 0;
 }
 
 int printf(char *fmt, ...)
 {
-     char *p = (char *)&fmt + sizeof(fmt);
-     uint8_t temp = 0;
-     while (1) {
-        temp = *fmt;
-        if (temp == '\0')
-            break;
-        /*else if (temp == '\\')*/
-            /*Uartx_PutChar(*++fmt);*/
-        else if (temp == '%') {
-            fmt++;
-            if (*fmt == 'd')
-                usart_send_num(*((int *)p));
-            p += sizeof(int);
-        }else{
-            Uartx_PutChar(temp);
-        }
-        fmt++;
+   char *p = (char *)&fmt + sizeof(fmt);
+   uint8_t temp = 0;
+   while (1) {
+    temp = *fmt;
+    if (temp == '\0')
+      break;
+    /*else if (temp == '\\')*/
+      /*Uartx_PutChar(*++fmt);*/
+    else if (temp == '%') {
+      fmt++;
+      if (*fmt == 'd')
+        usart_send_num(*((int *)p));
+      p += sizeof(int);
+    }else{
+      Uartx_PutChar(temp);
     }
+    fmt++;
+  }
    return 0;
 }
 
 
 u8 Uartx_PutChar(u8 ch)
 {
-   /* Write a character to the USART */
-   USART_SendData(USARTx, (u8) ch);
-   while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET) {
-   }
-   return ch;
+  /* Write a character to the USART */
+  USART_SendData(USARTx, (u8) ch);
+  while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET) {
+  }
+  return ch;
 }
 
 
@@ -166,14 +166,12 @@ void RCC_Configuration(void)
   RCC_DeInit();  
   //打开外部高速晶振
   RCC_HSEConfig(RCC_HSE_ON); 
- //等待外部高速时钟准备好
+  //等待外部高速时钟准备好
   HSEStartUpStatus = RCC_WaitForHSEStartUp(); 
-  //外部高速时钟已经准别好
-  if(HSEStartUpStatus == SUCCESS)  
-  {
+  if(HSEStartUpStatus == SUCCESS){
     FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
     FLASH_SetLatency(FLASH_Latency_2);
-   //配置AHB(HCLK)时钟=SYSCLK
+    //配置AHB(HCLK)时钟=SYSCLK
     RCC_HCLKConfig(RCC_SYSCLK_Div1);
     //配置APB2(PCLK2)钟=AHB时钟
     RCC_PCLK2Config(RCC_HCLK_Div1); 
@@ -183,23 +181,23 @@ void RCC_Configuration(void)
     RCC_ADCCLKConfig(RCC_PCLK2_Div4); 
     //配置PLL时钟 == 外部高速晶体时钟*9
     RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9); 
-	//配置ADC时钟= PCLK2/4
+    //配置ADC时钟= PCLK2/4
     RCC_ADCCLKConfig(RCC_PCLK2_Div4);
-   //使能PLL时钟
+    //使能PLL时钟
     RCC_PLLCmd(ENABLE);  
-   //等待PLL时钟就绪
+    //等待PLL时钟就绪
     while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET)  {
     }
     //配置系统时钟 = PLL时钟
     RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK); 
-   //检查PLL时钟是否作为系统时钟
+    //检查PLL时钟是否作为系统时钟
     while(RCC_GetSYSCLKSource() != 0x08)  {
     }
   }
     
   //Enable GPIO timer
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOx, ENABLE);
-
+  
   //Enable serial timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 
@@ -208,7 +206,7 @@ void RCC_Configuration(void)
 void TIM_Configuration(void)
 {
   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-
+  
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIMx
   /* Time Base configuration */
   TIM_TimeBaseStructure.TIM_Prescaler = 35;  //时钟预分频数 例如:时钟频率=72/(时钟预分频+1)  
@@ -223,29 +221,29 @@ void TIM_Configuration(void)
 }
 /*******************************************************************************
 * Function Name  : GPIO_Configuration
-* Description    : Configures the different GPIO ports.
-* Input          : None
-* Output         : None
-* Return         : None
+* Description  : Configures the different GPIO ports.
+* Input      : None
+* Output     : None
+* Return     : None
 *******************************************************************************/
 void GPIO_Configuration(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
-
+  
   //开启AFIO时钟
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-
+  
    //配置USARTx_Tx为复合推挽输出
   GPIO_InitStructure.GPIO_Pin = GPIO_TxPin;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
   GPIO_Init(GPIOx, &GPIO_InitStructure);
-
+  
   //配置 USARTx_Rx 为浮空输入
   GPIO_InitStructure.GPIO_Pin = GPIO_RxPin;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOx, &GPIO_InitStructure);
-
+  
   //HC-SR02 
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1; 
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -258,10 +256,10 @@ void GPIO_Configuration(void)
 
 /*******************************************************************************
 * Function Name  : NVIC_Configuration
-* Description    : Configures Vector Table base location.
-* Input          : None
-* Output         : None
-* Return         : None
+* Description  : Configures Vector Table base location.
+* Input      : None
+* Output     : None
+* Return     : None
 *******************************************************************************/
 void NVIC_Configuration(void)
 { 
@@ -287,17 +285,17 @@ void NVIC_Configuration(void)
 #ifdef  DEBUG
 /*******************************************************************************
 * Function Name  : assert_failed
-* Description    : Reports the name of the source file and the source line number
-*                  where the assert_param error has occurred.
-* Input          : - file: pointer to the source file name
-*                  - line: assert_param error line source number
-* Output         : None
-* Return         : None
+* Description  : Reports the name of the source file and the source line number
+*          where the assert_param error has occurred.
+* Input      : - file: pointer to the source file name
+*          - line: assert_param error line source number
+* Output     : None
+* Return     : None
 *******************************************************************************/
 void assert_failed(u8* file, u32 line)
 { 
   /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+   ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
 
   /* Infinite loop */
   while (1)
