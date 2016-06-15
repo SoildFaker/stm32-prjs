@@ -4,11 +4,11 @@
 #include "main.h"
 
 /*************************** 宏定义***********************************************/
-#define  USARTx           USART2
-#define  GPIOx            GPIOA
+#define  USARTx                   USART2
+#define  GPIOx                    GPIOA
 #define  RCC_APB2Periph_GPIOx     RCC_APB2Periph_GPIOA
-#define  GPIO_RxPin         GPIO_Pin_3
-#define  GPIO_TxPin         GPIO_Pin_2
+#define  GPIO_RxPin               GPIO_Pin_3
+#define  GPIO_TxPin               GPIO_Pin_2
 
 /******************************** 变量定义 ------------------------------------*/
 ErrorStatus HSEStartUpStatus;
