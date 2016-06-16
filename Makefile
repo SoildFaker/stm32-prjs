@@ -20,7 +20,7 @@ SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/tools/*.c) $(wildcard $(COM
 ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(SRCDIR)/tools/*.s) $(wildcard $(COMDIR)/*.s)
 
 # Include directories
-INCLUDE  = -I$(INCDIR) -Icmsis -I$(PERINC)
+INCLUDE  = -I$(INCDIR) -I$(INCDIR)/STM32 -I$(INCDIR)/CMSIS -I$(INCDIR)/DMP -I$(INCDIR)/IIC -I$(INCDIR)/MPU6050
 
 # Linker 
 LSCRIPT = STM32F103X8_FLASH.ld
