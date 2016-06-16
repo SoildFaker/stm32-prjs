@@ -1,10 +1,11 @@
 /* Includes ------------------------------------------------------------------*/
-#include "../main.h"
+#include "conf.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+u16 timer_counter;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -132,7 +133,7 @@ void TIM2_IRQHandler(void)
    if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
       //清除TIM2的中断待处理位
       TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
-      counter++;
+      timer_counter++;
    }
 }
 

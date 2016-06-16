@@ -1,4 +1,4 @@
-#include "../../include/STM32/stm32f10x.h"
+#include "../include/STM32/stm32f10x.h"
 
 /*!< Uncomment the line corresponding to the desired System clock (SYSCLK)
    frequency (after reset the HSI is used as SYSCLK source)

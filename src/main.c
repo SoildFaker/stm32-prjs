@@ -1,7 +1,7 @@
 /**
  * STM32F103C8 Quadrocopter
  */
-#include "main.h"
+#include "lib.h"
 
 int main(void)
 {
