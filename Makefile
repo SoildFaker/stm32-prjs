@@ -11,14 +11,13 @@ COMDIR = common
 BINDIR = bin
 OBJDIR = obj
 INCDIR = include
-PERINC = src/include
 
 # Project target
 CPU = cortex-m3
 
 # Sources
-SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(COMDIR)/*.c)
-ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(COMDIR)/*.s)
+SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/tools/*.c) $(wildcard $(COMDIR)/*.c)
+ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(SRCDIR)/tools/*.s) $(wildcard $(COMDIR)/*.s)
 
 # Include directories
 INCLUDE  = -I$(INCDIR) -Icmsis -I$(PERINC)
@@ -62,7 +61,7 @@ all:: $(BINDIR)/$(PROJECT).bin
 Build: $(BINDIR)/$(PROJECT).bin
 
 install: $(BINDIR)/$(PROJECT).bin
-	sudo $(OCD) $(OCDFLAGS)
+	$(OCD) $(OCDFLAGS)
 
 debug: $(BINDIR)/$(PROJECT).elf
 	$(GDB) $(BINDIR)/$(PROJECT).elf
@@ -97,6 +96,13 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -o $@ $<
 
+$(OBJDIR)/%.o: $(SRCDIR)/tools/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(GCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(SRCDIR)/tools/%.s
+	@mkdir -p $(dir $@)
+	$(AS) $(ASFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o: $(COMDIR)/%.c
 	@mkdir -p $(dir $@)
