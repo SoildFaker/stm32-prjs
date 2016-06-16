@@ -1,49 +1,7 @@
-/**
-  ******************************************************************************
-  * @file    stm32f10x_usart.c
-  * @author  MCD Application Team
-  * @version V3.5.0
-  * @date    11-March-2011
-  * @brief   This file provides all the USART firmware functions.
-  ******************************************************************************
-  * @attention
-  *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-  *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
-  ******************************************************************************
-  */
-
 /* Includes ------------------------------------------------------------------*/
-#include "usart.h"
-#include "rcc.h"
-#include "conf.h"
-
-/** @addtogroup STM32F10x_StdPeriph_Driver
-  * @{
-  */
-
-/** @defgroup USART 
-  * @brief USART driver modules
-  * @{
-  */
-
-/** @defgroup USART_Private_TypesDefinitions
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup USART_Private_Defines
-  * @{
-  */
+#include "../include/STM32/usart.h"
+#include "../include/STM32/rcc.h"
+#include "../include/conf.h"
 
 #define CR1_UE_Set                ((uint16_t)0x2000)  /*!< USART Enable Mask */
 #define CR1_UE_Reset              ((uint16_t)0xDFFF)  /*!< USART Disable Mask */
@@ -88,38 +46,6 @@
 /* USART One Bit Sampling Mask */
 #define CR3_ONEBITE_Set           ((u16)0x0800)  /* USART ONEBITE mode Enable Mask */
 #define CR3_ONEBITE_Reset         ((u16)0xF7FF)  /* USART ONEBITE mode Disable Mask */
-
-/**
-  * @}
-  */
-
-/** @defgroup USART_Private_Macros
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup USART_Private_Variables
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup USART_Private_FunctionPrototypes
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup USART_Private_Functions
-  * @{
-  */
 
 /**
   * @brief  Deinitializes the USARTx peripheral registers to their default reset values.
@@ -1044,16 +970,3 @@ void USART_ClearITPendingBit(USART_TypeDef* USARTx, uint16_t USART_IT)
   itmask = ((uint16_t)0x01 << (uint16_t)bitpos);
   USARTx->SR = (uint16_t)~itmask;
 }
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
