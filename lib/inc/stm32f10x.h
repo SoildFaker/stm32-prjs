@@ -1,21 +1,137 @@
+/**
+  ******************************************************************************
+  * @file    stm32f10x.h
+  * @author  MCD Application Team
+  * @version V3.5.0
+  * @date    11-March-2011
+  * @brief   CMSIS Cortex-M3 Device Peripheral Access Layer Header File. 
+  *          This file contains all the peripheral register's definitions, bits 
+  *          definitions and memory mapping for STM32F10x Connectivity line, 
+  *          High density, High density value line, Medium density, 
+  *          Medium density Value line, Low density, Low density Value line 
+  *          and XL-density devices.
+  *
+  *          The file is the unique include file that the application programmer
+  *          is using in the C source code, usually in main.c. This file contains:
+  *           - Configuration section that allows to select:
+  *              - The device used in the target application
+  *              - To use or not the peripheral抯 drivers in application code(i.e. 
+  *                code will be based on direct access to peripheral抯 registers 
+  *                rather than drivers API), this option is controlled by 
+  *                "#define USE_STDPERIPH_DRIVER"
+  *              - To change few application-specific parameters such as the HSE 
+  *                crystal frequency
+  *           - Data structures and the address mapping for all peripherals
+  *           - Peripheral's registers declarations and bits definition
+  *           - Macros to access peripheral抯 registers hardware
+  *
+  ******************************************************************************
+  * @attention
+  *
+  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  *
+  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  ******************************************************************************
+  */
+
+/** @addtogroup CMSIS
+  * @{
+  */
+
+/** @addtogroup stm32f10x
+  * @{
+  */
+    
 #ifndef __STM32F10x_H
 #define __STM32F10x_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif 
+  
+/** @addtogroup Library_configuration_section
+  * @{
+  */
+  
+/* Uncomment the line below according to the target STM32 device used in your
+   application 
+  */
 
-#define STM32F10X_MD     /* STM32 中密度芯片 */
+#if !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && !defined (STM32F10X_XL) && !defined (STM32F10X_CL) 
+  /* #define STM32F10X_LD */     /*!< STM32F10X_LD: STM32 Low density devices */
+  /* #define STM32F10X_LD_VL */  /*!< STM32F10X_LD_VL: STM32 Low density Value Line devices */  
+  #define STM32F10X_MD     /*!< STM32F10X_MD: STM32 Medium density devices */
+  /* #define STM32F10X_MD_VL */  /*!< STM32F10X_MD_VL: STM32 Medium density Value Line devices */  
+  /* #define STM32F10X_HD */     /*!< STM32F10X_HD: STM32 High density devices */
+  /* #define STM32F10X_HD_VL */  /*!< STM32F10X_HD_VL: STM32 High density value line devices */  
+  /* #define STM32F10X_XL */     /*!< STM32F10X_XL: STM32 XL-density devices */
+  /* #define STM32F10X_CL */     /*!< STM32F10X_CL: STM32 Connectivity line devices */
+#endif
+/*  Tip: To avoid modifying this file each time you need to switch between these
+        devices, you can define the device in your toolchain compiler preprocessor.
 
-// 定义高速晶振频率
+ - Low-density devices are STM32F101xx, STM32F102xx and STM32F103xx microcontrollers
+   where the Flash memory density ranges between 16 and 32 Kbytes.
+ - Low-density value line devices are STM32F100xx microcontrollers where the Flash
+   memory density ranges between 16 and 32 Kbytes.
+ - Medium-density devices are STM32F101xx, STM32F102xx and STM32F103xx microcontrollers
+   where the Flash memory density ranges between 64 and 128 Kbytes.
+ - Medium-density value line devices are STM32F100xx microcontrollers where the 
+   Flash memory density ranges between 64 and 128 Kbytes.   
+ - High-density devices are STM32F101xx and STM32F103xx microcontrollers where
+   the Flash memory density ranges between 256 and 512 Kbytes.
+ - High-density value line devices are STM32F100xx microcontrollers where the 
+   Flash memory density ranges between 256 and 512 Kbytes.   
+ - XL-density devices are STM32F101xx and STM32F103xx microcontrollers where
+   the Flash memory density ranges between 512 and 1024 Kbytes.
+ - Connectivity line devices are STM32F105xx and STM32F107xx microcontrollers.
+  */
+
+#if !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
+ #error "Please select first the target STM32F10x device used in your application (in stm32f10x.h file)"
+#endif
+
+#if !defined  USE_STDPERIPH_DRIVER
+/**
+ * @brief Comment the line below if you will not use the peripherals drivers.
+   In this case, these drivers will not be included and the application code will 
+   be based on direct access to peripherals registers 
+   */
+  /*#define USE_STDPERIPH_DRIVER*/
+#endif
+
+/**
+ * @brief In the following line adjust the value of External High Speed oscillator (HSE)
+   used in your application 
+   
+   Tip: To avoid modifying this file each time you need to use different HSE, you
+        can define the HSE value in your toolchain compiler preprocessor.
+  */           
 #if !defined  HSE_VALUE
-  #define HSE_VALUE    ((uint32_t)8000000) /* HSE 的频率单位是 Hz */
+ #ifdef STM32F10X_CL   
+  #define HSE_VALUE    ((uint32_t)25000000) /*!< Value of the External oscillator in Hz */
+ #else 
+  #define HSE_VALUE    ((uint32_t)8000000) /*!< Value of the External oscillator in Hz */
+ #endif /* STM32F10X_CL */
 #endif /* HSE_VALUE */
 
 
-// HSE 启动超时的时间
-#define HSE_STARTUP_TIMEOUT   ((uint16_t)0x0500)
+/**
+ * @brief In the following line adjust the External High Speed oscillator (HSE) Startup 
+   Timeout value 
+   */
+#define HSE_STARTUP_TIMEOUT   ((uint16_t)0x0500) /*!< Time out for HSE start up */
 
-#define HSI_VALUE    ((uint32_t)8000000) /* 内部高速晶振的频率Hz */
+#define HSI_VALUE    ((uint32_t)8000000) /*!< Value of the Internal oscillator in Hz*/
 
-// 外部设备库文件版本
+/**
+ * @brief STM32F10x Standard Peripheral Library version number
+   */
 #define __STM32F10X_STDPERIPH_VERSION_MAIN   (0x03) /*!< [31:24] main version */                                  
 #define __STM32F10X_STDPERIPH_VERSION_SUB1   (0x05) /*!< [23:16] sub1 version */
 #define __STM32F10X_STDPERIPH_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
@@ -25,6 +141,9 @@
                                              |(__STM32F10X_STDPERIPH_VERSION_SUB2 << 8)\
                                              |(__STM32F10X_STDPERIPH_VERSION_RC))
 
+/**
+  * @}
+  */
 
 /** @addtogroup Configuration_section_for_CMSIS
   * @{
@@ -356,7 +475,7 @@ typedef enum IRQn
   * @}
   */
 
-#include "../CMSIS/core_cm3.h"
+#include "core_cm3.h"
 #include "system_stm32f10x.h"
 #include <stdint.h>
 
@@ -8174,6 +8293,9 @@ typedef struct
   * @}
   */ 
 
+#ifdef USE_STDPERIPH_DRIVER
+  #include "stm32f10x_conf.h"
+#endif
 
 /** @addtogroup Exported_macro
   * @{
@@ -8193,5 +8315,22 @@ typedef struct
 
 #define MODIFY_REG(REG, CLEARMASK, SETMASK)  WRITE_REG((REG), (((READ_REG(REG)) & (~(CLEARMASK))) | (SETMASK)))
 
+/**
+  * @}
+  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __STM32F10x_H */
+
+/**
+  * @}
+  */
+
+  /**
+  * @}
+  */
+
+/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

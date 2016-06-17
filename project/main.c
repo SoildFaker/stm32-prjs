@@ -2,6 +2,7 @@
  * STM32F103C8 Quadrocopter
  */
 #include "main.h"
+#include "time.h"
 
 int main(void)
 {

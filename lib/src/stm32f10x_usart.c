@@ -1,7 +1,49 @@
+/**
+  ******************************************************************************
+  * @file    stm32f10x_usart.c
+  * @author  MCD Application Team
+  * @version V3.5.0
+  * @date    11-March-2011
+  * @brief   This file provides all the USART firmware functions.
+  ******************************************************************************
+  * @attention
+  *
+  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  *
+  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  ******************************************************************************
+  */
+
 /* Includes ------------------------------------------------------------------*/
-#include "../include/STM32/usart.h"
-#include "../include/STM32/rcc.h"
-#include "../src/conf.h"
+#include "stm32f10x_usart.h"
+#include "stm32f10x_rcc.h"
+#include "conf.h"
+
+/** @addtogroup STM32F10x_StdPeriph_Driver
+  * @{
+  */
+
+/** @defgroup USART 
+  * @brief USART driver modules
+  * @{
+  */
+
+/** @defgroup USART_Private_TypesDefinitions
+  * @{
+  */
+
+/**
+  * @}
+  */
+
+/** @defgroup USART_Private_Defines
+  * @{
+  */
 
 #define CR1_UE_Set                ((uint16_t)0x2000)  /*!< USART Enable Mask */
 #define CR1_UE_Reset              ((uint16_t)0xDFFF)  /*!< USART Disable Mask */
@@ -46,6 +88,38 @@
 /* USART One Bit Sampling Mask */
 #define CR3_ONEBITE_Set           ((u16)0x0800)  /* USART ONEBITE mode Enable Mask */
 #define CR3_ONEBITE_Reset         ((u16)0xF7FF)  /* USART ONEBITE mode Disable Mask */
+
+/**
+  * @}
+  */
+
+/** @defgroup USART_Private_Macros
+  * @{
+  */
+
+/**
+  * @}
+  */
+
+/** @defgroup USART_Private_Variables
+  * @{
+  */
+
+/**
+  * @}
+  */
+
+/** @defgroup USART_Private_FunctionPrototypes
+  * @{
+  */
+
+/**
+  * @}
+  */
+
+/** @defgroup USART_Private_Functions
+  * @{
+  */
 
 /**
   * @brief  Deinitializes the USARTx peripheral registers to their default reset values.
@@ -358,7 +432,7 @@ void USART_ITConfig(USART_TypeDef* USARTx, uint16_t USART_IT, FunctionalState Ne
 }
 
 /**
-  * @brief  Enables or disables the USART\92s DMA interface.
+  * @brief  Enables or disables the USART’s DMA interface.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
@@ -482,7 +556,7 @@ void USART_LINBreakDetectLengthConfig(USART_TypeDef* USARTx, uint16_t USART_LINB
 }
 
 /**
-  * @brief  Enables or disables the USART\92s LIN mode.
+  * @brief  Enables or disables the USART’s LIN mode.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
@@ -597,7 +671,7 @@ void USART_SetPrescaler(USART_TypeDef* USARTx, uint8_t USART_Prescaler)
 }
 
 /**
-  * @brief  Enables or disables the USART\92s Smart Card mode.
+  * @brief  Enables or disables the USART’s Smart Card mode.
   * @param  USARTx: where x can be 1, 2 or 3 to select the USART peripheral.
   * @param  NewState: new state of the Smart Card mode.
   *   This parameter can be: ENABLE or DISABLE.     
@@ -647,7 +721,7 @@ void USART_SmartCardNACKCmd(USART_TypeDef* USARTx, FunctionalState NewState)
 }
 
 /**
-  * @brief  Enables or disables the USART\92s Half Duplex communication.
+  * @brief  Enables or disables the USART’s Half Duplex communication.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
@@ -970,3 +1044,16 @@ void USART_ClearITPendingBit(USART_TypeDef* USARTx, uint16_t USART_IT)
   itmask = ((uint16_t)0x01 << (uint16_t)bitpos);
   USARTx->SR = (uint16_t)~itmask;
 }
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
+/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
