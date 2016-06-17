@@ -52,4 +52,25 @@ u8 Uartx_PutChar(u8 ch)
 }
 
 
+int _read(int file, char *ptr, int len) 
+{
+  int n;
+  int num = 0;
+  for (n = 0; n < len; n++) {
+     char c = UsartGet();
+    *ptr++ = c;
+    num++;
+  }
+  return num;
+}
+
+int _write(int file, char *ptr, int len) 
+{
+  int n;
+  for (n = 0; n < len; n++) {
+     UsartPut(*ptr++);
+  }
+  return len;
+}
+
 

@@ -1,49 +1,8 @@
-/**
-  ******************************************************************************
-  * @file    stm32f10x_tim.c
-  * @author  MCD Application Team
-  * @version V3.5.0
-  * @date    11-March-2011
-  * @brief   This file provides all the TIM firmware functions.
-  ******************************************************************************
-  * @attention
-  *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-  *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
-  ******************************************************************************
-  */
-
+// 时钟函数
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x_tim.h"
-#include "stm32f10x_rcc.h"
-#include "stm32f10x_conf.h"
-
-/** @addtogroup STM32F10x_StdPeriph_Driver
-  * @{
-  */
-
-/** @defgroup TIM 
-  * @brief TIM driver modules
-  * @{
-  */
-
-/** @defgroup TIM_Private_TypesDefinitions
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup TIM_Private_Defines
-  * @{
-  */
+#include "../include/STM32/tim.h"
+#include "../include/STM32/rcc.h"
+#include "../src/conf.h"
 
 /* ---------------------- TIM registers bit mask ------------------------ */
 #define SMCR_ETR_Mask               ((uint16_t)0x00FF) 
@@ -51,164 +10,67 @@
 #define CCER_CCE_Set                ((uint16_t)0x0001)  
 #define	CCER_CCNE_Set               ((uint16_t)0x0004) 
 
-/**
-  * @}
-  */
+static void TI1_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_ICSelection, uint16_t TIM_ICFilter);
+static void TI2_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_ICSelection, uint16_t TIM_ICFilter);
+static void TI3_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_ICSelection, uint16_t TIM_ICFilter);
+static void TI4_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_ICSelection, uint16_t TIM_ICFilter);
 
-/** @defgroup TIM_Private_Macros
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup TIM_Private_Variables
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup TIM_Private_FunctionPrototypes
-  * @{
-  */
-
-static void TI1_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_ICSelection,
-                       uint16_t TIM_ICFilter);
-static void TI2_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_ICSelection,
-                       uint16_t TIM_ICFilter);
-static void TI3_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_ICSelection,
-                       uint16_t TIM_ICFilter);
-static void TI4_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_ICSelection,
-                       uint16_t TIM_ICFilter);
-/**
-  * @}
-  */
-
-/** @defgroup TIM_Private_Macros
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup TIM_Private_Variables
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup TIM_Private_FunctionPrototypes
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup TIM_Private_Functions
-  * @{
-  */
-
-/**
-  * @brief  Deinitializes the TIMx peripheral registers to their default reset values.
-  * @param  TIMx: where x can be 1 to 17 to select the TIM peripheral.
-  * @retval None
-  */
+// Deinitializes the TIMx peripheral registers to their default reset values.
 void TIM_DeInit(TIM_TypeDef* TIMx)
 {
   /* Check the parameters */
   assert_param(IS_TIM_ALL_PERIPH(TIMx)); 
  
-  if (TIMx == TIM1)
-  {
+  if (TIMx == TIM1) {
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM1, ENABLE);
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM1, DISABLE);  
-  }     
-  else if (TIMx == TIM2)
-  {
+  } else if (TIMx == TIM2) {
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM2, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM2, DISABLE);
-  }
-  else if (TIMx == TIM3)
-  {
+  } else if (TIMx == TIM3) {
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM3, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM3, DISABLE);
-  }
-  else if (TIMx == TIM4)
-  {
+  } else if (TIMx == TIM4) {
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM4, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM4, DISABLE);
-  } 
-  else if (TIMx == TIM5)
-  {
+  } else if (TIMx == TIM5) {
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM5, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM5, DISABLE);
-  } 
-  else if (TIMx == TIM6)
-  {
+  } else if (TIMx == TIM6) {
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM6, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM6, DISABLE);
-  } 
-  else if (TIMx == TIM7)
-  {
+  } else if (TIMx == TIM7) {
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM7, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM7, DISABLE);
-  } 
-  else if (TIMx == TIM8)
-  {
+  } else if (TIMx == TIM8) {
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM8, ENABLE);
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM8, DISABLE);
-  }
-  else if (TIMx == TIM9)
-  {      
+  } else if (TIMx == TIM9) {      
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM9, ENABLE);
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM9, DISABLE);  
-   }  
-  else if (TIMx == TIM10)
-  {      
+   } else if (TIMx == TIM10) {      
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM10, ENABLE);
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM10, DISABLE);  
-  }  
-  else if (TIMx == TIM11) 
-  {     
+  } else if (TIMx == TIM11) {     
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM11, ENABLE);
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM11, DISABLE);  
-  }  
-  else if (TIMx == TIM12)
-  {      
+  } else if (TIMx == TIM12) {      
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM12, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM12, DISABLE);  
-  }  
-  else if (TIMx == TIM13) 
-  {       
+  } else if (TIMx == TIM13) {       
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM13, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM13, DISABLE);  
-  }
-  else if (TIMx == TIM14) 
-  {       
+  } else if (TIMx == TIM14) {       
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM14, ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM14, DISABLE);  
-  }        
-  else if (TIMx == TIM15)
-  {
+  } else if (TIMx == TIM15) {
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM15, ENABLE);
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM15, DISABLE);
-  } 
-  else if (TIMx == TIM16)
-  {
+  } else if (TIMx == TIM16) {
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM16, ENABLE);
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM16, DISABLE);
-  } 
-  else
-  {
-    if (TIMx == TIM17)
-    {
+  } else {
+    if (TIMx == TIM17) {
       RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM17, ENABLE);
       RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM17, DISABLE);
     }  
@@ -2876,16 +2738,3 @@ static void TI4_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_
   TIMx->CCER = tmpccer;
 }
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

@@ -26,9 +26,9 @@ INCLUDE  = -I$(INCDIR) -I$(INCDIR)/STM32 -I$(INCDIR)/CMSIS -I$(INCDIR)/DMP -I$(I
 LSCRIPT = STM32F103X8_FLASH.ld
 
 # C Flags
-GCFLAGS  = -Wall -fno-common -mthumb -mcpu=$(CPU) -DSTM32F103xB --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
+GCFLAGS  = -Wall -fno-common -mcpu=$(CPU) -mthumb -DSTM32F103xB --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
 GCFLAGS += $(INCLUDE)
-LDFLAGS += -T$(LSCRIPT) -mthumb -mcpu=$(CPU) --specs=nosys.specs 
+LDFLAGS += -T$(LSCRIPT) -mthumb -mcpu=$(CPU) --specs=nosys.specs -u _printf_float -u _scanf_float
 ASFLAGS += -mcpu=$(CPU)
 
 # Flashing

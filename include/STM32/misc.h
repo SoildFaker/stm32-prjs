@@ -1,51 +1,9 @@
-/**
-  ******************************************************************************
-  * @file    misc.h
-  * @author  MCD Application Team
-  * @version V3.5.0
-  * @date    11-March-2011
-  * @brief   This file contains all the functions prototypes for the miscellaneous
-  *          firmware library functions (add-on to CMSIS functions).
-  ******************************************************************************
-  * @attention
-  *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-  *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
-  ******************************************************************************
-  */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MISC_H
 #define __MISC_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
-
-/** @addtogroup STM32F10x_StdPeriph_Driver
-  * @{
-  */
-
-/** @addtogroup MISC
-  * @{
-  */
-
-/** @defgroup MISC_Exported_Types
-  * @{
-  */
-
-/** 
-  * @brief  NVIC Init Structure definition  
-  */
 
 typedef struct
 {
@@ -67,15 +25,9 @@ typedef struct
                                                    This parameter can be set either to ENABLE or DISABLE */   
 } NVIC_InitTypeDef;
  
-/**
-  * @}
-  */
 
 #define TIM2_IRQChannel              ((u8)0x1C)  /* TIM2 global Interrupt */
 
-/** @defgroup NVIC_Priority_Table 
-  * @{
-  */
 
 /**
 @code  
@@ -102,29 +54,14 @@ typedef struct
 @endcode
 */
 
-/**
-  * @}
-  */
-
-/** @defgroup MISC_Exported_Constants
-  * @{
-  */
-
-/** @defgroup Vector_Table_Base 
-  * @{
-  */
+/* group Vector_Table_Base */
 
 #define NVIC_VectTab_RAM             ((uint32_t)0x20000000)
 #define NVIC_VectTab_FLASH           ((uint32_t)0x08000000)
 #define IS_NVIC_VECTTAB(VECTTAB) (((VECTTAB) == NVIC_VectTab_RAM) || \
                                   ((VECTTAB) == NVIC_VectTab_FLASH))
-/**
-  * @}
-  */
 
-/** @defgroup System_Low_Power 
-  * @{
-  */
+/* group System_Low_Power */
 
 #define NVIC_LP_SEVONPEND            ((uint8_t)0x10)
 #define NVIC_LP_SLEEPDEEP            ((uint8_t)0x04)
@@ -132,13 +69,8 @@ typedef struct
 #define IS_NVIC_LP(LP) (((LP) == NVIC_LP_SEVONPEND) || \
                         ((LP) == NVIC_LP_SLEEPDEEP) || \
                         ((LP) == NVIC_LP_SLEEPONEXIT))
-/**
-  * @}
-  */
 
-/** @defgroup Preemption_Priority_Group 
-  * @{
-  */
+/* group Preemption_Priority_Group */
 
 #define NVIC_PriorityGroup_0         ((uint32_t)0x700) /*!< 0 bits for pre-emption priority
                                                             4 bits for subpriority */
@@ -163,37 +95,12 @@ typedef struct
 
 #define IS_NVIC_OFFSET(OFFSET)  ((OFFSET) < 0x000FFFFF)
 
-/**
-  * @}
-  */
 
-/** @defgroup SysTick_clock_source 
-  * @{
-  */
-
+/** group SysTick_clock_source */
 #define SysTick_CLKSource_HCLK_Div8    ((uint32_t)0xFFFFFFFB)
 #define SysTick_CLKSource_HCLK         ((uint32_t)0x00000004)
 #define IS_SYSTICK_CLK_SOURCE(SOURCE) (((SOURCE) == SysTick_CLKSource_HCLK) || \
                                        ((SOURCE) == SysTick_CLKSource_HCLK_Div8))
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup MISC_Exported_Macros
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup MISC_Exported_Functions
-  * @{
-  */
 
 void NVIC_PriorityGroupConfig(uint32_t NVIC_PriorityGroup);
 void NVIC_Init(NVIC_InitTypeDef* NVIC_InitStruct);
@@ -201,22 +108,4 @@ void NVIC_SetVectorTable(uint32_t NVIC_VectTab, uint32_t Offset);
 void NVIC_SystemLPConfig(uint8_t LowPowerMode, FunctionalState NewState);
 void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
-#ifdef __cplusplus
-}
-#endif
-
 #endif /* __MISC_H */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
