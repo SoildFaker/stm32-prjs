@@ -11,25 +11,24 @@ COMDIR = common
 BINDIR = bin
 OBJDIR = obj
 INCDIR = include
-PERINC = src/include
 
 # Project target
 CPU = cortex-m3
 
 # Sources
-SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(COMDIR)/*.c)
-ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(COMDIR)/*.s)
+SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/tools/*.c) $(wildcard $(COMDIR)/*.c)
+ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(SRCDIR)/tools/*.s) $(wildcard $(COMDIR)/*.s)
 
 # Include directories
-INCLUDE  = -I$(INCDIR) -Icmsis -I$(PERINC)
+INCLUDE  = -I$(INCDIR) -I$(INCDIR)/STM32 -I$(INCDIR)/CMSIS -I$(INCDIR)/DMP -I$(INCDIR)/IIC -I$(INCDIR)/MPU6050
 
 # Linker 
 LSCRIPT = STM32F103X8_FLASH.ld
 
 # C Flags
-GCFLAGS  = -Wall -fno-common -mthumb -mcpu=$(CPU) -DSTM32F103xB --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
+GCFLAGS  = -Wall -fno-common -mcpu=$(CPU) -mthumb -DSTM32F103xB --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
 GCFLAGS += $(INCLUDE)
-LDFLAGS += -T$(LSCRIPT) -mthumb -mcpu=$(CPU) --specs=nosys.specs 
+LDFLAGS += -T$(LSCRIPT) -mthumb -mcpu=$(CPU) --specs=nosys.specs -u _printf_float -u _scanf_float
 ASFLAGS += -mcpu=$(CPU)
 
 # Flashing
@@ -62,7 +61,7 @@ all:: $(BINDIR)/$(PROJECT).bin
 Build: $(BINDIR)/$(PROJECT).bin
 
 install: $(BINDIR)/$(PROJECT).bin
-	sudo $(OCD) $(OCDFLAGS)
+	$(OCD) $(OCDFLAGS)
 
 debug: $(BINDIR)/$(PROJECT).elf
 	$(GDB) $(BINDIR)/$(PROJECT).elf
@@ -97,6 +96,13 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -o $@ $<
 
+$(OBJDIR)/%.o: $(SRCDIR)/tools/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(GCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(SRCDIR)/tools/%.s
+	@mkdir -p $(dir $@)
+	$(AS) $(ASFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o: $(COMDIR)/%.c
 	@mkdir -p $(dir $@)
