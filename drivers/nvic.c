@@ -22,12 +22,12 @@
   */ 
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x_it.h"
-#include "main.h"
+#include "nvic.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
   */
+uint16_t timer_counter;
 
 /** @addtogroup RCC_ClockConfig
   * @{
@@ -123,7 +123,19 @@ void BusFault_Handler(void)
 
 /**
   * @brief  This function handles Usage Fault exception.
-rief  This function handles SVCall exception.
+  * @param  None
+  * @retval None
+  */
+void UsageFault_Handler(void)
+{
+  /* Go to infinite loop when Usage Fault exception occurs */
+  while (1)
+  {
+  }
+}
+
+/**
+  * @brief  This function handles SVCall exception.
   * @param  None
   * @retval None
   */
@@ -158,27 +170,19 @@ void SysTick_Handler(void)
 {
 }
 
-void TIM2_IRQHandler(void)
-{
-   u8 ReadValue;
-   //检测是否发生溢出更新事件
-   if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
-      //清除TIM2的中断待处理位
-      TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
-      //将PB.5管脚输出数值写入ReadValue
-      ReadValue = GPIO_ReadOutputDataBit(GPIOB,GPIO_Pin_5);
-     
-      if(ReadValue == 0) {
-        GPIO_SetBits(GPIOB,GPIO_Pin_5);
-      }else{
-        GPIO_ResetBits(GPIOB,GPIO_Pin_5);      
-      }
-   }
-}
-
 /******************************************************************************/
 /*            STM32F10x Peripherals Interrupt Handlers                        */
 /******************************************************************************/
+
+void TIM2_IRQHandler(void)
+{
+  //检测是否发生溢出更新事件
+  if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
+    //清除TIM2的中断待处理位
+    TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
+    timer_counter++;
+  }
+}
 
 /**
   * @brief  This function handles RCC interrupt request. 

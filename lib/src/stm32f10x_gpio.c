@@ -20,9 +20,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "../include/STM32/gpio.h"
-#include "../include/STM32/rcc.h"
-#include "../src/conf.h"
+#include "stm32f10x_gpio.h"
+#include "stm32f10x_rcc.h"
+#include "conf.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Driver
   * @{

@@ -1,4 +1,4 @@
-#include "main.h"
+#include "hcsr04.h"
 
 
 int HCSR04_Get(void)
@@ -28,15 +28,15 @@ void GPIO_Conf(void)
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
   
    //配置USARTx_Tx为复合推挽输出
-  GPIO_InitStructure.GPIO_Pin = GPIO_TxPin;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-  GPIO_Init(GPIOx, &GPIO_InitStructure);
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
   
   //配置 USARTx_Rx 为浮空输入
-  GPIO_InitStructure.GPIO_Pin = GPIO_RxPin;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-  GPIO_Init(GPIOx, &GPIO_InitStructure);
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
   
   //HC-SR02 
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1; 
@@ -56,7 +56,7 @@ void NVIC_Conf(void)
   NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0); 
 
   // 打开TIM2中断
-  NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQChannel;
+  NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;

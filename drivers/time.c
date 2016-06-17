@@ -1,4 +1,4 @@
-#include "main.h"
+#include "time.h"
 
 static u8  fac_us=0;//us延时倍乘数			   
 static u16 fac_ms=0;//ms延时倍乘数
@@ -79,7 +79,7 @@ void RCC_Conf(void)
   }
   
   //Enable GPIO timer
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOx, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
   
   //Enable serial timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);

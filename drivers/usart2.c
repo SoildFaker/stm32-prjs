@@ -1,4 +1,4 @@
-#include "main.h"
+#include "usart2.h"
 
 int _read(int file, char *ptr, int len) 
 {
@@ -24,17 +24,17 @@ int _write(int file, char *ptr, int len)
 
 uint8_t UsartPut(uint8_t ch)
 {
-	USART_SendData(USARTx, (uint8_t) ch);
+	USART_SendData(USART2, (uint8_t) ch);
 	//Loop until the end of transmission
-	while(USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET) {
+	while(USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET) {
 	}
   return ch;
 }
 
 uint8_t UsartGet(void)
 {
-	while (USART_GetFlagStatus(USARTx, USART_FLAG_RXNE) == RESET);
-	return (uint8_t)USART_ReceiveData(USARTx);
+	while (USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET);
+	return (uint8_t)USART_ReceiveData(USART2);
 }
 
 void USART_Conf(void)
@@ -48,9 +48,9 @@ void USART_Conf(void)
   USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
   USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
   //初始化串口
-  USART_Init(USARTx, &USART_InitStructure);
+  USART_Init(USART2, &USART_InitStructure);
   //启动串口
-  USART_Cmd(USARTx, ENABLE);
+  USART_Cmd(USART2, ENABLE);
 }
 
 

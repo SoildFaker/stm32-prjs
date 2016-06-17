@@ -1,26 +1,26 @@
 # Makefile for the STM32F103C8
 #
-# Modified from Kevin Cuzner by Enbin Li
+# Enbin Li
 #
 
 PROJECT = copter
 
 # Project Structure
-SRCDIR = src
-COMDIR = common
-BINDIR = bin
-OBJDIR = obj
-INCDIR = include
+SRCDIR = project
+BINDIR = project/bin
+OBJDIR = project/obj
+DRVDIR = drivers
+LIBDIR = lib/src
 
 # Project target
 CPU = cortex-m3
 
 # Sources
-SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/tools/*.c) $(wildcard $(COMDIR)/*.c)
-ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(SRCDIR)/tools/*.s) $(wildcard $(COMDIR)/*.s)
+SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(DRVDIR)/*.c) $(wildcard $(LIBDIR)/*.c)
+ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(DRVDIR)/*.s)
 
 # Include directories
-INCLUDE  = -I$(INCDIR) -I$(INCDIR)/STM32 -I$(INCDIR)/CMSIS -I$(INCDIR)/DMP -I$(INCDIR)/IIC -I$(INCDIR)/MPU6050
+INCLUDE  = -Icmsis -Ilib/inc -Idrivers 
 
 # Linker 
 LSCRIPT = STM32F103X8_FLASH.ld
@@ -96,18 +96,19 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o: $(SRCDIR)/tools/%.c
+
+$(OBJDIR)/%.o: $(LIBDIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(GCFLAGS) -c $< -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/tools/%.s
+$(OBJDIR)/%.o: $(LIBDIR)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o: $(COMDIR)/%.c
+$(OBJDIR)/%.o: $(DRVDIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(GCFLAGS) -c $< -o $@
 
-$(OBJDIR)/%.o: $(COMDIR)/%.s
+$(OBJDIR)/%.o: $(DRVDIR)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -o $@ $<

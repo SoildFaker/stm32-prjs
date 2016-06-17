@@ -1,5 +1,8 @@
-#include "main.h"
+#include "conf.h"
 
+#define  I2C_Speed                400000
+#define  I2C1_SLAVE_ADDRESS7      0xA0
+#define  I2C_PageSize             8
 
 void I2C_Conf(void)
 {
