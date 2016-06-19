@@ -1,0 +1,76 @@
+//以指定的宽度发送十进制数的ascii码。
+int usart_send_num(uint32_t num)
+{
+  int data[5]={0};
+  int tmp = num;
+  int r = 0, i;
+  while(tmp>0){
+    data[r] = tmp % 10;
+    r++;
+    tmp /= 10;
+  }
+  for (i = r-1; i >= 0; --i) {
+    Uartx_PutChar(data[i]+'0');
+  }
+  if(r==0){
+    Uartx_PutChar('0');
+  }
+  return 0;
+}
+
+int printf(char *fmt, ...)
+{
+   char *p = (char *)&fmt + sizeof(fmt);
+   uint8_t temp = 0;
+   while (1) {
+    temp = *fmt;
+    if (temp == '\0')
+      break;
+    /*else if (temp == '\\')*/
+      /*Uartx_PutChar(*++fmt);*/
+    else if (temp == '%') {
+      fmt++;
+      if (*fmt == 'd')
+        usart_send_num(*((int *)p));
+      p += sizeof(int);
+    }else{
+      Uartx_PutChar(temp);
+    }
+    fmt++;
+  }
+   return 0;
+}
+
+
+u8 Uartx_PutChar(u8 ch)
+{
+  /* Write a character to the USART */
+  USART_SendData(USARTx, (u8) ch);
+  while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET) {
+  }
+  return ch;
+}
+
+
+int _read(int file, char *ptr, int len) 
+{
+  int n;
+  int num = 0;
+  for (n = 0; n < len; n++) {
+     char c = UsartGet();
+    *ptr++ = c;
+    num++;
+  }
+  return num;
+}
+
+int _write(int file, char *ptr, int len) 
+{
+  int n;
+  for (n = 0; n < len; n++) {
+     UsartPut(*ptr++);
+  }
+  return len;
+}
+
+

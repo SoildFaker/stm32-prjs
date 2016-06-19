@@ -1,35 +1,34 @@
 # Makefile for the STM32F103C8
 #
-# Modified from Kevin Cuzner by Enbin Li
+# Enbin Li
 #
 
 PROJECT = copter
 
 # Project Structure
-SRCDIR = src
-COMDIR = common
-BINDIR = bin
-OBJDIR = obj
-INCDIR = include
-PERINC = src/include
+SRCDIR = project
+BINDIR = project/bin
+OBJDIR = project/obj
+DRVDIR = drivers
+LIBDIR = lib/src
 
 # Project target
 CPU = cortex-m3
 
 # Sources
-SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(COMDIR)/*.c)
-ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(COMDIR)/*.s)
+SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(DRVDIR)/*.c) $(wildcard $(LIBDIR)/*.c)
+ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(DRVDIR)/*.s)
 
 # Include directories
-INCLUDE  = -I$(INCDIR) -Icmsis -I$(PERINC)
+INCLUDE  = -Icmsis -Ilib/inc -Idrivers 
 
 # Linker 
 LSCRIPT = STM32F103X8_FLASH.ld
 
 # C Flags
-GCFLAGS  = -Wall -fno-common -mthumb -mcpu=$(CPU) -DSTM32F103xB --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
+GCFLAGS  = -Wall -fno-common -mcpu=$(CPU) -mthumb -DSTM32F103xB --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
 GCFLAGS += $(INCLUDE)
-LDFLAGS += -T$(LSCRIPT) -mthumb -mcpu=$(CPU) --specs=nosys.specs 
+LDFLAGS += -T$(LSCRIPT) -mthumb -mcpu=$(CPU) --specs=nosys.specs -u _printf_float -u _scanf_float
 ASFLAGS += -mcpu=$(CPU)
 
 # Flashing
@@ -62,7 +61,7 @@ all:: $(BINDIR)/$(PROJECT).bin
 Build: $(BINDIR)/$(PROJECT).bin
 
 install: $(BINDIR)/$(PROJECT).bin
-	sudo $(OCD) $(OCDFLAGS)
+	$(OCD) $(OCDFLAGS)
 
 debug: $(BINDIR)/$(PROJECT).elf
 	$(GDB) $(BINDIR)/$(PROJECT).elf
@@ -98,10 +97,18 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.s
 	$(AS) $(ASFLAGS) -o $@ $<
 
 
-$(OBJDIR)/%.o: $(COMDIR)/%.c
+$(OBJDIR)/%.o: $(LIBDIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(GCFLAGS) -c $< -o $@
 
-$(OBJDIR)/%.o: $(COMDIR)/%.s
+$(OBJDIR)/%.o: $(LIBDIR)/%.s
+	@mkdir -p $(dir $@)
+	$(AS) $(ASFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(DRVDIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(GCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(DRVDIR)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -o $@ $<
