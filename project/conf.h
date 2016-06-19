@@ -18,7 +18,7 @@
 //#include "stm32f10x_spi.h"
 //#include "stm32f10x_wwdg.h"
 //#include "stm32f10x_dma.h"
-//#include "stm32f10x_i2c.h"
+#include "stm32f10x_i2c.h"
 #include "stm32f10x_tim.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
@@ -33,11 +33,15 @@
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
 #include "mpu6050.h"
-#include "time.h"
-#include "usart2.h"
-#include "hcsr04.h"
 
 
+/* functions -----------------------------------------------------------------*/
+void USART_Conf(void);
+void I2C_Conf(void);
+void RCC_Conf(void);
+void TIMER_Conf(void);
+void GPIO_Conf(void);
+void NVIC_Conf(void);
 /* #define USE_FULL_ASSERT    1 */
 
 /* Exported macro ------------------------------------------------------------*/
