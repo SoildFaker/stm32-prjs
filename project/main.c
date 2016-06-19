@@ -1,8 +1,14 @@
 /**
  * STM32F103C8 Quadrocopter
  */
-#include "main.h"
-#include "time.h"
+#include "tools.h"
+#include <stdio.h>
+#include <math.h>
+
+/* Exported constants --------------------------------------------------------*/
+#define SYSCLK_FREQ_72MHz
+#define _DLIB_PRINTF_SPECIFIER_FLOAT
+
 
 int main(void)
 {
