@@ -23,7 +23,7 @@ void I2C_Conf(void)
 {
   I2C_InitTypeDef  I2C_InitStructure; 
 
-  /* I2C configuration */
+  /*[> I2C configuration <]*/
   I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
   I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
   I2C_InitStructure.I2C_OwnAddress1 = I2C_SLAVE_ADDRESS;
@@ -31,9 +31,9 @@ void I2C_Conf(void)
   I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
   I2C_InitStructure.I2C_ClockSpeed = I2C_Speed;
   
-  /* Apply I2C configuration after enabling it */
+  /*[> Apply I2C configuration after enabling it <]*/
   I2C_Init(MPU_I2Cx, &I2C_InitStructure);
-  /* I2C Peripheral Enable */
+  /*[> I2C Peripheral Enable <]*/
   I2C_Cmd(MPU_I2Cx, ENABLE);
 }
 
@@ -75,10 +75,10 @@ void RCC_Conf(void)
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
   //Enable GPIO timer
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);//使能I2C的IO口    
+  /*RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);//使能I2C的IO口    */
 
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);//使能I2C的IO口    
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);//使能I2C的IO口    
+  /*RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);//使能I2C的IO口    */
 
   //Enable serial timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
@@ -130,9 +130,9 @@ void GPIO_Conf(void)
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
   //I2C配置
-  GPIO_InitStructure.GPIO_Pin = SDA_Pin | SCL_Pin;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;// 开漏输出
-  GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化结构体配置
+  /*GPIO_InitStructure.GPIO_Pin = SDA_Pin | SCL_Pin;*/
+  /*GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;// 开漏输出*/
+  /*GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化结构体配置*/
 }
 
 // 系统中断控制

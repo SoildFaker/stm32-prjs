@@ -12,20 +12,16 @@ int main(void)
 {
   SystemInit();
   UserInit();
-  printf("debug:MPU\r\n");
   MPU6050_Init();
-  printf("debug:DMP\r\n");
   DMP_Init();
 
-  printf("debug:Start\r\n");
 
   while (1) {  
     printf("height:%d\r\n", HCSR04_Get());
     Read_DMP();
-    DelayUs(1000);
     printf("string:%s\r\n", "Hello World.");
-    printf("float:%lf\r\n", Pitch);
-    DelayMs(1000);
+    printf("quad[0]:%d\r\n", iPitch);
+    DelayMs(10000);
   }
   return 0;
 }

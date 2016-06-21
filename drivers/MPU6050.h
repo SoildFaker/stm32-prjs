@@ -2,7 +2,6 @@
 #define __MPU6050_H
 
 #include "conf.h"
-
 #define devAddr  0xD0
 
 #define MPU6050_ADDRESS_AD0_LOW     0x68 // address pin low (GND), default for InvenSense evaluation board
@@ -41,7 +40,7 @@
 #define MPU6050_RA_I2C_MST_CTRL     0x24
 #define MPU6050_RA_I2C_SLV0_ADDR    0x25
 #define MPU6050_RA_I2C_SLV0_REG     0x26
-#define MPU6050_RA_I2C_SLV0_CTRL    0x27
+# define MPU6050_RA_I2C_SLV0_CTRL    0x27
 #define MPU6050_RA_I2C_SLV1_ADDR    0x28
 #define MPU6050_RA_I2C_SLV1_REG     0x29
 #define MPU6050_RA_I2C_SLV1_CTRL    0x2A
@@ -354,22 +353,21 @@
 
 #define MPU6050_WHO_AM_I_BIT        6
 #define MPU6050_WHO_AM_I_LENGTH     6
-
-extern short gyro[3], accel[3];
-extern int Gx_offset, Gy_offset, Gz_offset;
+extern	short gyro[3], accel[3];
+extern int16_t Gx_offset,Gy_offset,Gz_offset;
 extern float Acc1G_Values;
-extern float Pitch, Roll, Yaw;
-
-//渚涘閮ㄨ皟鐢ㄧ殑API
-//
-void MPU6050_Init(void);
-uint8_t MPU6050_TestConnection(void);
-void MPU6050_GetMotion6(int* ax, int* ay, int* az, int* gx, int* gy, int* gz);
-void MPU6050_GetlastMotion6(int* ax, int* ay, int* az, int* gx, int* gy, int* gz);
-uint8_t MPU6050_GetDeviceID(void);
-void MPU6050_InitGyro_Offset(void);
+extern float Pitch;
+extern uint16_t iPitch;
+//供外部调用的API
+void MPU6050_Init(void); //初始化
+uint8_t MPU6050_testConnection(void); //检测MPU6050是否存在
+//读取ADC值
+void MPU6050_getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz);
+void MPU6050_getlastMotion6(int16_t* ax, int16_t* ay, 
+		int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz);
+uint8_t MPU6050_getDeviceID(void); //读取MPU6050的ID
+void MPU6050_InitGyro_Offset(void);//初始化陀螺仪偏置
 void DMP_Init(void);
 void Read_DMP(void);
 int Read_Temperature(void);
-
 #endif

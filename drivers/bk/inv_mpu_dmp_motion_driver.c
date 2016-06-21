@@ -9,8 +9,9 @@
  *      @details    All functions are preceded by the dmp_ prefix to
  *                  differentiate among MPL and general driver function calls.
  */
-#include "conf.h"
 
+#include "conf.h"
+#include "tools.h"
 
 #define  MOTION_DRIVER_TARGET_MSP430
 /* The following functions must be defined for this platform:

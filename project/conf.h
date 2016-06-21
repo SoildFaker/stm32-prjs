@@ -48,10 +48,10 @@
 #define  TRIG_Pin                 GPIO_Pin_1
 #define  ECHO_Pin                 GPIO_Pin_0
 //陀螺仪接口 GPIOB
-#define  SDA_Pin                  GPIO_Pin_13
-#define  SCL_Pin                  GPIO_Pin_12
+#define  SDA_Pin                  GPIO_Pin_9
+#define  SCL_Pin                  GPIO_Pin_8
 #define  MPU_I2Cx                 I2C2
-#define  I2C_Speed                40000
+#define  I2C_Speed                400000
 #define  I2C_SLAVE_ADDRESS        0xD0
 #define  I2C_PageSize             8
 
