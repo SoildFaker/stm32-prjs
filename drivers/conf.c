@@ -1,13 +1,5 @@
 #include "conf.h"
 
-#define  GPIO_RxPin               GPIO_Pin_3              // out port
-#define  GPIO_TxPin               GPIO_Pin_2              // in port
-#define  SDA_Pin                  GPIO_Pin_11             // IIC SDA
-#define  SCL_Pin                  GPIO_Pin_10             // IIC SCL
-#define  I2C_Speed                400000
-#define  I2C1_SLAVE_ADDRESS7      0xA0
-#define  I2C_PageSize             8
-
 ErrorStatus HSEStartUpStatus;
 // 串口相关配置
 void USART_Conf(void)
@@ -31,18 +23,18 @@ void I2C_Conf(void)
 {
   I2C_InitTypeDef  I2C_InitStructure; 
 
-  /* I2C configuration */
+  /*[> I2C configuration <]*/
   I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
   I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
-  I2C_InitStructure.I2C_OwnAddress1 = I2C1_SLAVE_ADDRESS7;
+  I2C_InitStructure.I2C_OwnAddress1 = I2C_SLAVE_ADDRESS;
   I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
   I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
   I2C_InitStructure.I2C_ClockSpeed = I2C_Speed;
   
-  /* I2C Peripheral Enable */
-  I2C_Cmd(I2C2, ENABLE);
-  /* Apply I2C configuration after enabling it */
-  I2C_Init(I2C2, &I2C_InitStructure);
+  /*[> Apply I2C configuration after enabling it <]*/
+  I2C_Init(MPU_I2Cx, &I2C_InitStructure);
+  /*[> I2C Peripheral Enable <]*/
+  I2C_Cmd(MPU_I2Cx, ENABLE);
 }
 
 void RCC_Conf(void)
@@ -80,12 +72,20 @@ void RCC_Conf(void)
   }
   }
   
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
   //Enable GPIO timer
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-  
+  /*RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);//使能I2C的IO口    */
+
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);//使能I2C的IO口    
+  /*RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);//使能I2C的IO口    */
+
   //Enable serial timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIM2
+
+  //开启AFIO时钟
 }
 
 // 定时器设置 
@@ -93,7 +93,6 @@ void TIMER_Conf(void)
 {
   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
   
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIM2
   TIM_TimeBaseStructure.TIM_Prescaler = 71;  //时钟预分频数 例如:时钟频率=72/(时钟预分频+1)  
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; ////定时器模式 向上计数  
   TIM_TimeBaseStructure.TIM_Period = 0xffff;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
@@ -111,34 +110,29 @@ void GPIO_Conf(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   
-  //开启AFIO时钟
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-  
-   //配置USARTx_Tx为复合推挽输出
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+  //USARTx_Tx为复合推挽输出
+  GPIO_InitStructure.GPIO_Pin = GPIO_TxPin;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   
-  //配置 USARTx_Rx 为浮空输入
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+  //USARTx_Rx 为浮空输入
+  GPIO_InitStructure.GPIO_Pin = GPIO_RxPin;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   
-  //HC-SR02 
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1; 
+  //HC-SR04 
+  GPIO_InitStructure.GPIO_Pin = TRIG_Pin; 
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; 
+  GPIO_InitStructure.GPIO_Pin = ECHO_Pin; 
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
   //I2C配置
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);//使能I2C的IO口    
-  GPIO_InitStructure.GPIO_Pin = SDA_Pin | SCL_Pin;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;// 开漏输出
-  GPIO_Init(GPIOB,&GPIO_InitStructure);//初始化结构体配置
+  /*GPIO_InitStructure.GPIO_Pin = SDA_Pin | SCL_Pin;*/
+  /*GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;// 开漏输出*/
+  /*GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化结构体配置*/
 }
 
 // 系统中断控制

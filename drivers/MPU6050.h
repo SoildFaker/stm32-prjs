@@ -1,6 +1,7 @@
 #ifndef __MPU6050_H
 #define __MPU6050_H
 
+#include "conf.h"
 #define devAddr  0xD0
 
 #define MPU6050_ADDRESS_AD0_LOW     0x68 // address pin low (GND), default for InvenSense evaluation board
@@ -355,7 +356,8 @@
 extern	short gyro[3], accel[3];
 extern int16_t Gx_offset,Gy_offset,Gz_offset;
 extern float Acc1G_Values;
-extern float Pitch, Roll, Yaw;
+extern float Pitch;
+extern uint16_t iPitch;
 //供外部调用的API
 void MPU6050_Init(void); //初始化
 uint8_t MPU6050_testConnection(void); //检测MPU6050是否存在

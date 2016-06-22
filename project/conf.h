@@ -32,8 +32,31 @@
 #include "dmpmap.h"
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
-#include "mpu6050.h"
+#include "MPU6050.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <errno.h>
+#include <string.h>
+
+/* Constant ------------------------------------------------------------------*/
+//串口通讯接口 GPIOA
+#define  GPIO_RxPin               GPIO_Pin_3              
+#define  GPIO_TxPin               GPIO_Pin_2              
+//超声波测距接口 GPIOA
+#define  TRIG_Pin                 GPIO_Pin_1
+#define  ECHO_Pin                 GPIO_Pin_0
+//陀螺仪接口 GPIOB
+#define  SDA_Pin                  GPIO_Pin_9
+#define  SCL_Pin                  GPIO_Pin_8
+#define  MPU_I2Cx                 I2C2
+#define  I2C_Speed                400000
+#define  I2C_SLAVE_ADDRESS        0xD0
+#define  I2C_PageSize             8
+
+#define SYSCLK_FREQ_72MHz
+#define _DLIB_PRINTF_SPECIFIER_FLOAT
 
 /* functions -----------------------------------------------------------------*/
 void USART_Conf(void);

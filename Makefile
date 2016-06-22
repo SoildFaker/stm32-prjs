@@ -26,9 +26,10 @@ INCLUDE  = -Icmsis -Ilib/inc -Idrivers
 LSCRIPT = STM32F103X8_FLASH.ld
 
 # C Flags
-GCFLAGS  = -Wall -fno-common -mcpu=$(CPU) -mthumb -DSTM32F103xB --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
+GCFLAGS  = -Wall -fno-common -mcpu=$(CPU) -mthumb --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
+GCFLAGS += -fno-math-errno -msoft-float -std=gnu89 -O1
 GCFLAGS += $(INCLUDE)
-LDFLAGS += -T$(LSCRIPT) -mthumb -mcpu=$(CPU) --specs=nosys.specs -u _printf_float -u _scanf_float
+LDFLAGS += -T$(LSCRIPT) -mthumb -mcpu=$(CPU) --specs=nosys.specs -u _printf_float -u _scanf_float -lm 
 ASFLAGS += -mcpu=$(CPU)
 
 # Flashing
