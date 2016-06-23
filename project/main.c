@@ -16,7 +16,7 @@ int main(void)
   DMP_Init();
 
 
-  while (1) {  
+  while (1) {
     printf("height:%d\r\n", HCSR04_Get());
     Read_DMP();
     printf("string:%s\r\n", "Hello World.");
