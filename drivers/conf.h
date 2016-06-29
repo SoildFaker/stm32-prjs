@@ -27,9 +27,7 @@
 #include "stm32f10x_usart.h"
 #include "stm32f10x.h"
 #include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
-#include "dmpKey.h"
 #include "nvic.h"
-#include "dmpmap.h"
 #include "MPU6050.h"
 
 #include <stdio.h>
