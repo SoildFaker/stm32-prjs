@@ -1,5 +1,4 @@
 #include "tools.h"
-#include "IOI2C.h"
 
 static u8  fac_us=0;//us延时倍乘数			   
 static u16 fac_ms=0;//ms延时倍乘数
@@ -13,8 +12,8 @@ void UserInit(void)
   TIMER_Conf();
   DelayInit(72);
 
-  /*I2C_Conf();*/
-  IIC_Init();
+  MPU6050_I2C_Init();
+  MPU6050_Initialize();
 }
 
 int HCSR04_Get(void)
@@ -74,118 +73,6 @@ uint8_t UsartGet(void)
 	while (USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET);
 	return (uint8_t)USART_ReceiveData(USART2);
 }
-
-/*// IIC写字节*/
-/*void I2C_ByteWrite(uint8_t HardwareAddr, uint8_t WriteAddr, uint8_t data)*/
-/*{*/
-  /*printf("debug:A\r\n");*/
-  /*I2C_GenerateSTART(MPU_I2Cx, ENABLE);*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_MODE_SELECT));*/
-  /*printf("debug:B\r\n");*/
-  /*I2C_Send7bitAddress(MPU_I2Cx, HardwareAddr,I2C_Direction_Transmitter);*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));*/
-  /*I2C_SendData(MPU_I2Cx, WriteAddr);*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));*/
-  /*I2C_SendData(MPU_I2Cx, data);*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));*/
-  /*I2C_GenerateSTOP(MPU_I2Cx, ENABLE);*/
-/*}*/
-
-/*// IIC写数据*/
-/*uint8_t I2C_Write(uint8_t HardwareAddr, uint8_t WriteAddr, uint8_t NumByteToWrite, uint8_t *pData)*/
-/*{*/
-  /*I2C_GenerateSTART(MPU_I2Cx, ENABLE);*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_MODE_SELECT));*/
-  /*I2C_Send7bitAddress(MPU_I2Cx, HardwareAddr,I2C_Direction_Transmitter);*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));*/
-  /*I2C_SendData(MPU_I2Cx, WriteAddr);*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));*/
-  /*while(NumByteToWrite){*/
-    /*if(I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED)){*/
-      /*I2C_SendData(MPU_I2Cx, *pData);*/
-      /*pData++;*/
-      /*NumByteToWrite--;*/
-    /*}*/
-  /*}*/
-  /*I2C_GenerateSTOP(MPU_I2Cx, ENABLE);*/
-  /*return 0;*/
-/*}*/
-
-/*// I2C 读字节*/
-/*uint8_t I2C_ByteRead(uint8_t HardwareAddr, uint8_t ReadAddr)*/
-/*{*/
-  /*uint8_t receive = 0;*/
-  /*while(I2C_GetFlagStatus(MPU_I2Cx, I2C_FLAG_BUSY));//检查I2C是否忙碌中*/
-  /*I2C_GenerateSTART(MPU_I2Cx, ENABLE);//产生开始信号*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_MODE_SELECT));//清除EV5*/
-  /*I2C_Send7bitAddress(MPU_I2Cx, HardwareAddr, I2C_Direction_Transmitter);//写入器件*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));//清除EV6*/
-  /*I2C_SendData(MPU_I2Cx, ReadAddr);//发送要读取的地址*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));//清除EV8*/
-  /*I2C_GenerateSTART(MPU_I2Cx, ENABLE);//开启信号*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_MODE_SELECT));//清除EV5*/
-  /*I2C_Send7bitAddress(MPU_I2Cx, HardwareAddr, I2C_Direction_Receiver);//读数据*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));//清除EV6*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED));*/
-  /*receive = I2C_ReceiveData(MPU_I2Cx);*/
-  /*I2C_AcknowledgeConfig(MPU_I2Cx, DISABLE);*/
-  /*I2C_GenerateSTOP(MPU_I2Cx, ENABLE);*/
-  /*I2C_AcknowledgeConfig(MPU_I2Cx, ENABLE);*/
-  /*return receive;*/
-/*}*/
-
-/*// I2C 读连续数据*/
-/*uint8_t I2C_Read(uint8_t HardwareAddr, uint8_t ReadAddr, uint16_t NumByteToRead, uint8_t *pBuffer)*/
-/*{*/
-  /*while(I2C_GetFlagStatus(MPU_I2Cx, I2C_FLAG_BUSY));//检查I2C是否忙碌中*/
-  /*I2C_GenerateSTART(MPU_I2Cx, ENABLE);//产生开始信号*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_MODE_SELECT));//清除EV5*/
-  /*I2C_Send7bitAddress(MPU_I2Cx, HardwareAddr, I2C_Direction_Transmitter);//写入器件*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));//清除EV6*/
-  /*I2C_SendData(MPU_I2Cx, ReadAddr);//发送要读取的地址*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));//清除EV8*/
-  /*I2C_GenerateSTART(MPU_I2Cx, ENABLE);//开启信号*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_MODE_SELECT));//清除EV5*/
-  /*I2C_Send7bitAddress(MPU_I2Cx, HardwareAddr, I2C_Direction_Receiver);//读数据*/
-  /*while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));//清除EV6*/
-  /*while(NumByteToRead){//接受数据*/
-    /*if (NumByteToRead == 1) {//最后一个数据时关闭应答*/
-      /*I2C_AcknowledgeConfig(MPU_I2Cx, DISABLE);*/
-      /*I2C_GenerateSTOP(MPU_I2Cx, ENABLE);*/
-    /*}*/
-    /*if (I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED)) {*/
-      /**pBuffer = I2C_ReceiveData(MPU_I2Cx);*/
-      /*pBuffer++;*/
-      /*NumByteToRead--;*/
-    /*}*/
-  /*}*/
-  /*I2C_AcknowledgeConfig(MPU_I2Cx, ENABLE);*/
-  /*return 0;*/
-
-/*}*/
-/*// 读修改写 指定设备 指定寄存器一个字节 中的多个位*/
-/*void I2C_BitsWrite(uint8_t HardwareAddr, uint8_t WriteAddr, uint8_t BitStart, uint8_t Length, uint8_t Data)*/
-/*{*/
-  /*uint8_t b;*/
-  /*b = I2C_ByteRead(HardwareAddr, WriteAddr);*/
-  /*printf("debug:%d\r\n",b);*/
-  /*u8 mask = (0xFF << (BitStart + 1)) | 0xFF >> ((8 - BitStart) + Length - 1);*/
-  /*Data <<= (8 - Length);*/
-  /*Data >>= (7 - BitStart);*/
-  /*b &= mask;*/
-  /*b |= Data;*/
-  /*printf("debug:%d\r\n",b);*/
-  /*I2C_ByteWrite(HardwareAddr, WriteAddr, b);*/
-
-/*}*/
-/*//读修改写 指定设备 指定寄存器一个字节 中的1个位*/
-/*void I2C_BitWrite(uint8_t HardwareAddr, uint8_t WriteAddr, uint8_t BitNum, uint8_t Data)*/
-/*{*/
-  /*uint8_t b;*/
-  /*b = I2C_ByteRead(HardwareAddr, WriteAddr);*/
-  /*b = (Data != 0) ? (b | (1 << BitNum)) : (b & ~(1 << BitNum));*/
-  /*I2C_ByteWrite(HardwareAddr, WriteAddr, b);*/
-/*}*/
 
 //初始化延迟函数
 void DelayInit(u8 SYSCLK)

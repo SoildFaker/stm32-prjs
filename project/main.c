@@ -10,18 +10,17 @@
 
 int main(void)
 {
+  int16_t AccelGyro[8];
   SystemInit();
   UserInit();
-  MPU6050_Init();
-  DMP_Init();
 
 
   while (1) {
+    MPU6050_GetRawAccelGyro(AccelGyro);
     printf("height:%d\r\n", HCSR04_Get());
-    Read_DMP();
     printf("string:%s\r\n", "Hello World.");
-    printf("quad[0]:%d\r\n", iPitch);
-    DelayMs(10000);
+    printf("quad[0]:%d\r\n", AccelGyro[0]);
+    DelayMs(1000);
   }
   return 0;
 }

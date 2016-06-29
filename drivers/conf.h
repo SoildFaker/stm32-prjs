@@ -30,8 +30,6 @@
 #include "dmpKey.h"
 #include "nvic.h"
 #include "dmpmap.h"
-#include "inv_mpu.h"
-#include "inv_mpu_dmp_motion_driver.h"
 #include "MPU6050.h"
 
 #include <stdio.h>
@@ -48,12 +46,15 @@
 #define  TRIG_Pin                 GPIO_Pin_1
 #define  ECHO_Pin                 GPIO_Pin_0
 //陀螺仪接口 GPIOB
-#define  SDA_Pin                  GPIO_Pin_9
-#define  SCL_Pin                  GPIO_Pin_8
+#define  SDA_Pin                  GPIO_Pin_11
+#define  SCL_Pin                  GPIO_Pin_10
 #define  MPU_I2Cx                 I2C2
 #define  I2C_Speed                400000
 #define  I2C_SLAVE_ADDRESS        0xD0
 #define  I2C_PageSize             8
+
+#define  TRUE                     1
+#define  FALSE                    0
 
 #define SYSCLK_FREQ_72MHz
 #define _DLIB_PRINTF_SPECIFIER_FLOAT

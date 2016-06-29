@@ -72,20 +72,16 @@ void RCC_Conf(void)
   }
   }
   
+  //开启AFIO时钟
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
   //Enable GPIO timer
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-  /*RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);//使能I2C的IO口    */
-
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);//使能I2C的IO口    
-  /*RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);//使能I2C的IO口    */
 
   //Enable serial timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIM2
 
-  //开启AFIO时钟
 }
 
 // 定时器设置 
@@ -128,11 +124,6 @@ void GPIO_Conf(void)
   GPIO_InitStructure.GPIO_Pin = ECHO_Pin; 
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-  //I2C配置
-  /*GPIO_InitStructure.GPIO_Pin = SDA_Pin | SCL_Pin;*/
-  /*GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;// 开漏输出*/
-  /*GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化结构体配置*/
 }
 
 // 系统中断控制
