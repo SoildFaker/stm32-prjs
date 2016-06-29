@@ -5,6 +5,7 @@
 
 int HCSR04_Get(void);
 uint8_t UsartPut(uint8_t ch);
+void getAttitude(int16_t* AccelGyro);
 uint8_t UsartGet(void);
 void DelayInit(u8 SYSCLK);
 void DelayUs(u32 nus);

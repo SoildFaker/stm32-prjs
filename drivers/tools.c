@@ -6,11 +6,10 @@ static u16 fac_ms=0;//ms延时倍乘数
 void UserInit(void)
 {
   RCC_Conf();
-  NVIC_Conf();
   GPIO_Conf();
-  USART_Conf();  
+  NVIC_Conf();
   TIMER_Conf();
-  DelayInit(72);
+  USART_Conf();  
 
   MPU6050_I2C_Init();
   MPU6050_Initialize();
@@ -35,6 +34,20 @@ int HCSR04_Get(void)
   return length;
 }
 
+void getAttitude(int16_t* attitude)
+{
+  double gyrofac = 8.192*2;
+  double accelfac = 6.536;
+  int16_t AccelGyro[6];
+  double x,y,z;
+  MPU6050_GetRawAccelGyro(AccelGyro);
+  /*AccelGyro[0]/=gyrofac; AccelGyro[1]/=gyrofac; AccelGyro[2]/=gyrofac;*/
+  x=(float)AccelGyro[0]/1000;y=(float)AccelGyro[1]/1000;z=(float)AccelGyro[2]/1000;
+  AccelGyro[3]/=accelfac; AccelGyro[4]/=accelfac; AccelGyro[5]/=accelfac;
+  attitude[0]=atan(y/x)*1000;
+  attitude[1]=atan(x/y)*1000;
+  attitude[2]=atan(x/z)*1000;
+}
 
 int _read(int file, char *ptr, int len) 
 {
@@ -102,6 +115,13 @@ void DelayMs(u16 nms)
 {	 		  	  
 	u32 temp;		   
 	SysTick->LOAD=(u32)nms*fac_ms;//时间加载(SysTick->LOAD为24bit)
+  SysTick->VAL=0x00;    //清空计数器
+	SysTick->CTRL=0x01 ;    //开始倒数 	 
+	do {
+		temp=SysTick->CTRL;
+	}
+	while((temp&0x01)&&!(temp&(1<<16)));//等待时间到达   
+	SysTick->CTRL=0x00;     //关闭计数器
 	SysTick->VAL =0x00;       //清空计数器
 }
 
