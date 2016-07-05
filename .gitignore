@@ -1,4 +1,5 @@
 obj/
 bk/
 *.bk
+*.o
 *.lst
