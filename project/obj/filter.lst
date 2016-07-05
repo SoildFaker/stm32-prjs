@@ -1,0 +1,1257 @@
+ARM GAS  /tmp/ccXjpyXR.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"filter.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.global	__aeabi_fsub
+  16              		.global	__aeabi_fmul
+  17              		.global	__aeabi_fadd
+  18              		.global	__aeabi_i2f
+  19              		.global	__aeabi_fdiv
+  20              		.align	1
+  21              		.global	Kalman_Filter
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  25              		.fpu softvfp
+  26              		.type	Kalman_Filter, %function
+  27              	Kalman_Filter:
+  28              	.LFB0:
+  29              		.file 1 "drivers/filter.c"
+   1:drivers/filter.c **** #include "filter.h"
+   2:drivers/filter.c **** float K1 =0.02; 
+   3:drivers/filter.c **** float angle, angle_dot; 	
+   4:drivers/filter.c **** float Q_angle=0.001;// 过程噪声的协方差
+   5:drivers/filter.c **** float Q_gyro=0.003;//0.03 过程噪声的协方差 过程噪声的协方差为一个一行两列矩阵
+   6:drivers/filter.c **** float R_angle=0.5;// 测量噪声的协方差 既测量偏差
+   7:drivers/filter.c **** float dt=0.005;//                 
+   8:drivers/filter.c **** char  C_0 = 1;
+   9:drivers/filter.c **** float Q_bias, Angle_err;
+  10:drivers/filter.c **** float PCt_0, PCt_1, E;
+  11:drivers/filter.c **** float K_0, K_1, t_0, t_1;
+  12:drivers/filter.c **** float Pdot[4] ={0,0,0,0};
+  13:drivers/filter.c **** float PP[2][2] = { { 1, 0 },{ 0, 1 } };
+  14:drivers/filter.c **** 
+  15:drivers/filter.c **** /**************************************************************************
+  16:drivers/filter.c **** 函数功能：简易卡尔曼滤波
+  17:drivers/filter.c **** 入口参数：加速度、角速度
+  18:drivers/filter.c **** 返回  值：无
+  19:drivers/filter.c **** **************************************************************************/
+  20:drivers/filter.c **** void Kalman_Filter(float Accel,float Gyro)		
+  21:drivers/filter.c **** {
+  30              		.loc 1 21 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 40
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  36              		.cfi_def_cfa_offset 36
+ARM GAS  /tmp/ccXjpyXR.s 			page 2
+
+
+  37              		.cfi_offset 4, -36
+  38              		.cfi_offset 5, -32
+  39              		.cfi_offset 6, -28
+  40              		.cfi_offset 7, -24
+  41              		.cfi_offset 8, -20
+  42              		.cfi_offset 9, -16
+  43              		.cfi_offset 10, -12
+  44              		.cfi_offset 11, -8
+  45              		.cfi_offset 14, -4
+  46 0004 8BB0     		sub	sp, sp, #44
+  47              		.cfi_def_cfa_offset 80
+  48 0006 8246     		mov	r10, r0
+  49 0008 0846     		mov	r0, r1
+  50              	.LVL1:
+  22:drivers/filter.c **** 	angle+=(Gyro - Q_bias) * dt; //先验估计
+  51              		.loc 1 22 0
+  52 000a 5C4C     		ldr	r4, .L3
+  53 000c 2368     		ldr	r3, [r4]	@ float
+  54 000e 1A46     		mov	r2, r3
+  55 0010 5B4D     		ldr	r5, .L3+4
+  56 0012 2B68     		ldr	r3, [r5]	@ float
+  57 0014 1E46     		mov	r6, r3
+  58 0016 0592     		str	r2, [sp, #20]	@ float
+  59 0018 1146     		mov	r1, r2
+  60              	.LVL2:
+  61 001a 0790     		str	r0, [sp, #28]	@ float
+  62 001c FFF7FEFF 		bl	__aeabi_fsub
+  63              	.LVL3:
+  64 0020 0196     		str	r6, [sp, #4]	@ float
+  65 0022 3146     		mov	r1, r6
+  66 0024 FFF7FEFF 		bl	__aeabi_fmul
+  67              	.LVL4:
+  68 0028 6168     		ldr	r1, [r4, #4]	@ float
+  69 002a FFF7FEFF 		bl	__aeabi_fadd
+  70              	.LVL5:
+  71 002e 0290     		str	r0, [sp, #8]	@ float
+  23:drivers/filter.c **** 	Pdot[0]=Q_angle - PP[0][1] - PP[1][0]; // Pk-先验估计误差协方差的微分
+  72              		.loc 1 23 0
+  73 0030 D5F80880 		ldr	r8, [r5, #8]	@ float
+  74 0034 EF68     		ldr	r7, [r5, #12]	@ float
+  75 0036 4146     		mov	r1, r8
+  76 0038 6869     		ldr	r0, [r5, #20]	@ float
+  77 003a FFF7FEFF 		bl	__aeabi_fsub
+  78              	.LVL6:
+  79 003e 3946     		mov	r1, r7
+  80 0040 FFF7FEFF 		bl	__aeabi_fsub
+  81              	.LVL7:
+  82 0044 0146     		mov	r1, r0
+  83 0046 A060     		str	r0, [r4, #8]	@ float
+  24:drivers/filter.c **** 
+  25:drivers/filter.c **** 	Pdot[1]=-PP[1][1];
+  84              		.loc 1 25 0
+  85 0048 D5F810B0 		ldr	fp, [r5, #16]	@ float
+  86 004c 0BF10046 		add	r6, fp, #-2147483648
+  87 0050 E660     		str	r6, [r4, #12]	@ float
+  26:drivers/filter.c **** 	Pdot[2]=-PP[1][1];
+  88              		.loc 1 26 0
+ARM GAS  /tmp/ccXjpyXR.s 			page 3
+
+
+  89 0052 2661     		str	r6, [r4, #16]	@ float
+  27:drivers/filter.c **** 	Pdot[3]=Q_gyro;
+  90              		.loc 1 27 0
+  91 0054 D5F81890 		ldr	r9, [r5, #24]	@ float
+  92 0058 C4F81490 		str	r9, [r4, #20]	@ float
+  28:drivers/filter.c **** 	PP[0][0] += Pdot[0] * dt;   // Pk-先验估计误差协方差微分的积分
+  93              		.loc 1 28 0
+  94 005c 0198     		ldr	r0, [sp, #4]	@ float
+  95 005e FFF7FEFF 		bl	__aeabi_fmul
+  96              	.LVL8:
+  97 0062 6968     		ldr	r1, [r5, #4]	@ float
+  98 0064 FFF7FEFF 		bl	__aeabi_fadd
+  99              	.LVL9:
+ 100 0068 0390     		str	r0, [sp, #12]	@ float
+  29:drivers/filter.c **** 	PP[0][1] += Pdot[1] * dt;   // =先验估计误差协方差
+ 101              		.loc 1 29 0
+ 102 006a 3146     		mov	r1, r6
+ 103 006c 0198     		ldr	r0, [sp, #4]	@ float
+ 104 006e FFF7FEFF 		bl	__aeabi_fmul
+ 105              	.LVL10:
+ 106 0072 0646     		mov	r6, r0
+ 107 0074 0146     		mov	r1, r0
+ 108 0076 4046     		mov	r0, r8
+ 109 0078 FFF7FEFF 		bl	__aeabi_fadd
+ 110              	.LVL11:
+ 111 007c 0490     		str	r0, [sp, #16]	@ float
+  30:drivers/filter.c **** 	PP[1][0] += Pdot[2] * dt;
+ 112              		.loc 1 30 0
+ 113 007e 3146     		mov	r1, r6
+ 114 0080 3846     		mov	r0, r7
+ 115 0082 FFF7FEFF 		bl	__aeabi_fadd
+ 116              	.LVL12:
+ 117 0086 8046     		mov	r8, r0
+  31:drivers/filter.c **** 	PP[1][1] += Pdot[3] * dt;
+  32:drivers/filter.c **** 		
+  33:drivers/filter.c **** 	Angle_err = Accel - angle;	//zk-先验估计
+ 118              		.loc 1 33 0
+ 119 0088 0299     		ldr	r1, [sp, #8]	@ float
+ 120 008a 5046     		mov	r0, r10
+ 121 008c FFF7FEFF 		bl	__aeabi_fsub
+ 122              	.LVL13:
+ 123 0090 0990     		str	r0, [sp, #36]	@ float
+ 124 0092 A061     		str	r0, [r4, #24]	@ float
+  34:drivers/filter.c **** 	
+  35:drivers/filter.c **** 	PCt_0 = C_0 * PP[0][0];
+ 125              		.loc 1 35 0
+ 126 0094 287F     		ldrb	r0, [r5, #28]	@ zero_extendqisi2
+ 127 0096 FFF7FEFF 		bl	__aeabi_i2f
+ 128              	.LVL14:
+ 129 009a 0746     		mov	r7, r0
+ 130 009c 0146     		mov	r1, r0
+ 131 009e 0398     		ldr	r0, [sp, #12]	@ float
+ 132 00a0 FFF7FEFF 		bl	__aeabi_fmul
+ 133              	.LVL15:
+ 134 00a4 0646     		mov	r6, r0
+ 135 00a6 E061     		str	r0, [r4, #28]	@ float
+  36:drivers/filter.c **** 	PCt_1 = C_0 * PP[1][0];
+ARM GAS  /tmp/ccXjpyXR.s 			page 4
+
+
+ 136              		.loc 1 36 0
+ 137 00a8 3946     		mov	r1, r7
+ 138 00aa CDF82080 		str	r8, [sp, #32]	@ float
+ 139 00ae 4046     		mov	r0, r8
+ 140 00b0 FFF7FEFF 		bl	__aeabi_fmul
+ 141              	.LVL16:
+ 142 00b4 8046     		mov	r8, r0
+ 143 00b6 2062     		str	r0, [r4, #32]	@ float
+  37:drivers/filter.c **** 	
+  38:drivers/filter.c **** 	E = R_angle + C_0 * PCt_0;
+ 144              		.loc 1 38 0
+ 145 00b8 3146     		mov	r1, r6
+ 146 00ba 0697     		str	r7, [sp, #24]	@ float
+ 147 00bc 3846     		mov	r0, r7
+ 148 00be FFF7FEFF 		bl	__aeabi_fmul
+ 149              	.LVL17:
+ 150 00c2 296A     		ldr	r1, [r5, #32]	@ float
+ 151 00c4 FFF7FEFF 		bl	__aeabi_fadd
+ 152              	.LVL18:
+ 153 00c8 8246     		mov	r10, r0
+ 154              	.LVL19:
+ 155 00ca 6062     		str	r0, [r4, #36]	@ float
+  39:drivers/filter.c **** 	
+  40:drivers/filter.c **** 	K_0 = PCt_0 / E;
+ 156              		.loc 1 40 0
+ 157 00cc 0146     		mov	r1, r0
+ 158 00ce 3046     		mov	r0, r6
+ 159 00d0 FFF7FEFF 		bl	__aeabi_fdiv
+ 160              	.LVL20:
+ 161 00d4 0746     		mov	r7, r0
+ 162 00d6 A062     		str	r0, [r4, #40]	@ float
+  41:drivers/filter.c **** 	K_1 = PCt_1 / E;
+ 163              		.loc 1 41 0
+ 164 00d8 5146     		mov	r1, r10
+ 165 00da 4046     		mov	r0, r8
+ 166 00dc FFF7FEFF 		bl	__aeabi_fdiv
+ 167              	.LVL21:
+ 168 00e0 8246     		mov	r10, r0
+ 169 00e2 E062     		str	r0, [r4, #44]	@ float
+  42:drivers/filter.c **** 	
+  43:drivers/filter.c **** 	t_0 = PCt_0;
+ 170              		.loc 1 43 0
+ 171 00e4 2663     		str	r6, [r4, #48]	@ float
+  44:drivers/filter.c **** 	t_1 = C_0 * PP[0][1];
+ 172              		.loc 1 44 0
+ 173 00e6 0699     		ldr	r1, [sp, #24]	@ float
+ 174 00e8 0498     		ldr	r0, [sp, #16]	@ float
+ 175 00ea FFF7FEFF 		bl	__aeabi_fmul
+ 176              	.LVL22:
+ 177 00ee 8046     		mov	r8, r0
+ 178 00f0 6063     		str	r0, [r4, #52]	@ float
+  45:drivers/filter.c **** 
+  46:drivers/filter.c **** 	PP[0][0] -= K_0 * t_0;		 //后验估计误差协方差
+ 179              		.loc 1 46 0
+ 180 00f2 3946     		mov	r1, r7
+ 181 00f4 3046     		mov	r0, r6
+ 182 00f6 FFF7FEFF 		bl	__aeabi_fmul
+ARM GAS  /tmp/ccXjpyXR.s 			page 5
+
+
+ 183              	.LVL23:
+ 184 00fa 0146     		mov	r1, r0
+ 185 00fc 0398     		ldr	r0, [sp, #12]	@ float
+ 186 00fe FFF7FEFF 		bl	__aeabi_fsub
+ 187              	.LVL24:
+ 188 0102 6860     		str	r0, [r5, #4]	@ float
+  47:drivers/filter.c **** 	PP[0][1] -= K_0 * t_1;
+ 189              		.loc 1 47 0
+ 190 0104 4146     		mov	r1, r8
+ 191 0106 3846     		mov	r0, r7
+ 192 0108 FFF7FEFF 		bl	__aeabi_fmul
+ 193              	.LVL25:
+ 194 010c 0146     		mov	r1, r0
+ 195 010e 0498     		ldr	r0, [sp, #16]	@ float
+ 196 0110 FFF7FEFF 		bl	__aeabi_fsub
+ 197              	.LVL26:
+ 198 0114 A860     		str	r0, [r5, #8]	@ float
+  48:drivers/filter.c **** 	PP[1][0] -= K_1 * t_0;
+ 199              		.loc 1 48 0
+ 200 0116 5146     		mov	r1, r10
+ 201 0118 3046     		mov	r0, r6
+ 202 011a FFF7FEFF 		bl	__aeabi_fmul
+ 203              	.LVL27:
+ 204 011e 0146     		mov	r1, r0
+ 205 0120 0898     		ldr	r0, [sp, #32]	@ float
+ 206 0122 FFF7FEFF 		bl	__aeabi_fsub
+ 207              	.LVL28:
+ 208 0126 E860     		str	r0, [r5, #12]	@ float
+  31:drivers/filter.c **** 		
+ 209              		.loc 1 31 0
+ 210 0128 4946     		mov	r1, r9
+ 211 012a 0198     		ldr	r0, [sp, #4]	@ float
+ 212 012c FFF7FEFF 		bl	__aeabi_fmul
+ 213              	.LVL29:
+ 214 0130 5946     		mov	r1, fp
+ 215 0132 FFF7FEFF 		bl	__aeabi_fadd
+ 216              	.LVL30:
+ 217 0136 0646     		mov	r6, r0
+  49:drivers/filter.c **** 	PP[1][1] -= K_1 * t_1;
+ 218              		.loc 1 49 0
+ 219 0138 4146     		mov	r1, r8
+ 220 013a 5046     		mov	r0, r10
+ 221 013c FFF7FEFF 		bl	__aeabi_fmul
+ 222              	.LVL31:
+ 223 0140 0146     		mov	r1, r0
+ 224 0142 3046     		mov	r0, r6
+ 225 0144 FFF7FEFF 		bl	__aeabi_fsub
+ 226              	.LVL32:
+ 227 0148 2861     		str	r0, [r5, #16]	@ float
+  50:drivers/filter.c **** 		
+  51:drivers/filter.c **** 	angle	+= K_0 * Angle_err;	 //后验估计
+ 228              		.loc 1 51 0
+ 229 014a 3946     		mov	r1, r7
+ 230 014c 099D     		ldr	r5, [sp, #36]	@ float
+ 231 014e 2846     		mov	r0, r5
+ 232 0150 FFF7FEFF 		bl	__aeabi_fmul
+ 233              	.LVL33:
+ARM GAS  /tmp/ccXjpyXR.s 			page 6
+
+
+ 234 0154 0299     		ldr	r1, [sp, #8]	@ float
+ 235 0156 FFF7FEFF 		bl	__aeabi_fadd
+ 236              	.LVL34:
+ 237 015a 6060     		str	r0, [r4, #4]	@ float
+  52:drivers/filter.c **** 	Q_bias	+= K_1 * Angle_err;	 //后验估计
+ 238              		.loc 1 52 0
+ 239 015c 5146     		mov	r1, r10
+ 240 015e 2846     		mov	r0, r5
+ 241 0160 FFF7FEFF 		bl	__aeabi_fmul
+ 242              	.LVL35:
+ 243 0164 0599     		ldr	r1, [sp, #20]	@ float
+ 244 0166 FFF7FEFF 		bl	__aeabi_fadd
+ 245              	.LVL36:
+ 246 016a 0146     		mov	r1, r0
+ 247 016c 2060     		str	r0, [r4]	@ float
+  53:drivers/filter.c **** 	angle_dot   = Gyro - Q_bias;	 //输出值(后验估计)的微分=角速度
+ 248              		.loc 1 53 0
+ 249 016e 0798     		ldr	r0, [sp, #28]	@ float
+ 250 0170 FFF7FEFF 		bl	__aeabi_fsub
+ 251              	.LVL37:
+ 252 0174 A063     		str	r0, [r4, #56]	@ float
+  54:drivers/filter.c **** }
+ 253              		.loc 1 54 0
+ 254 0176 0BB0     		add	sp, sp, #44
+ 255              		.cfi_def_cfa_offset 36
+ 256              		@ sp needed
+ 257 0178 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 258              	.LVL38:
+ 259              	.L4:
+ 260              		.align	2
+ 261              	.L3:
+ 262 017c 00000000 		.word	.LANCHOR0
+ 263 0180 00000000 		.word	.LANCHOR1
+ 264              		.cfi_endproc
+ 265              	.LFE0:
+ 266              		.size	Kalman_Filter, .-Kalman_Filter
+ 267              		.global	__aeabi_f2d
+ 268              		.global	__aeabi_dmul
+ 269              		.global	__aeabi_dadd
+ 270              		.global	__aeabi_d2f
+ 271              		.align	1
+ 272              		.global	Yijielvbo
+ 273              		.syntax unified
+ 274              		.thumb
+ 275              		.thumb_func
+ 276              		.fpu softvfp
+ 277              		.type	Yijielvbo, %function
+ 278              	Yijielvbo:
+ 279              	.LFB1:
+  55:drivers/filter.c **** 
+  56:drivers/filter.c **** /**************************************************************************
+  57:drivers/filter.c **** 函数功能：一阶互补滤波
+  58:drivers/filter.c **** 入口参数：加速度、角速度
+  59:drivers/filter.c **** 返回  值：无
+  60:drivers/filter.c **** **************************************************************************/
+  61:drivers/filter.c **** void Yijielvbo(float angle_m, float gyro_m)
+  62:drivers/filter.c **** {
+ARM GAS  /tmp/ccXjpyXR.s 			page 7
+
+
+ 280              		.loc 1 62 0
+ 281              		.cfi_startproc
+ 282              		@ args = 0, pretend = 0, frame = 0
+ 283              		@ frame_needed = 0, uses_anonymous_args = 0
+ 284              	.LVL39:
+ 285 0184 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 286              		.cfi_def_cfa_offset 32
+ 287              		.cfi_offset 3, -32
+ 288              		.cfi_offset 4, -28
+ 289              		.cfi_offset 5, -24
+ 290              		.cfi_offset 6, -20
+ 291              		.cfi_offset 7, -16
+ 292              		.cfi_offset 8, -12
+ 293              		.cfi_offset 9, -8
+ 294              		.cfi_offset 14, -4
+ 295 0188 8046     		mov	r8, r0
+ 296 018a 8946     		mov	r9, r1
+  63:drivers/filter.c ****    angle = K1 * angle_m+ (1-K1) * (angle + gyro_m * 0.005);
+ 297              		.loc 1 63 0
+ 298 018c 1E4B     		ldr	r3, .L7+8
+ 299 018e 5D6A     		ldr	r5, [r3, #36]	@ float
+ 300 0190 1E4C     		ldr	r4, .L7+12
+ 301 0192 6068     		ldr	r0, [r4, #4]	@ float
+ 302              	.LVL40:
+ 303 0194 FFF7FEFF 		bl	__aeabi_f2d
+ 304              	.LVL41:
+ 305 0198 0646     		mov	r6, r0
+ 306 019a 0F46     		mov	r7, r1
+ 307 019c 4846     		mov	r0, r9
+ 308 019e FFF7FEFF 		bl	__aeabi_f2d
+ 309              	.LVL42:
+ 310 01a2 17A3     		adr	r3, .L7
+ 311 01a4 D3E90023 		ldrd	r2, [r3]
+ 312 01a8 FFF7FEFF 		bl	__aeabi_dmul
+ 313              	.LVL43:
+ 314 01ac 0246     		mov	r2, r0
+ 315 01ae 0B46     		mov	r3, r1
+ 316 01b0 3046     		mov	r0, r6
+ 317 01b2 3946     		mov	r1, r7
+ 318 01b4 FFF7FEFF 		bl	__aeabi_dadd
+ 319              	.LVL44:
+ 320 01b8 0646     		mov	r6, r0
+ 321 01ba 0F46     		mov	r7, r1
+ 322 01bc 2946     		mov	r1, r5
+ 323 01be 4FF07E50 		mov	r0, #1065353216
+ 324 01c2 FFF7FEFF 		bl	__aeabi_fsub
+ 325              	.LVL45:
+ 326 01c6 FFF7FEFF 		bl	__aeabi_f2d
+ 327              	.LVL46:
+ 328 01ca 0246     		mov	r2, r0
+ 329 01cc 0B46     		mov	r3, r1
+ 330 01ce 3046     		mov	r0, r6
+ 331 01d0 3946     		mov	r1, r7
+ 332 01d2 FFF7FEFF 		bl	__aeabi_dmul
+ 333              	.LVL47:
+ 334 01d6 0646     		mov	r6, r0
+ 335 01d8 0F46     		mov	r7, r1
+ARM GAS  /tmp/ccXjpyXR.s 			page 8
+
+
+ 336 01da 4146     		mov	r1, r8
+ 337 01dc 2846     		mov	r0, r5
+ 338 01de FFF7FEFF 		bl	__aeabi_fmul
+ 339              	.LVL48:
+ 340 01e2 FFF7FEFF 		bl	__aeabi_f2d
+ 341              	.LVL49:
+ 342 01e6 0246     		mov	r2, r0
+ 343 01e8 0B46     		mov	r3, r1
+ 344 01ea 3046     		mov	r0, r6
+ 345 01ec 3946     		mov	r1, r7
+ 346 01ee FFF7FEFF 		bl	__aeabi_dadd
+ 347              	.LVL50:
+ 348 01f2 FFF7FEFF 		bl	__aeabi_d2f
+ 349              	.LVL51:
+ 350 01f6 6060     		str	r0, [r4, #4]	@ float
+ 351 01f8 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 352              	.LVL52:
+ 353              	.L8:
+ 354 01fc AFF30080 		.align	3
+ 355              	.L7:
+ 356 0200 7B14AE47 		.word	1202590843
+ 357 0204 E17A743F 		.word	1064598241
+ 358 0208 00000000 		.word	.LANCHOR1
+ 359 020c 00000000 		.word	.LANCHOR0
+ 360              		.cfi_endproc
+ 361              	.LFE1:
+ 362              		.size	Yijielvbo, .-Yijielvbo
+ 363              		.global	PP
+ 364              		.global	Pdot
+ 365              		.global	t_1
+ 366              		.global	t_0
+ 367              		.global	K_1
+ 368              		.global	K_0
+ 369              		.global	E
+ 370              		.global	PCt_1
+ 371              		.global	PCt_0
+ 372              		.global	Angle_err
+ 373              		.global	Q_bias
+ 374              		.global	C_0
+ 375              		.global	dt
+ 376              		.global	R_angle
+ 377              		.global	Q_gyro
+ 378              		.global	Q_angle
+ 379              		.global	angle_dot
+ 380              		.global	angle
+ 381              		.global	K1
+ 382              		.data
+ 383              		.align	2
+ 384              		.set	.LANCHOR1,. + 0
+ 385              		.type	dt, %object
+ 386              		.size	dt, 4
+ 387              	dt:
+ 388 0000 0AD7A33B 		.word	1000593162
+ 389              		.type	PP, %object
+ 390              		.size	PP, 16
+ 391              	PP:
+ 392 0004 0000803F 		.word	1065353216
+ARM GAS  /tmp/ccXjpyXR.s 			page 9
+
+
+ 393 0008 00000000 		.word	0
+ 394 000c 00000000 		.word	0
+ 395 0010 0000803F 		.word	1065353216
+ 396              		.type	Q_angle, %object
+ 397              		.size	Q_angle, 4
+ 398              	Q_angle:
+ 399 0014 6F12833A 		.word	981668463
+ 400              		.type	Q_gyro, %object
+ 401              		.size	Q_gyro, 4
+ 402              	Q_gyro:
+ 403 0018 A69B443B 		.word	994352038
+ 404              		.type	C_0, %object
+ 405              		.size	C_0, 1
+ 406              	C_0:
+ 407 001c 01       		.byte	1
+ 408 001d 000000   		.space	3
+ 409              		.type	R_angle, %object
+ 410              		.size	R_angle, 4
+ 411              	R_angle:
+ 412 0020 0000003F 		.word	1056964608
+ 413              		.type	K1, %object
+ 414              		.size	K1, 4
+ 415              	K1:
+ 416 0024 0AD7A33C 		.word	1017370378
+ 417              		.bss
+ 418              		.align	2
+ 419              		.set	.LANCHOR0,. + 0
+ 420              		.type	Q_bias, %object
+ 421              		.size	Q_bias, 4
+ 422              	Q_bias:
+ 423 0000 00000000 		.space	4
+ 424              		.type	angle, %object
+ 425              		.size	angle, 4
+ 426              	angle:
+ 427 0004 00000000 		.space	4
+ 428              		.type	Pdot, %object
+ 429              		.size	Pdot, 16
+ 430              	Pdot:
+ 431 0008 00000000 		.space	16
+ 431      00000000 
+ 431      00000000 
+ 431      00000000 
+ 432              		.type	Angle_err, %object
+ 433              		.size	Angle_err, 4
+ 434              	Angle_err:
+ 435 0018 00000000 		.space	4
+ 436              		.type	PCt_0, %object
+ 437              		.size	PCt_0, 4
+ 438              	PCt_0:
+ 439 001c 00000000 		.space	4
+ 440              		.type	PCt_1, %object
+ 441              		.size	PCt_1, 4
+ 442              	PCt_1:
+ 443 0020 00000000 		.space	4
+ 444              		.type	E, %object
+ 445              		.size	E, 4
+ 446              	E:
+ARM GAS  /tmp/ccXjpyXR.s 			page 10
+
+
+ 447 0024 00000000 		.space	4
+ 448              		.type	K_0, %object
+ 449              		.size	K_0, 4
+ 450              	K_0:
+ 451 0028 00000000 		.space	4
+ 452              		.type	K_1, %object
+ 453              		.size	K_1, 4
+ 454              	K_1:
+ 455 002c 00000000 		.space	4
+ 456              		.type	t_0, %object
+ 457              		.size	t_0, 4
+ 458              	t_0:
+ 459 0030 00000000 		.space	4
+ 460              		.type	t_1, %object
+ 461              		.size	t_1, 4
+ 462              	t_1:
+ 463 0034 00000000 		.space	4
+ 464              		.type	angle_dot, %object
+ 465              		.size	angle_dot, 4
+ 466              	angle_dot:
+ 467 0038 00000000 		.space	4
+ 468              		.text
+ 469              	.Letext0:
+ 470              		.file 2 "drivers/filter.h"
+ 471              		.section	.debug_info,"",%progbits
+ 472              	.Ldebug_info0:
+ 473 0000 0D020000 		.4byte	0x20d
+ 474 0004 0400     		.2byte	0x4
+ 475 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 476 000a 04       		.byte	0x4
+ 477 000b 01       		.uleb128 0x1
+ 478 000c C2000000 		.4byte	.LASF17
+ 479 0010 0C       		.byte	0xc
+ 480 0011 6D000000 		.4byte	.LASF18
+ 481 0015 31000000 		.4byte	.LASF19
+ 482 0019 00000000 		.4byte	.Ltext0
+ 483 001d 10020000 		.4byte	.Letext0-.Ltext0
+ 484 0021 00000000 		.4byte	.Ldebug_line0
+ 485 0025 02       		.uleb128 0x2
+ 486 0026 04       		.byte	0x4
+ 487 0027 04       		.byte	0x4
+ 488 0028 BC000000 		.4byte	.LASF5
+ 489 002c 03       		.uleb128 0x3
+ 490 002d B6000000 		.4byte	.LASF0
+ 491 0031 02       		.byte	0x2
+ 492 0032 04       		.byte	0x4
+ 493 0033 25000000 		.4byte	0x25
+ 494 0037 03       		.uleb128 0x3
+ 495 0038 0A010000 		.4byte	.LASF1
+ 496 003c 02       		.byte	0x2
+ 497 003d 04       		.byte	0x4
+ 498 003e 25000000 		.4byte	0x25
+ 499 0042 04       		.uleb128 0x4
+ 500 0043 4B3100   		.ascii	"K1\000"
+ 501 0046 01       		.byte	0x1
+ 502 0047 02       		.byte	0x2
+ 503 0048 25000000 		.4byte	0x25
+ARM GAS  /tmp/ccXjpyXR.s 			page 11
+
+
+ 504 004c 05       		.uleb128 0x5
+ 505 004d 03       		.byte	0x3
+ 506 004e 00000000 		.4byte	K1
+ 507 0052 05       		.uleb128 0x5
+ 508 0053 2C000000 		.4byte	0x2c
+ 509 0057 01       		.byte	0x1
+ 510 0058 03       		.byte	0x3
+ 511 0059 05       		.uleb128 0x5
+ 512 005a 03       		.byte	0x3
+ 513 005b 00000000 		.4byte	angle
+ 514 005f 05       		.uleb128 0x5
+ 515 0060 37000000 		.4byte	0x37
+ 516 0064 01       		.byte	0x1
+ 517 0065 03       		.byte	0x3
+ 518 0066 05       		.uleb128 0x5
+ 519 0067 03       		.byte	0x3
+ 520 0068 00000000 		.4byte	angle_dot
+ 521 006c 06       		.uleb128 0x6
+ 522 006d 7E000000 		.4byte	.LASF2
+ 523 0071 01       		.byte	0x1
+ 524 0072 04       		.byte	0x4
+ 525 0073 25000000 		.4byte	0x25
+ 526 0077 05       		.uleb128 0x5
+ 527 0078 03       		.byte	0x3
+ 528 0079 00000000 		.4byte	Q_angle
+ 529 007d 06       		.uleb128 0x6
+ 530 007e 05000000 		.4byte	.LASF3
+ 531 0082 01       		.byte	0x1
+ 532 0083 05       		.byte	0x5
+ 533 0084 25000000 		.4byte	0x25
+ 534 0088 05       		.uleb128 0x5
+ 535 0089 03       		.byte	0x3
+ 536 008a 00000000 		.4byte	Q_gyro
+ 537 008e 06       		.uleb128 0x6
+ 538 008f A8000000 		.4byte	.LASF4
+ 539 0093 01       		.byte	0x1
+ 540 0094 06       		.byte	0x6
+ 541 0095 25000000 		.4byte	0x25
+ 542 0099 05       		.uleb128 0x5
+ 543 009a 03       		.byte	0x3
+ 544 009b 00000000 		.4byte	R_angle
+ 545 009f 04       		.uleb128 0x4
+ 546 00a0 647400   		.ascii	"dt\000"
+ 547 00a3 01       		.byte	0x1
+ 548 00a4 07       		.byte	0x7
+ 549 00a5 25000000 		.4byte	0x25
+ 550 00a9 05       		.uleb128 0x5
+ 551 00aa 03       		.byte	0x3
+ 552 00ab 00000000 		.4byte	dt
+ 553 00af 04       		.uleb128 0x4
+ 554 00b0 435F3000 		.ascii	"C_0\000"
+ 555 00b4 01       		.byte	0x1
+ 556 00b5 08       		.byte	0x8
+ 557 00b6 C0000000 		.4byte	0xc0
+ 558 00ba 05       		.uleb128 0x5
+ 559 00bb 03       		.byte	0x3
+ 560 00bc 00000000 		.4byte	C_0
+ARM GAS  /tmp/ccXjpyXR.s 			page 12
+
+
+ 561 00c0 02       		.uleb128 0x2
+ 562 00c1 01       		.byte	0x1
+ 563 00c2 08       		.byte	0x8
+ 564 00c3 92000000 		.4byte	.LASF6
+ 565 00c7 06       		.uleb128 0x6
+ 566 00c8 2A000000 		.4byte	.LASF7
+ 567 00cc 01       		.byte	0x1
+ 568 00cd 09       		.byte	0x9
+ 569 00ce 25000000 		.4byte	0x25
+ 570 00d2 05       		.uleb128 0x5
+ 571 00d3 03       		.byte	0x3
+ 572 00d4 00000000 		.4byte	Q_bias
+ 573 00d8 06       		.uleb128 0x6
+ 574 00d9 20000000 		.4byte	.LASF8
+ 575 00dd 01       		.byte	0x1
+ 576 00de 09       		.byte	0x9
+ 577 00df 25000000 		.4byte	0x25
+ 578 00e3 05       		.uleb128 0x5
+ 579 00e4 03       		.byte	0x3
+ 580 00e5 00000000 		.4byte	Angle_err
+ 581 00e9 06       		.uleb128 0x6
+ 582 00ea B0000000 		.4byte	.LASF9
+ 583 00ee 01       		.byte	0x1
+ 584 00ef 0A       		.byte	0xa
+ 585 00f0 25000000 		.4byte	0x25
+ 586 00f4 05       		.uleb128 0x5
+ 587 00f5 03       		.byte	0x3
+ 588 00f6 00000000 		.4byte	PCt_0
+ 589 00fa 06       		.uleb128 0x6
+ 590 00fb 04010000 		.4byte	.LASF10
+ 591 00ff 01       		.byte	0x1
+ 592 0100 0A       		.byte	0xa
+ 593 0101 25000000 		.4byte	0x25
+ 594 0105 05       		.uleb128 0x5
+ 595 0106 03       		.byte	0x3
+ 596 0107 00000000 		.4byte	PCt_1
+ 597 010b 04       		.uleb128 0x4
+ 598 010c 4500     		.ascii	"E\000"
+ 599 010e 01       		.byte	0x1
+ 600 010f 0A       		.byte	0xa
+ 601 0110 25000000 		.4byte	0x25
+ 602 0114 05       		.uleb128 0x5
+ 603 0115 03       		.byte	0x3
+ 604 0116 00000000 		.4byte	E
+ 605 011a 04       		.uleb128 0x4
+ 606 011b 4B5F3000 		.ascii	"K_0\000"
+ 607 011f 01       		.byte	0x1
+ 608 0120 0B       		.byte	0xb
+ 609 0121 25000000 		.4byte	0x25
+ 610 0125 05       		.uleb128 0x5
+ 611 0126 03       		.byte	0x3
+ 612 0127 00000000 		.4byte	K_0
+ 613 012b 04       		.uleb128 0x4
+ 614 012c 4B5F3100 		.ascii	"K_1\000"
+ 615 0130 01       		.byte	0x1
+ 616 0131 0B       		.byte	0xb
+ 617 0132 25000000 		.4byte	0x25
+ARM GAS  /tmp/ccXjpyXR.s 			page 13
+
+
+ 618 0136 05       		.uleb128 0x5
+ 619 0137 03       		.byte	0x3
+ 620 0138 00000000 		.4byte	K_1
+ 621 013c 04       		.uleb128 0x4
+ 622 013d 745F3000 		.ascii	"t_0\000"
+ 623 0141 01       		.byte	0x1
+ 624 0142 0B       		.byte	0xb
+ 625 0143 25000000 		.4byte	0x25
+ 626 0147 05       		.uleb128 0x5
+ 627 0148 03       		.byte	0x3
+ 628 0149 00000000 		.4byte	t_0
+ 629 014d 04       		.uleb128 0x4
+ 630 014e 745F3100 		.ascii	"t_1\000"
+ 631 0152 01       		.byte	0x1
+ 632 0153 0B       		.byte	0xb
+ 633 0154 25000000 		.4byte	0x25
+ 634 0158 05       		.uleb128 0x5
+ 635 0159 03       		.byte	0x3
+ 636 015a 00000000 		.4byte	t_1
+ 637 015e 07       		.uleb128 0x7
+ 638 015f 25000000 		.4byte	0x25
+ 639 0163 6E010000 		.4byte	0x16e
+ 640 0167 08       		.uleb128 0x8
+ 641 0168 6E010000 		.4byte	0x16e
+ 642 016c 03       		.byte	0x3
+ 643 016d 00       		.byte	0
+ 644 016e 02       		.uleb128 0x2
+ 645 016f 04       		.byte	0x4
+ 646 0170 07       		.byte	0x7
+ 647 0171 97000000 		.4byte	.LASF11
+ 648 0175 06       		.uleb128 0x6
+ 649 0176 86000000 		.4byte	.LASF12
+ 650 017a 01       		.byte	0x1
+ 651 017b 0C       		.byte	0xc
+ 652 017c 5E010000 		.4byte	0x15e
+ 653 0180 05       		.uleb128 0x5
+ 654 0181 03       		.byte	0x3
+ 655 0182 00000000 		.4byte	Pdot
+ 656 0186 07       		.uleb128 0x7
+ 657 0187 25000000 		.4byte	0x25
+ 658 018b 9C010000 		.4byte	0x19c
+ 659 018f 08       		.uleb128 0x8
+ 660 0190 6E010000 		.4byte	0x16e
+ 661 0194 01       		.byte	0x1
+ 662 0195 08       		.uleb128 0x8
+ 663 0196 6E010000 		.4byte	0x16e
+ 664 019a 01       		.byte	0x1
+ 665 019b 00       		.byte	0
+ 666 019c 04       		.uleb128 0x4
+ 667 019d 505000   		.ascii	"PP\000"
+ 668 01a0 01       		.byte	0x1
+ 669 01a1 0D       		.byte	0xd
+ 670 01a2 86010000 		.4byte	0x186
+ 671 01a6 05       		.uleb128 0x5
+ 672 01a7 03       		.byte	0x3
+ 673 01a8 00000000 		.4byte	PP
+ 674 01ac 09       		.uleb128 0x9
+ARM GAS  /tmp/ccXjpyXR.s 			page 14
+
+
+ 675 01ad 63000000 		.4byte	.LASF20
+ 676 01b1 01       		.byte	0x1
+ 677 01b2 3D       		.byte	0x3d
+ 678 01b3 84010000 		.4byte	.LFB1
+ 679 01b7 8C000000 		.4byte	.LFE1-.LFB1
+ 680 01bb 01       		.uleb128 0x1
+ 681 01bc 9C       		.byte	0x9c
+ 682 01bd E0010000 		.4byte	0x1e0
+ 683 01c1 0A       		.uleb128 0xa
+ 684 01c2 A0000000 		.4byte	.LASF13
+ 685 01c6 01       		.byte	0x1
+ 686 01c7 3D       		.byte	0x3d
+ 687 01c8 25000000 		.4byte	0x25
+ 688 01cc 00000000 		.4byte	.LLST2
+ 689 01d0 0A       		.uleb128 0xa
+ 690 01d1 8B000000 		.4byte	.LASF14
+ 691 01d5 01       		.byte	0x1
+ 692 01d6 3D       		.byte	0x3d
+ 693 01d7 25000000 		.4byte	0x25
+ 694 01db 2E000000 		.4byte	.LLST3
+ 695 01df 00       		.byte	0
+ 696 01e0 0B       		.uleb128 0xb
+ 697 01e1 12000000 		.4byte	.LASF21
+ 698 01e5 01       		.byte	0x1
+ 699 01e6 14       		.byte	0x14
+ 700 01e7 00000000 		.4byte	.LFB0
+ 701 01eb 84010000 		.4byte	.LFE0-.LFB0
+ 702 01ef 01       		.uleb128 0x1
+ 703 01f0 9C       		.byte	0x9c
+ 704 01f1 0A       		.uleb128 0xa
+ 705 01f2 0C000000 		.4byte	.LASF15
+ 706 01f6 01       		.byte	0x1
+ 707 01f7 14       		.byte	0x14
+ 708 01f8 25000000 		.4byte	0x25
+ 709 01fc 5C000000 		.4byte	.LLST0
+ 710 0200 0A       		.uleb128 0xa
+ 711 0201 00000000 		.4byte	.LASF16
+ 712 0205 01       		.byte	0x1
+ 713 0206 14       		.byte	0x14
+ 714 0207 25000000 		.4byte	0x25
+ 715 020b 8A000000 		.4byte	.LLST1
+ 716 020f 00       		.byte	0
+ 717 0210 00       		.byte	0
+ 718              		.section	.debug_abbrev,"",%progbits
+ 719              	.Ldebug_abbrev0:
+ 720 0000 01       		.uleb128 0x1
+ 721 0001 11       		.uleb128 0x11
+ 722 0002 01       		.byte	0x1
+ 723 0003 25       		.uleb128 0x25
+ 724 0004 0E       		.uleb128 0xe
+ 725 0005 13       		.uleb128 0x13
+ 726 0006 0B       		.uleb128 0xb
+ 727 0007 03       		.uleb128 0x3
+ 728 0008 0E       		.uleb128 0xe
+ 729 0009 1B       		.uleb128 0x1b
+ 730 000a 0E       		.uleb128 0xe
+ 731 000b 11       		.uleb128 0x11
+ARM GAS  /tmp/ccXjpyXR.s 			page 15
+
+
+ 732 000c 01       		.uleb128 0x1
+ 733 000d 12       		.uleb128 0x12
+ 734 000e 06       		.uleb128 0x6
+ 735 000f 10       		.uleb128 0x10
+ 736 0010 17       		.uleb128 0x17
+ 737 0011 00       		.byte	0
+ 738 0012 00       		.byte	0
+ 739 0013 02       		.uleb128 0x2
+ 740 0014 24       		.uleb128 0x24
+ 741 0015 00       		.byte	0
+ 742 0016 0B       		.uleb128 0xb
+ 743 0017 0B       		.uleb128 0xb
+ 744 0018 3E       		.uleb128 0x3e
+ 745 0019 0B       		.uleb128 0xb
+ 746 001a 03       		.uleb128 0x3
+ 747 001b 0E       		.uleb128 0xe
+ 748 001c 00       		.byte	0
+ 749 001d 00       		.byte	0
+ 750 001e 03       		.uleb128 0x3
+ 751 001f 34       		.uleb128 0x34
+ 752 0020 00       		.byte	0
+ 753 0021 03       		.uleb128 0x3
+ 754 0022 0E       		.uleb128 0xe
+ 755 0023 3A       		.uleb128 0x3a
+ 756 0024 0B       		.uleb128 0xb
+ 757 0025 3B       		.uleb128 0x3b
+ 758 0026 0B       		.uleb128 0xb
+ 759 0027 49       		.uleb128 0x49
+ 760 0028 13       		.uleb128 0x13
+ 761 0029 3F       		.uleb128 0x3f
+ 762 002a 19       		.uleb128 0x19
+ 763 002b 3C       		.uleb128 0x3c
+ 764 002c 19       		.uleb128 0x19
+ 765 002d 00       		.byte	0
+ 766 002e 00       		.byte	0
+ 767 002f 04       		.uleb128 0x4
+ 768 0030 34       		.uleb128 0x34
+ 769 0031 00       		.byte	0
+ 770 0032 03       		.uleb128 0x3
+ 771 0033 08       		.uleb128 0x8
+ 772 0034 3A       		.uleb128 0x3a
+ 773 0035 0B       		.uleb128 0xb
+ 774 0036 3B       		.uleb128 0x3b
+ 775 0037 0B       		.uleb128 0xb
+ 776 0038 49       		.uleb128 0x49
+ 777 0039 13       		.uleb128 0x13
+ 778 003a 3F       		.uleb128 0x3f
+ 779 003b 19       		.uleb128 0x19
+ 780 003c 02       		.uleb128 0x2
+ 781 003d 18       		.uleb128 0x18
+ 782 003e 00       		.byte	0
+ 783 003f 00       		.byte	0
+ 784 0040 05       		.uleb128 0x5
+ 785 0041 34       		.uleb128 0x34
+ 786 0042 00       		.byte	0
+ 787 0043 47       		.uleb128 0x47
+ 788 0044 13       		.uleb128 0x13
+ARM GAS  /tmp/ccXjpyXR.s 			page 16
+
+
+ 789 0045 3A       		.uleb128 0x3a
+ 790 0046 0B       		.uleb128 0xb
+ 791 0047 3B       		.uleb128 0x3b
+ 792 0048 0B       		.uleb128 0xb
+ 793 0049 02       		.uleb128 0x2
+ 794 004a 18       		.uleb128 0x18
+ 795 004b 00       		.byte	0
+ 796 004c 00       		.byte	0
+ 797 004d 06       		.uleb128 0x6
+ 798 004e 34       		.uleb128 0x34
+ 799 004f 00       		.byte	0
+ 800 0050 03       		.uleb128 0x3
+ 801 0051 0E       		.uleb128 0xe
+ 802 0052 3A       		.uleb128 0x3a
+ 803 0053 0B       		.uleb128 0xb
+ 804 0054 3B       		.uleb128 0x3b
+ 805 0055 0B       		.uleb128 0xb
+ 806 0056 49       		.uleb128 0x49
+ 807 0057 13       		.uleb128 0x13
+ 808 0058 3F       		.uleb128 0x3f
+ 809 0059 19       		.uleb128 0x19
+ 810 005a 02       		.uleb128 0x2
+ 811 005b 18       		.uleb128 0x18
+ 812 005c 00       		.byte	0
+ 813 005d 00       		.byte	0
+ 814 005e 07       		.uleb128 0x7
+ 815 005f 01       		.uleb128 0x1
+ 816 0060 01       		.byte	0x1
+ 817 0061 49       		.uleb128 0x49
+ 818 0062 13       		.uleb128 0x13
+ 819 0063 01       		.uleb128 0x1
+ 820 0064 13       		.uleb128 0x13
+ 821 0065 00       		.byte	0
+ 822 0066 00       		.byte	0
+ 823 0067 08       		.uleb128 0x8
+ 824 0068 21       		.uleb128 0x21
+ 825 0069 00       		.byte	0
+ 826 006a 49       		.uleb128 0x49
+ 827 006b 13       		.uleb128 0x13
+ 828 006c 2F       		.uleb128 0x2f
+ 829 006d 0B       		.uleb128 0xb
+ 830 006e 00       		.byte	0
+ 831 006f 00       		.byte	0
+ 832 0070 09       		.uleb128 0x9
+ 833 0071 2E       		.uleb128 0x2e
+ 834 0072 01       		.byte	0x1
+ 835 0073 3F       		.uleb128 0x3f
+ 836 0074 19       		.uleb128 0x19
+ 837 0075 03       		.uleb128 0x3
+ 838 0076 0E       		.uleb128 0xe
+ 839 0077 3A       		.uleb128 0x3a
+ 840 0078 0B       		.uleb128 0xb
+ 841 0079 3B       		.uleb128 0x3b
+ 842 007a 0B       		.uleb128 0xb
+ 843 007b 27       		.uleb128 0x27
+ 844 007c 19       		.uleb128 0x19
+ 845 007d 11       		.uleb128 0x11
+ARM GAS  /tmp/ccXjpyXR.s 			page 17
+
+
+ 846 007e 01       		.uleb128 0x1
+ 847 007f 12       		.uleb128 0x12
+ 848 0080 06       		.uleb128 0x6
+ 849 0081 40       		.uleb128 0x40
+ 850 0082 18       		.uleb128 0x18
+ 851 0083 9642     		.uleb128 0x2116
+ 852 0085 19       		.uleb128 0x19
+ 853 0086 01       		.uleb128 0x1
+ 854 0087 13       		.uleb128 0x13
+ 855 0088 00       		.byte	0
+ 856 0089 00       		.byte	0
+ 857 008a 0A       		.uleb128 0xa
+ 858 008b 05       		.uleb128 0x5
+ 859 008c 00       		.byte	0
+ 860 008d 03       		.uleb128 0x3
+ 861 008e 0E       		.uleb128 0xe
+ 862 008f 3A       		.uleb128 0x3a
+ 863 0090 0B       		.uleb128 0xb
+ 864 0091 3B       		.uleb128 0x3b
+ 865 0092 0B       		.uleb128 0xb
+ 866 0093 49       		.uleb128 0x49
+ 867 0094 13       		.uleb128 0x13
+ 868 0095 02       		.uleb128 0x2
+ 869 0096 17       		.uleb128 0x17
+ 870 0097 00       		.byte	0
+ 871 0098 00       		.byte	0
+ 872 0099 0B       		.uleb128 0xb
+ 873 009a 2E       		.uleb128 0x2e
+ 874 009b 01       		.byte	0x1
+ 875 009c 3F       		.uleb128 0x3f
+ 876 009d 19       		.uleb128 0x19
+ 877 009e 03       		.uleb128 0x3
+ 878 009f 0E       		.uleb128 0xe
+ 879 00a0 3A       		.uleb128 0x3a
+ 880 00a1 0B       		.uleb128 0xb
+ 881 00a2 3B       		.uleb128 0x3b
+ 882 00a3 0B       		.uleb128 0xb
+ 883 00a4 27       		.uleb128 0x27
+ 884 00a5 19       		.uleb128 0x19
+ 885 00a6 11       		.uleb128 0x11
+ 886 00a7 01       		.uleb128 0x1
+ 887 00a8 12       		.uleb128 0x12
+ 888 00a9 06       		.uleb128 0x6
+ 889 00aa 40       		.uleb128 0x40
+ 890 00ab 18       		.uleb128 0x18
+ 891 00ac 9642     		.uleb128 0x2116
+ 892 00ae 19       		.uleb128 0x19
+ 893 00af 00       		.byte	0
+ 894 00b0 00       		.byte	0
+ 895 00b1 00       		.byte	0
+ 896              		.section	.debug_loc,"",%progbits
+ 897              	.Ldebug_loc0:
+ 898              	.LLST2:
+ 899 0000 84010000 		.4byte	.LVL39-.Ltext0
+ 900 0004 94010000 		.4byte	.LVL40-.Ltext0
+ 901 0008 0100     		.2byte	0x1
+ 902 000a 50       		.byte	0x50
+ARM GAS  /tmp/ccXjpyXR.s 			page 18
+
+
+ 903 000b 94010000 		.4byte	.LVL40-.Ltext0
+ 904 000f FC010000 		.4byte	.LVL52-.Ltext0
+ 905 0013 0100     		.2byte	0x1
+ 906 0015 58       		.byte	0x58
+ 907 0016 FC010000 		.4byte	.LVL52-.Ltext0
+ 908 001a 10020000 		.4byte	.LFE1-.Ltext0
+ 909 001e 0600     		.2byte	0x6
+ 910 0020 F3       		.byte	0xf3
+ 911 0021 03       		.uleb128 0x3
+ 912 0022 F5       		.byte	0xf5
+ 913 0023 00       		.uleb128 0
+ 914 0024 25       		.uleb128 0x25
+ 915 0025 9F       		.byte	0x9f
+ 916 0026 00000000 		.4byte	0
+ 917 002a 00000000 		.4byte	0
+ 918              	.LLST3:
+ 919 002e 84010000 		.4byte	.LVL39-.Ltext0
+ 920 0032 97010000 		.4byte	.LVL41-1-.Ltext0
+ 921 0036 0100     		.2byte	0x1
+ 922 0038 51       		.byte	0x51
+ 923 0039 97010000 		.4byte	.LVL41-1-.Ltext0
+ 924 003d FC010000 		.4byte	.LVL52-.Ltext0
+ 925 0041 0100     		.2byte	0x1
+ 926 0043 59       		.byte	0x59
+ 927 0044 FC010000 		.4byte	.LVL52-.Ltext0
+ 928 0048 10020000 		.4byte	.LFE1-.Ltext0
+ 929 004c 0600     		.2byte	0x6
+ 930 004e F3       		.byte	0xf3
+ 931 004f 03       		.uleb128 0x3
+ 932 0050 F5       		.byte	0xf5
+ 933 0051 01       		.uleb128 0x1
+ 934 0052 25       		.uleb128 0x25
+ 935 0053 9F       		.byte	0x9f
+ 936 0054 00000000 		.4byte	0
+ 937 0058 00000000 		.4byte	0
+ 938              	.LLST0:
+ 939 005c 00000000 		.4byte	.LVL0-.Ltext0
+ 940 0060 0A000000 		.4byte	.LVL1-.Ltext0
+ 941 0064 0100     		.2byte	0x1
+ 942 0066 50       		.byte	0x50
+ 943 0067 0A000000 		.4byte	.LVL1-.Ltext0
+ 944 006b CA000000 		.4byte	.LVL19-.Ltext0
+ 945 006f 0100     		.2byte	0x1
+ 946 0071 5A       		.byte	0x5a
+ 947 0072 CA000000 		.4byte	.LVL19-.Ltext0
+ 948 0076 84010000 		.4byte	.LFE0-.Ltext0
+ 949 007a 0600     		.2byte	0x6
+ 950 007c F3       		.byte	0xf3
+ 951 007d 03       		.uleb128 0x3
+ 952 007e F5       		.byte	0xf5
+ 953 007f 00       		.uleb128 0
+ 954 0080 25       		.uleb128 0x25
+ 955 0081 9F       		.byte	0x9f
+ 956 0082 00000000 		.4byte	0
+ 957 0086 00000000 		.4byte	0
+ 958              	.LLST1:
+ 959 008a 00000000 		.4byte	.LVL0-.Ltext0
+ARM GAS  /tmp/ccXjpyXR.s 			page 19
+
+
+ 960 008e 1A000000 		.4byte	.LVL2-.Ltext0
+ 961 0092 0100     		.2byte	0x1
+ 962 0094 51       		.byte	0x51
+ 963 0095 1A000000 		.4byte	.LVL2-.Ltext0
+ 964 0099 1F000000 		.4byte	.LVL3-1-.Ltext0
+ 965 009d 0100     		.2byte	0x1
+ 966 009f 50       		.byte	0x50
+ 967 00a0 1F000000 		.4byte	.LVL3-1-.Ltext0
+ 968 00a4 7C010000 		.4byte	.LVL38-.Ltext0
+ 969 00a8 0200     		.2byte	0x2
+ 970 00aa 91       		.byte	0x91
+ 971 00ab 4C       		.sleb128 -52
+ 972 00ac 7C010000 		.4byte	.LVL38-.Ltext0
+ 973 00b0 84010000 		.4byte	.LFE0-.Ltext0
+ 974 00b4 0200     		.2byte	0x2
+ 975 00b6 7D       		.byte	0x7d
+ 976 00b7 4C       		.sleb128 -52
+ 977 00b8 00000000 		.4byte	0
+ 978 00bc 00000000 		.4byte	0
+ 979              		.section	.debug_aranges,"",%progbits
+ 980 0000 1C000000 		.4byte	0x1c
+ 981 0004 0200     		.2byte	0x2
+ 982 0006 00000000 		.4byte	.Ldebug_info0
+ 983 000a 04       		.byte	0x4
+ 984 000b 00       		.byte	0
+ 985 000c 0000     		.2byte	0
+ 986 000e 0000     		.2byte	0
+ 987 0010 00000000 		.4byte	.Ltext0
+ 988 0014 10020000 		.4byte	.Letext0-.Ltext0
+ 989 0018 00000000 		.4byte	0
+ 990 001c 00000000 		.4byte	0
+ 991              		.section	.debug_line,"",%progbits
+ 992              	.Ldebug_line0:
+ 993 0000 68000000 		.section	.debug_str,"MS",%progbits,1
+ 993      02003300 
+ 993      00000201 
+ 993      FB0E0D00 
+ 993      01010101 
+ 994              	.LASF16:
+ 995 0000 4779726F 		.ascii	"Gyro\000"
+ 995      00
+ 996              	.LASF3:
+ 997 0005 515F6779 		.ascii	"Q_gyro\000"
+ 997      726F00
+ 998              	.LASF15:
+ 999 000c 41636365 		.ascii	"Accel\000"
+ 999      6C00
+ 1000              	.LASF21:
+ 1001 0012 4B616C6D 		.ascii	"Kalman_Filter\000"
+ 1001      616E5F46 
+ 1001      696C7465 
+ 1001      7200
+ 1002              	.LASF8:
+ 1003 0020 416E676C 		.ascii	"Angle_err\000"
+ 1003      655F6572 
+ 1003      7200
+ 1004              	.LASF7:
+ARM GAS  /tmp/ccXjpyXR.s 			page 20
+
+
+ 1005 002a 515F6269 		.ascii	"Q_bias\000"
+ 1005      617300
+ 1006              	.LASF19:
+ 1007 0031 2F686F6D 		.ascii	"/home/faker/Documents/code/STM/stm32-quadrocopter\000"
+ 1007      652F6661 
+ 1007      6B65722F 
+ 1007      446F6375 
+ 1007      6D656E74 
+ 1008              	.LASF20:
+ 1009 0063 59696A69 		.ascii	"Yijielvbo\000"
+ 1009      656C7662 
+ 1009      6F00
+ 1010              	.LASF18:
+ 1011 006d 64726976 		.ascii	"drivers/filter.c\000"
+ 1011      6572732F 
+ 1011      66696C74 
+ 1011      65722E63 
+ 1011      00
+ 1012              	.LASF2:
+ 1013 007e 515F616E 		.ascii	"Q_angle\000"
+ 1013      676C6500 
+ 1014              	.LASF12:
+ 1015 0086 50646F74 		.ascii	"Pdot\000"
+ 1015      00
+ 1016              	.LASF14:
+ 1017 008b 6779726F 		.ascii	"gyro_m\000"
+ 1017      5F6D00
+ 1018              	.LASF6:
+ 1019 0092 63686172 		.ascii	"char\000"
+ 1019      00
+ 1020              	.LASF11:
+ 1021 0097 73697A65 		.ascii	"sizetype\000"
+ 1021      74797065 
+ 1021      00
+ 1022              	.LASF13:
+ 1023 00a0 616E676C 		.ascii	"angle_m\000"
+ 1023      655F6D00 
+ 1024              	.LASF4:
+ 1025 00a8 525F616E 		.ascii	"R_angle\000"
+ 1025      676C6500 
+ 1026              	.LASF9:
+ 1027 00b0 5043745F 		.ascii	"PCt_0\000"
+ 1027      3000
+ 1028              	.LASF0:
+ 1029 00b6 616E676C 		.ascii	"angle\000"
+ 1029      6500
+ 1030              	.LASF5:
+ 1031 00bc 666C6F61 		.ascii	"float\000"
+ 1031      7400
+ 1032              	.LASF17:
+ 1033 00c2 474E5520 		.ascii	"GNU C11 6.1.1 20160526 -mcpu=cortex-m3 -mthumb -g -"
+ 1033      43313120 
+ 1033      362E312E 
+ 1033      31203230 
+ 1033      31363035 
+ 1034 00f5 4F31202D 		.ascii	"O1 -fno-common\000"
+ 1034      666E6F2D 
+ARM GAS  /tmp/ccXjpyXR.s 			page 21
+
+
+ 1034      636F6D6D 
+ 1034      6F6E00
+ 1035              	.LASF10:
+ 1036 0104 5043745F 		.ascii	"PCt_1\000"
+ 1036      3100
+ 1037              	.LASF1:
+ 1038 010a 616E676C 		.ascii	"angle_dot\000"
+ 1038      655F646F 
+ 1038      7400
+ 1039              		.ident	"GCC: (Arch Repository) 6.1.1 20160526"
+ARM GAS  /tmp/ccXjpyXR.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 filter.c
+     /tmp/ccXjpyXR.s:20     .text:0000000000000000 $t
+     /tmp/ccXjpyXR.s:27     .text:0000000000000000 Kalman_Filter
+     /tmp/ccXjpyXR.s:262    .text:000000000000017c $d
+     /tmp/ccXjpyXR.s:271    .text:0000000000000184 $t
+     /tmp/ccXjpyXR.s:278    .text:0000000000000184 Yijielvbo
+     /tmp/ccXjpyXR.s:356    .text:0000000000000200 $d
+     /tmp/ccXjpyXR.s:391    .data:0000000000000004 PP
+     /tmp/ccXjpyXR.s:430    .bss:0000000000000008 Pdot
+     /tmp/ccXjpyXR.s:462    .bss:0000000000000034 t_1
+     /tmp/ccXjpyXR.s:458    .bss:0000000000000030 t_0
+     /tmp/ccXjpyXR.s:454    .bss:000000000000002c K_1
+     /tmp/ccXjpyXR.s:450    .bss:0000000000000028 K_0
+     /tmp/ccXjpyXR.s:446    .bss:0000000000000024 E
+     /tmp/ccXjpyXR.s:442    .bss:0000000000000020 PCt_1
+     /tmp/ccXjpyXR.s:438    .bss:000000000000001c PCt_0
+     /tmp/ccXjpyXR.s:434    .bss:0000000000000018 Angle_err
+     /tmp/ccXjpyXR.s:422    .bss:0000000000000000 Q_bias
+     /tmp/ccXjpyXR.s:406    .data:000000000000001c C_0
+     /tmp/ccXjpyXR.s:387    .data:0000000000000000 dt
+     /tmp/ccXjpyXR.s:411    .data:0000000000000020 R_angle
+     /tmp/ccXjpyXR.s:402    .data:0000000000000018 Q_gyro
+     /tmp/ccXjpyXR.s:398    .data:0000000000000014 Q_angle
+     /tmp/ccXjpyXR.s:466    .bss:0000000000000038 angle_dot
+     /tmp/ccXjpyXR.s:426    .bss:0000000000000004 angle
+     /tmp/ccXjpyXR.s:415    .data:0000000000000024 K1
+     /tmp/ccXjpyXR.s:383    .data:0000000000000000 $d
+     /tmp/ccXjpyXR.s:418    .bss:0000000000000000 $d
+                     .debug_frame:0000000000000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_fsub
+__aeabi_fmul
+__aeabi_fadd
+__aeabi_i2f
+__aeabi_fdiv
+__aeabi_f2d
+__aeabi_dmul
+__aeabi_dadd
+__aeabi_d2f

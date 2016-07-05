@@ -1,0 +1,2947 @@
+ARM GAS  /tmp/ccDWfJV2.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"system_stm32f10x.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.align	1
+  16              		.global	SystemInit
+  17              		.syntax unified
+  18              		.thumb
+  19              		.thumb_func
+  20              		.fpu softvfp
+  21              		.type	SystemInit, %function
+  22              	SystemInit:
+  23              	.LFB63:
+  24              		.file 1 "lib/src/system_stm32f10x.c"
+   1:lib/src/system_stm32f10x.c **** /**
+   2:lib/src/system_stm32f10x.c ****   ******************************************************************************
+   3:lib/src/system_stm32f10x.c ****   * @file    system_stm32f10x.c
+   4:lib/src/system_stm32f10x.c ****   * @author  MCD Application Team
+   5:lib/src/system_stm32f10x.c ****   * @version V3.5.0
+   6:lib/src/system_stm32f10x.c ****   * @date    11-March-2011
+   7:lib/src/system_stm32f10x.c ****   * @brief   CMSIS Cortex-M3 Device Peripheral Access Layer System Source File.
+   8:lib/src/system_stm32f10x.c ****   * 
+   9:lib/src/system_stm32f10x.c ****   * 1.  This file provides two functions and one global variable to be called from 
+  10:lib/src/system_stm32f10x.c ****   *     user application:
+  11:lib/src/system_stm32f10x.c ****   *      - SystemInit(): Setups the system clock (System clock source, PLL Multiplier
+  12:lib/src/system_stm32f10x.c ****   *                      factors, AHB/APBx prescalers and Flash settings). 
+  13:lib/src/system_stm32f10x.c ****   *                      This function is called at startup just after reset and 
+  14:lib/src/system_stm32f10x.c ****   *                      before branch to main program. This call is made inside
+  15:lib/src/system_stm32f10x.c ****   *                      the "startup_stm32f10x_xx.s" file.
+  16:lib/src/system_stm32f10x.c ****   *
+  17:lib/src/system_stm32f10x.c ****   *      - SystemCoreClock variable: Contains the core clock (HCLK), it can be used
+  18:lib/src/system_stm32f10x.c ****   *                                  by the user application to setup the SysTick 
+  19:lib/src/system_stm32f10x.c ****   *                                  timer or configure other parameters.
+  20:lib/src/system_stm32f10x.c ****   *                                     
+  21:lib/src/system_stm32f10x.c ****   *      - SystemCoreClockUpdate(): Updates the variable SystemCoreClock and must
+  22:lib/src/system_stm32f10x.c ****   *                                 be called whenever the core clock is changed
+  23:lib/src/system_stm32f10x.c ****   *                                 during program execution.
+  24:lib/src/system_stm32f10x.c ****   *
+  25:lib/src/system_stm32f10x.c ****   * 2. After each device reset the HSI (8 MHz) is used as system clock source.
+  26:lib/src/system_stm32f10x.c ****   *    Then SystemInit() function is called, in "startup_stm32f10x_xx.s" file, to
+  27:lib/src/system_stm32f10x.c ****   *    configure the system clock before to branch to main program.
+  28:lib/src/system_stm32f10x.c ****   *
+  29:lib/src/system_stm32f10x.c ****   * 3. If the system clock source selected by user fails to startup, the SystemInit()
+  30:lib/src/system_stm32f10x.c ****   *    function will do nothing and HSI still used as system clock source. User can 
+  31:lib/src/system_stm32f10x.c ****   *    add some code to deal with this issue inside the SetSysClock() function.
+  32:lib/src/system_stm32f10x.c ****   *
+  33:lib/src/system_stm32f10x.c ****   * 4. The default value of HSE crystal is set to 8 MHz (or 25 MHz, depedning on
+ARM GAS  /tmp/ccDWfJV2.s 			page 2
+
+
+  34:lib/src/system_stm32f10x.c ****   *    the product used), refer to "HSE_VALUE" define in "stm32f10x.h" file. 
+  35:lib/src/system_stm32f10x.c ****   *    When HSE is used as system clock source, directly or through PLL, and you
+  36:lib/src/system_stm32f10x.c ****   *    are using different crystal you have to adapt the HSE value to your own
+  37:lib/src/system_stm32f10x.c ****   *    configuration.
+  38:lib/src/system_stm32f10x.c ****   *        
+  39:lib/src/system_stm32f10x.c ****   ******************************************************************************
+  40:lib/src/system_stm32f10x.c ****   * @attention
+  41:lib/src/system_stm32f10x.c ****   *
+  42:lib/src/system_stm32f10x.c ****   * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+  43:lib/src/system_stm32f10x.c ****   * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+  44:lib/src/system_stm32f10x.c ****   * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+  45:lib/src/system_stm32f10x.c ****   * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+  46:lib/src/system_stm32f10x.c ****   * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+  47:lib/src/system_stm32f10x.c ****   * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  48:lib/src/system_stm32f10x.c ****   *
+  49:lib/src/system_stm32f10x.c ****   * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  50:lib/src/system_stm32f10x.c ****   ******************************************************************************
+  51:lib/src/system_stm32f10x.c ****   */
+  52:lib/src/system_stm32f10x.c **** 
+  53:lib/src/system_stm32f10x.c **** /** @addtogroup CMSIS
+  54:lib/src/system_stm32f10x.c ****   * @{
+  55:lib/src/system_stm32f10x.c ****   */
+  56:lib/src/system_stm32f10x.c **** 
+  57:lib/src/system_stm32f10x.c **** /** @addtogroup stm32f10x_system
+  58:lib/src/system_stm32f10x.c ****   * @{
+  59:lib/src/system_stm32f10x.c ****   */  
+  60:lib/src/system_stm32f10x.c ****   
+  61:lib/src/system_stm32f10x.c **** /** @addtogroup STM32F10x_System_Private_Includes
+  62:lib/src/system_stm32f10x.c ****   * @{
+  63:lib/src/system_stm32f10x.c ****   */
+  64:lib/src/system_stm32f10x.c **** 
+  65:lib/src/system_stm32f10x.c **** #include "stm32f10x.h"
+  66:lib/src/system_stm32f10x.c **** 
+  67:lib/src/system_stm32f10x.c **** /**
+  68:lib/src/system_stm32f10x.c ****   * @}
+  69:lib/src/system_stm32f10x.c ****   */
+  70:lib/src/system_stm32f10x.c **** 
+  71:lib/src/system_stm32f10x.c **** /** @addtogroup STM32F10x_System_Private_TypesDefinitions
+  72:lib/src/system_stm32f10x.c ****   * @{
+  73:lib/src/system_stm32f10x.c ****   */
+  74:lib/src/system_stm32f10x.c **** 
+  75:lib/src/system_stm32f10x.c **** /**
+  76:lib/src/system_stm32f10x.c ****   * @}
+  77:lib/src/system_stm32f10x.c ****   */
+  78:lib/src/system_stm32f10x.c **** 
+  79:lib/src/system_stm32f10x.c **** /** @addtogroup STM32F10x_System_Private_Defines
+  80:lib/src/system_stm32f10x.c ****   * @{
+  81:lib/src/system_stm32f10x.c ****   */
+  82:lib/src/system_stm32f10x.c **** 
+  83:lib/src/system_stm32f10x.c **** /*!< Uncomment the line corresponding to the desired System clock (SYSCLK)
+  84:lib/src/system_stm32f10x.c ****    frequency (after reset the HSI is used as SYSCLK source)
+  85:lib/src/system_stm32f10x.c ****    
+  86:lib/src/system_stm32f10x.c ****    IMPORTANT NOTE:
+  87:lib/src/system_stm32f10x.c ****    ============== 
+  88:lib/src/system_stm32f10x.c ****    1. After each device reset the HSI is used as System clock source.
+  89:lib/src/system_stm32f10x.c **** 
+  90:lib/src/system_stm32f10x.c ****    2. Please make sure that the selected System clock doesn't exceed your device's
+ARM GAS  /tmp/ccDWfJV2.s 			page 3
+
+
+  91:lib/src/system_stm32f10x.c ****       maximum frequency.
+  92:lib/src/system_stm32f10x.c ****       
+  93:lib/src/system_stm32f10x.c ****    3. If none of the define below is enabled, the HSI is used as System clock
+  94:lib/src/system_stm32f10x.c ****     source.
+  95:lib/src/system_stm32f10x.c **** 
+  96:lib/src/system_stm32f10x.c ****    4. The System clock configuration functions provided within this file assume that:
+  97:lib/src/system_stm32f10x.c ****         - For Low, Medium and High density Value line devices an external 8MHz 
+  98:lib/src/system_stm32f10x.c ****           crystal is used to drive the System clock.
+  99:lib/src/system_stm32f10x.c ****         - For Low, Medium and High density devices an external 8MHz crystal is
+ 100:lib/src/system_stm32f10x.c ****           used to drive the System clock.
+ 101:lib/src/system_stm32f10x.c ****         - For Connectivity line devices an external 25MHz crystal is used to drive
+ 102:lib/src/system_stm32f10x.c ****           the System clock.
+ 103:lib/src/system_stm32f10x.c ****      If you are using different crystal you have to adapt those functions accordingly.
+ 104:lib/src/system_stm32f10x.c ****     */
+ 105:lib/src/system_stm32f10x.c ****     
+ 106:lib/src/system_stm32f10x.c **** #if defined (STM32F10X_LD_VL) || (defined STM32F10X_MD_VL) || (defined STM32F10X_HD_VL)
+ 107:lib/src/system_stm32f10x.c **** /* #define SYSCLK_FREQ_HSE    HSE_VALUE */
+ 108:lib/src/system_stm32f10x.c ****  #define SYSCLK_FREQ_24MHz  24000000
+ 109:lib/src/system_stm32f10x.c **** #else
+ 110:lib/src/system_stm32f10x.c **** /* #define SYSCLK_FREQ_HSE    HSE_VALUE */
+ 111:lib/src/system_stm32f10x.c **** /* #define SYSCLK_FREQ_24MHz  24000000 */ 
+ 112:lib/src/system_stm32f10x.c **** /* #define SYSCLK_FREQ_36MHz  36000000 */
+ 113:lib/src/system_stm32f10x.c **** /* #define SYSCLK_FREQ_48MHz  48000000 */
+ 114:lib/src/system_stm32f10x.c **** /* #define SYSCLK_FREQ_56MHz  56000000 */
+ 115:lib/src/system_stm32f10x.c **** #define SYSCLK_FREQ_72MHz  72000000
+ 116:lib/src/system_stm32f10x.c **** #endif
+ 117:lib/src/system_stm32f10x.c **** 
+ 118:lib/src/system_stm32f10x.c **** /*!< Uncomment the following line if you need to use external SRAM mounted
+ 119:lib/src/system_stm32f10x.c ****      on STM3210E-EVAL board (STM32 High density and XL-density devices) or on 
+ 120:lib/src/system_stm32f10x.c ****      STM32100E-EVAL board (STM32 High-density value line devices) as data memory */ 
+ 121:lib/src/system_stm32f10x.c **** #if defined (STM32F10X_HD) || (defined STM32F10X_XL) || (defined STM32F10X_HD_VL)
+ 122:lib/src/system_stm32f10x.c **** /* #define DATA_IN_ExtSRAM */
+ 123:lib/src/system_stm32f10x.c **** #endif
+ 124:lib/src/system_stm32f10x.c **** 
+ 125:lib/src/system_stm32f10x.c **** /*!< Uncomment the following line if you need to relocate your vector Table in
+ 126:lib/src/system_stm32f10x.c ****      Internal SRAM. */ 
+ 127:lib/src/system_stm32f10x.c **** /* #define VECT_TAB_SRAM */
+ 128:lib/src/system_stm32f10x.c **** #define VECT_TAB_OFFSET  0x0 /*!< Vector Table base offset field. 
+ 129:lib/src/system_stm32f10x.c ****                                   This value must be a multiple of 0x200. */
+ 130:lib/src/system_stm32f10x.c **** 
+ 131:lib/src/system_stm32f10x.c **** 
+ 132:lib/src/system_stm32f10x.c **** /**
+ 133:lib/src/system_stm32f10x.c ****   * @}
+ 134:lib/src/system_stm32f10x.c ****   */
+ 135:lib/src/system_stm32f10x.c **** 
+ 136:lib/src/system_stm32f10x.c **** /** @addtogroup STM32F10x_System_Private_Macros
+ 137:lib/src/system_stm32f10x.c ****   * @{
+ 138:lib/src/system_stm32f10x.c ****   */
+ 139:lib/src/system_stm32f10x.c **** 
+ 140:lib/src/system_stm32f10x.c **** /**
+ 141:lib/src/system_stm32f10x.c ****   * @}
+ 142:lib/src/system_stm32f10x.c ****   */
+ 143:lib/src/system_stm32f10x.c **** 
+ 144:lib/src/system_stm32f10x.c **** /** @addtogroup STM32F10x_System_Private_Variables
+ 145:lib/src/system_stm32f10x.c ****   * @{
+ 146:lib/src/system_stm32f10x.c ****   */
+ 147:lib/src/system_stm32f10x.c **** 
+ARM GAS  /tmp/ccDWfJV2.s 			page 4
+
+
+ 148:lib/src/system_stm32f10x.c **** /*******************************************************************************
+ 149:lib/src/system_stm32f10x.c **** *  Clock Definitions
+ 150:lib/src/system_stm32f10x.c **** *******************************************************************************/
+ 151:lib/src/system_stm32f10x.c **** #ifdef SYSCLK_FREQ_HSE
+ 152:lib/src/system_stm32f10x.c ****   uint32_t SystemCoreClock         = SYSCLK_FREQ_HSE;        /*!< System Clock Frequency (Core Cloc
+ 153:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_24MHz
+ 154:lib/src/system_stm32f10x.c ****   uint32_t SystemCoreClock         = SYSCLK_FREQ_24MHz;        /*!< System Clock Frequency (Core Cl
+ 155:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_36MHz
+ 156:lib/src/system_stm32f10x.c ****   uint32_t SystemCoreClock         = SYSCLK_FREQ_36MHz;        /*!< System Clock Frequency (Core Cl
+ 157:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_48MHz
+ 158:lib/src/system_stm32f10x.c ****   uint32_t SystemCoreClock         = SYSCLK_FREQ_48MHz;        /*!< System Clock Frequency (Core Cl
+ 159:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_56MHz
+ 160:lib/src/system_stm32f10x.c ****   uint32_t SystemCoreClock         = SYSCLK_FREQ_56MHz;        /*!< System Clock Frequency (Core Cl
+ 161:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_72MHz
+ 162:lib/src/system_stm32f10x.c ****   uint32_t SystemCoreClock         = SYSCLK_FREQ_72MHz;        /*!< System Clock Frequency (Core Cl
+ 163:lib/src/system_stm32f10x.c **** #else /*!< HSI Selected as System Clock source */
+ 164:lib/src/system_stm32f10x.c ****   uint32_t SystemCoreClock         = HSI_VALUE;        /*!< System Clock Frequency (Core Clock) */
+ 165:lib/src/system_stm32f10x.c **** #endif
+ 166:lib/src/system_stm32f10x.c **** 
+ 167:lib/src/system_stm32f10x.c **** __I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+ 168:lib/src/system_stm32f10x.c **** /**
+ 169:lib/src/system_stm32f10x.c ****   * @}
+ 170:lib/src/system_stm32f10x.c ****   */
+ 171:lib/src/system_stm32f10x.c **** 
+ 172:lib/src/system_stm32f10x.c **** /** @addtogroup STM32F10x_System_Private_FunctionPrototypes
+ 173:lib/src/system_stm32f10x.c ****   * @{
+ 174:lib/src/system_stm32f10x.c ****   */
+ 175:lib/src/system_stm32f10x.c **** 
+ 176:lib/src/system_stm32f10x.c **** static void SetSysClock(void);
+ 177:lib/src/system_stm32f10x.c **** 
+ 178:lib/src/system_stm32f10x.c **** #ifdef SYSCLK_FREQ_HSE
+ 179:lib/src/system_stm32f10x.c ****   static void SetSysClockToHSE(void);
+ 180:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_24MHz
+ 181:lib/src/system_stm32f10x.c ****   static void SetSysClockTo24(void);
+ 182:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_36MHz
+ 183:lib/src/system_stm32f10x.c ****   static void SetSysClockTo36(void);
+ 184:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_48MHz
+ 185:lib/src/system_stm32f10x.c ****   static void SetSysClockTo48(void);
+ 186:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_56MHz
+ 187:lib/src/system_stm32f10x.c ****   static void SetSysClockTo56(void);  
+ 188:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_72MHz
+ 189:lib/src/system_stm32f10x.c ****   static void SetSysClockTo72(void);
+ 190:lib/src/system_stm32f10x.c **** #endif
+ 191:lib/src/system_stm32f10x.c **** 
+ 192:lib/src/system_stm32f10x.c **** #ifdef DATA_IN_ExtSRAM
+ 193:lib/src/system_stm32f10x.c ****   static void SystemInit_ExtMemCtl(void); 
+ 194:lib/src/system_stm32f10x.c **** #endif /* DATA_IN_ExtSRAM */
+ 195:lib/src/system_stm32f10x.c **** 
+ 196:lib/src/system_stm32f10x.c **** /**
+ 197:lib/src/system_stm32f10x.c ****   * @}
+ 198:lib/src/system_stm32f10x.c ****   */
+ 199:lib/src/system_stm32f10x.c **** 
+ 200:lib/src/system_stm32f10x.c **** /** @addtogroup STM32F10x_System_Private_Functions
+ 201:lib/src/system_stm32f10x.c ****   * @{
+ 202:lib/src/system_stm32f10x.c ****   */
+ 203:lib/src/system_stm32f10x.c **** 
+ 204:lib/src/system_stm32f10x.c **** /**
+ARM GAS  /tmp/ccDWfJV2.s 			page 5
+
+
+ 205:lib/src/system_stm32f10x.c ****   * @brief  Setup the microcontroller system
+ 206:lib/src/system_stm32f10x.c ****   *         Initialize the Embedded Flash Interface, the PLL and update the 
+ 207:lib/src/system_stm32f10x.c ****   *         SystemCoreClock variable.
+ 208:lib/src/system_stm32f10x.c ****   * @note   This function should be used only after reset.
+ 209:lib/src/system_stm32f10x.c ****   * @param  None
+ 210:lib/src/system_stm32f10x.c ****   * @retval None
+ 211:lib/src/system_stm32f10x.c ****   */
+ 212:lib/src/system_stm32f10x.c **** void SystemInit (void)
+ 213:lib/src/system_stm32f10x.c **** {
+  25              		.loc 1 213 0
+  26              		.cfi_startproc
+  27              		@ args = 0, pretend = 0, frame = 8
+  28              		@ frame_needed = 0, uses_anonymous_args = 0
+  29              		@ link register save eliminated.
+  30 0000 82B0     		sub	sp, sp, #8
+  31              		.cfi_def_cfa_offset 8
+ 214:lib/src/system_stm32f10x.c ****   /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
+ 215:lib/src/system_stm32f10x.c ****   /* Set HSION bit */
+ 216:lib/src/system_stm32f10x.c ****   RCC->CR |= (uint32_t)0x00000001;
+  32              		.loc 1 216 0
+  33 0002 3C4B     		ldr	r3, .L14
+  34 0004 1A68     		ldr	r2, [r3]
+  35 0006 42F00102 		orr	r2, r2, #1
+  36 000a 1A60     		str	r2, [r3]
+ 217:lib/src/system_stm32f10x.c **** 
+ 218:lib/src/system_stm32f10x.c ****   /* Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits */
+ 219:lib/src/system_stm32f10x.c **** #ifndef STM32F10X_CL
+ 220:lib/src/system_stm32f10x.c ****   RCC->CFGR &= (uint32_t)0xF8FF0000;
+  37              		.loc 1 220 0
+  38 000c 5968     		ldr	r1, [r3, #4]
+  39 000e 3A4A     		ldr	r2, .L14+4
+  40 0010 0A40     		ands	r2, r2, r1
+  41 0012 5A60     		str	r2, [r3, #4]
+ 221:lib/src/system_stm32f10x.c **** #else
+ 222:lib/src/system_stm32f10x.c ****   RCC->CFGR &= (uint32_t)0xF0FF0000;
+ 223:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */   
+ 224:lib/src/system_stm32f10x.c ****   
+ 225:lib/src/system_stm32f10x.c ****   /* Reset HSEON, CSSON and PLLON bits */
+ 226:lib/src/system_stm32f10x.c ****   RCC->CR &= (uint32_t)0xFEF6FFFF;
+  42              		.loc 1 226 0
+  43 0014 1A68     		ldr	r2, [r3]
+  44 0016 22F08472 		bic	r2, r2, #17301504
+  45 001a 22F48032 		bic	r2, r2, #65536
+  46 001e 1A60     		str	r2, [r3]
+ 227:lib/src/system_stm32f10x.c **** 
+ 228:lib/src/system_stm32f10x.c ****   /* Reset HSEBYP bit */
+ 229:lib/src/system_stm32f10x.c ****   RCC->CR &= (uint32_t)0xFFFBFFFF;
+  47              		.loc 1 229 0
+  48 0020 1A68     		ldr	r2, [r3]
+  49 0022 22F48022 		bic	r2, r2, #262144
+  50 0026 1A60     		str	r2, [r3]
+ 230:lib/src/system_stm32f10x.c **** 
+ 231:lib/src/system_stm32f10x.c ****   /* Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits */
+ 232:lib/src/system_stm32f10x.c ****   RCC->CFGR &= (uint32_t)0xFF80FFFF;
+  51              		.loc 1 232 0
+  52 0028 5A68     		ldr	r2, [r3, #4]
+  53 002a 22F4FE02 		bic	r2, r2, #8323072
+ARM GAS  /tmp/ccDWfJV2.s 			page 6
+
+
+  54 002e 5A60     		str	r2, [r3, #4]
+ 233:lib/src/system_stm32f10x.c **** 
+ 234:lib/src/system_stm32f10x.c **** #ifdef STM32F10X_CL
+ 235:lib/src/system_stm32f10x.c ****   /* Reset PLL2ON and PLL3ON bits */
+ 236:lib/src/system_stm32f10x.c ****   RCC->CR &= (uint32_t)0xEBFFFFFF;
+ 237:lib/src/system_stm32f10x.c **** 
+ 238:lib/src/system_stm32f10x.c ****   /* Disable all interrupts and clear pending bits  */
+ 239:lib/src/system_stm32f10x.c ****   RCC->CIR = 0x00FF0000;
+ 240:lib/src/system_stm32f10x.c **** 
+ 241:lib/src/system_stm32f10x.c ****   /* Reset CFGR2 register */
+ 242:lib/src/system_stm32f10x.c ****   RCC->CFGR2 = 0x00000000;
+ 243:lib/src/system_stm32f10x.c **** #elif defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || (defined STM32F10X_HD_VL)
+ 244:lib/src/system_stm32f10x.c ****   /* Disable all interrupts and clear pending bits  */
+ 245:lib/src/system_stm32f10x.c ****   RCC->CIR = 0x009F0000;
+ 246:lib/src/system_stm32f10x.c **** 
+ 247:lib/src/system_stm32f10x.c ****   /* Reset CFGR2 register */
+ 248:lib/src/system_stm32f10x.c ****   RCC->CFGR2 = 0x00000000;      
+ 249:lib/src/system_stm32f10x.c **** #else
+ 250:lib/src/system_stm32f10x.c ****   /* Disable all interrupts and clear pending bits  */
+ 251:lib/src/system_stm32f10x.c ****   RCC->CIR = 0x009F0000;
+  55              		.loc 1 251 0
+  56 0030 4FF41F02 		mov	r2, #10420224
+  57 0034 9A60     		str	r2, [r3, #8]
+  58              	.LBB6:
+  59              	.LBB7:
+  60              	.LBB8:
+ 252:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */
+ 253:lib/src/system_stm32f10x.c ****     
+ 254:lib/src/system_stm32f10x.c **** #if defined (STM32F10X_HD) || (defined STM32F10X_XL) || (defined STM32F10X_HD_VL)
+ 255:lib/src/system_stm32f10x.c ****   #ifdef DATA_IN_ExtSRAM
+ 256:lib/src/system_stm32f10x.c ****     SystemInit_ExtMemCtl(); 
+ 257:lib/src/system_stm32f10x.c ****   #endif /* DATA_IN_ExtSRAM */
+ 258:lib/src/system_stm32f10x.c **** #endif 
+ 259:lib/src/system_stm32f10x.c **** 
+ 260:lib/src/system_stm32f10x.c ****   /* Configure the System clock frequency, HCLK, PCLK2 and PCLK1 prescalers */
+ 261:lib/src/system_stm32f10x.c ****   /* Configure the Flash Latency cycles and enable prefetch buffer */
+ 262:lib/src/system_stm32f10x.c ****   SetSysClock();
+ 263:lib/src/system_stm32f10x.c **** 
+ 264:lib/src/system_stm32f10x.c **** #ifdef VECT_TAB_SRAM
+ 265:lib/src/system_stm32f10x.c ****   SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM. */
+ 266:lib/src/system_stm32f10x.c **** #else
+ 267:lib/src/system_stm32f10x.c ****   SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH. */
+ 268:lib/src/system_stm32f10x.c **** #endif 
+ 269:lib/src/system_stm32f10x.c **** }
+ 270:lib/src/system_stm32f10x.c **** 
+ 271:lib/src/system_stm32f10x.c **** /**
+ 272:lib/src/system_stm32f10x.c ****   * @brief  Update SystemCoreClock variable according to Clock Register Values.
+ 273:lib/src/system_stm32f10x.c ****   *         The SystemCoreClock variable contains the core clock (HCLK), it can
+ 274:lib/src/system_stm32f10x.c ****   *         be used by the user application to setup the SysTick timer or configure
+ 275:lib/src/system_stm32f10x.c ****   *         other parameters.
+ 276:lib/src/system_stm32f10x.c ****   *           
+ 277:lib/src/system_stm32f10x.c ****   * @note   Each time the core clock (HCLK) changes, this function must be called
+ 278:lib/src/system_stm32f10x.c ****   *         to update SystemCoreClock variable value. Otherwise, any configuration
+ 279:lib/src/system_stm32f10x.c ****   *         based on this variable will be incorrect.         
+ 280:lib/src/system_stm32f10x.c ****   *     
+ 281:lib/src/system_stm32f10x.c ****   * @note   - The system frequency computed by this function is not the real 
+ 282:lib/src/system_stm32f10x.c ****   *           frequency in the chip. It is calculated based on the predefined 
+ARM GAS  /tmp/ccDWfJV2.s 			page 7
+
+
+ 283:lib/src/system_stm32f10x.c ****   *           constant and the selected clock source:
+ 284:lib/src/system_stm32f10x.c ****   *             
+ 285:lib/src/system_stm32f10x.c ****   *           - If SYSCLK source is HSI, SystemCoreClock will contain the HSI_VALUE(*)
+ 286:lib/src/system_stm32f10x.c ****   *                                              
+ 287:lib/src/system_stm32f10x.c ****   *           - If SYSCLK source is HSE, SystemCoreClock will contain the HSE_VALUE(**)
+ 288:lib/src/system_stm32f10x.c ****   *                          
+ 289:lib/src/system_stm32f10x.c ****   *           - If SYSCLK source is PLL, SystemCoreClock will contain the HSE_VALUE(**) 
+ 290:lib/src/system_stm32f10x.c ****   *             or HSI_VALUE(*) multiplied by the PLL factors.
+ 291:lib/src/system_stm32f10x.c ****   *         
+ 292:lib/src/system_stm32f10x.c ****   *         (*) HSI_VALUE is a constant defined in stm32f1xx.h file (default value
+ 293:lib/src/system_stm32f10x.c ****   *             8 MHz) but the real value may vary depending on the variations
+ 294:lib/src/system_stm32f10x.c ****   *             in voltage and temperature.   
+ 295:lib/src/system_stm32f10x.c ****   *    
+ 296:lib/src/system_stm32f10x.c ****   *         (**) HSE_VALUE is a constant defined in stm32f1xx.h file (default value
+ 297:lib/src/system_stm32f10x.c ****   *              8 MHz or 25 MHz, depedning on the product used), user has to ensure
+ 298:lib/src/system_stm32f10x.c ****   *              that HSE_VALUE is same as the real frequency of the crystal used.
+ 299:lib/src/system_stm32f10x.c ****   *              Otherwise, this function may have wrong result.
+ 300:lib/src/system_stm32f10x.c ****   *                
+ 301:lib/src/system_stm32f10x.c ****   *         - The result of this function could be not correct when using fractional
+ 302:lib/src/system_stm32f10x.c ****   *           value for HSE crystal.
+ 303:lib/src/system_stm32f10x.c ****   * @param  None
+ 304:lib/src/system_stm32f10x.c ****   * @retval None
+ 305:lib/src/system_stm32f10x.c ****   */
+ 306:lib/src/system_stm32f10x.c **** void SystemCoreClockUpdate (void)
+ 307:lib/src/system_stm32f10x.c **** {
+ 308:lib/src/system_stm32f10x.c ****   uint32_t tmp = 0, pllmull = 0, pllsource = 0;
+ 309:lib/src/system_stm32f10x.c **** 
+ 310:lib/src/system_stm32f10x.c **** #ifdef  STM32F10X_CL
+ 311:lib/src/system_stm32f10x.c ****   uint32_t prediv1source = 0, prediv1factor = 0, prediv2factor = 0, pll2mull = 0;
+ 312:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */
+ 313:lib/src/system_stm32f10x.c **** 
+ 314:lib/src/system_stm32f10x.c **** #if defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || (defined STM32F10X_HD_VL)
+ 315:lib/src/system_stm32f10x.c ****   uint32_t prediv1factor = 0;
+ 316:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_LD_VL or STM32F10X_MD_VL or STM32F10X_HD_VL */
+ 317:lib/src/system_stm32f10x.c ****     
+ 318:lib/src/system_stm32f10x.c ****   /* Get SYSCLK source -------------------------------------------------------*/
+ 319:lib/src/system_stm32f10x.c ****   tmp = RCC->CFGR & RCC_CFGR_SWS;
+ 320:lib/src/system_stm32f10x.c ****   
+ 321:lib/src/system_stm32f10x.c ****   switch (tmp)
+ 322:lib/src/system_stm32f10x.c ****   {
+ 323:lib/src/system_stm32f10x.c ****     case 0x00:  /* HSI used as system clock */
+ 324:lib/src/system_stm32f10x.c ****       SystemCoreClock = HSI_VALUE;
+ 325:lib/src/system_stm32f10x.c ****       break;
+ 326:lib/src/system_stm32f10x.c ****     case 0x04:  /* HSE used as system clock */
+ 327:lib/src/system_stm32f10x.c ****       SystemCoreClock = HSE_VALUE;
+ 328:lib/src/system_stm32f10x.c ****       break;
+ 329:lib/src/system_stm32f10x.c ****     case 0x08:  /* PLL used as system clock */
+ 330:lib/src/system_stm32f10x.c **** 
+ 331:lib/src/system_stm32f10x.c ****       /* Get PLL clock source and multiplication factor ----------------------*/
+ 332:lib/src/system_stm32f10x.c ****       pllmull = RCC->CFGR & RCC_CFGR_PLLMULL;
+ 333:lib/src/system_stm32f10x.c ****       pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
+ 334:lib/src/system_stm32f10x.c ****       
+ 335:lib/src/system_stm32f10x.c **** #ifndef STM32F10X_CL      
+ 336:lib/src/system_stm32f10x.c ****       pllmull = ( pllmull >> 18) + 2;
+ 337:lib/src/system_stm32f10x.c ****       
+ 338:lib/src/system_stm32f10x.c ****       if (pllsource == 0x00)
+ 339:lib/src/system_stm32f10x.c ****       {
+ARM GAS  /tmp/ccDWfJV2.s 			page 8
+
+
+ 340:lib/src/system_stm32f10x.c ****         /* HSI oscillator clock divided by 2 selected as PLL clock entry */
+ 341:lib/src/system_stm32f10x.c ****         SystemCoreClock = (HSI_VALUE >> 1) * pllmull;
+ 342:lib/src/system_stm32f10x.c ****       }
+ 343:lib/src/system_stm32f10x.c ****       else
+ 344:lib/src/system_stm32f10x.c ****       {
+ 345:lib/src/system_stm32f10x.c ****  #if defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || (defined STM32F10X_HD_VL)
+ 346:lib/src/system_stm32f10x.c ****        prediv1factor = (RCC->CFGR2 & RCC_CFGR2_PREDIV1) + 1;
+ 347:lib/src/system_stm32f10x.c ****        /* HSE oscillator clock selected as PREDIV1 clock entry */
+ 348:lib/src/system_stm32f10x.c ****        SystemCoreClock = (HSE_VALUE / prediv1factor) * pllmull; 
+ 349:lib/src/system_stm32f10x.c ****  #else
+ 350:lib/src/system_stm32f10x.c ****         /* HSE selected as PLL clock entry */
+ 351:lib/src/system_stm32f10x.c ****         if ((RCC->CFGR & RCC_CFGR_PLLXTPRE) != (uint32_t)RESET)
+ 352:lib/src/system_stm32f10x.c ****         {/* HSE oscillator clock divided by 2 */
+ 353:lib/src/system_stm32f10x.c ****           SystemCoreClock = (HSE_VALUE >> 1) * pllmull;
+ 354:lib/src/system_stm32f10x.c ****         }
+ 355:lib/src/system_stm32f10x.c ****         else
+ 356:lib/src/system_stm32f10x.c ****         {
+ 357:lib/src/system_stm32f10x.c ****           SystemCoreClock = HSE_VALUE * pllmull;
+ 358:lib/src/system_stm32f10x.c ****         }
+ 359:lib/src/system_stm32f10x.c ****  #endif
+ 360:lib/src/system_stm32f10x.c ****       }
+ 361:lib/src/system_stm32f10x.c **** #else
+ 362:lib/src/system_stm32f10x.c ****       pllmull = pllmull >> 18;
+ 363:lib/src/system_stm32f10x.c ****       
+ 364:lib/src/system_stm32f10x.c ****       if (pllmull != 0x0D)
+ 365:lib/src/system_stm32f10x.c ****       {
+ 366:lib/src/system_stm32f10x.c ****          pllmull += 2;
+ 367:lib/src/system_stm32f10x.c ****       }
+ 368:lib/src/system_stm32f10x.c ****       else
+ 369:lib/src/system_stm32f10x.c ****       { /* PLL multiplication factor = PLL input clock * 6.5 */
+ 370:lib/src/system_stm32f10x.c ****         pllmull = 13 / 2; 
+ 371:lib/src/system_stm32f10x.c ****       }
+ 372:lib/src/system_stm32f10x.c ****             
+ 373:lib/src/system_stm32f10x.c ****       if (pllsource == 0x00)
+ 374:lib/src/system_stm32f10x.c ****       {
+ 375:lib/src/system_stm32f10x.c ****         /* HSI oscillator clock divided by 2 selected as PLL clock entry */
+ 376:lib/src/system_stm32f10x.c ****         SystemCoreClock = (HSI_VALUE >> 1) * pllmull;
+ 377:lib/src/system_stm32f10x.c ****       }
+ 378:lib/src/system_stm32f10x.c ****       else
+ 379:lib/src/system_stm32f10x.c ****       {/* PREDIV1 selected as PLL clock entry */
+ 380:lib/src/system_stm32f10x.c ****         
+ 381:lib/src/system_stm32f10x.c ****         /* Get PREDIV1 clock source and division factor */
+ 382:lib/src/system_stm32f10x.c ****         prediv1source = RCC->CFGR2 & RCC_CFGR2_PREDIV1SRC;
+ 383:lib/src/system_stm32f10x.c ****         prediv1factor = (RCC->CFGR2 & RCC_CFGR2_PREDIV1) + 1;
+ 384:lib/src/system_stm32f10x.c ****         
+ 385:lib/src/system_stm32f10x.c ****         if (prediv1source == 0)
+ 386:lib/src/system_stm32f10x.c ****         { 
+ 387:lib/src/system_stm32f10x.c ****           /* HSE oscillator clock selected as PREDIV1 clock entry */
+ 388:lib/src/system_stm32f10x.c ****           SystemCoreClock = (HSE_VALUE / prediv1factor) * pllmull;          
+ 389:lib/src/system_stm32f10x.c ****         }
+ 390:lib/src/system_stm32f10x.c ****         else
+ 391:lib/src/system_stm32f10x.c ****         {/* PLL2 clock selected as PREDIV1 clock entry */
+ 392:lib/src/system_stm32f10x.c ****           
+ 393:lib/src/system_stm32f10x.c ****           /* Get PREDIV2 division factor and PLL2 multiplication factor */
+ 394:lib/src/system_stm32f10x.c ****           prediv2factor = ((RCC->CFGR2 & RCC_CFGR2_PREDIV2) >> 4) + 1;
+ 395:lib/src/system_stm32f10x.c ****           pll2mull = ((RCC->CFGR2 & RCC_CFGR2_PLL2MUL) >> 8 ) + 2; 
+ 396:lib/src/system_stm32f10x.c ****           SystemCoreClock = (((HSE_VALUE / prediv2factor) * pll2mull) / prediv1factor) * pllmull;  
+ARM GAS  /tmp/ccDWfJV2.s 			page 9
+
+
+ 397:lib/src/system_stm32f10x.c ****         }
+ 398:lib/src/system_stm32f10x.c ****       }
+ 399:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */ 
+ 400:lib/src/system_stm32f10x.c ****       break;
+ 401:lib/src/system_stm32f10x.c **** 
+ 402:lib/src/system_stm32f10x.c ****     default:
+ 403:lib/src/system_stm32f10x.c ****       SystemCoreClock = HSI_VALUE;
+ 404:lib/src/system_stm32f10x.c ****       break;
+ 405:lib/src/system_stm32f10x.c ****   }
+ 406:lib/src/system_stm32f10x.c ****   
+ 407:lib/src/system_stm32f10x.c ****   /* Compute HCLK clock frequency ----------------*/
+ 408:lib/src/system_stm32f10x.c ****   /* Get HCLK prescaler */
+ 409:lib/src/system_stm32f10x.c ****   tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
+ 410:lib/src/system_stm32f10x.c ****   /* HCLK clock frequency */
+ 411:lib/src/system_stm32f10x.c ****   SystemCoreClock >>= tmp;  
+ 412:lib/src/system_stm32f10x.c **** }
+ 413:lib/src/system_stm32f10x.c **** 
+ 414:lib/src/system_stm32f10x.c **** /**
+ 415:lib/src/system_stm32f10x.c ****   * @brief  Configures the System clock frequency, HCLK, PCLK2 and PCLK1 prescalers.
+ 416:lib/src/system_stm32f10x.c ****   * @param  None
+ 417:lib/src/system_stm32f10x.c ****   * @retval None
+ 418:lib/src/system_stm32f10x.c ****   */
+ 419:lib/src/system_stm32f10x.c **** static void SetSysClock(void)
+ 420:lib/src/system_stm32f10x.c **** {
+ 421:lib/src/system_stm32f10x.c **** #ifdef SYSCLK_FREQ_HSE
+ 422:lib/src/system_stm32f10x.c ****   SetSysClockToHSE();
+ 423:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_24MHz
+ 424:lib/src/system_stm32f10x.c ****   SetSysClockTo24();
+ 425:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_36MHz
+ 426:lib/src/system_stm32f10x.c ****   SetSysClockTo36();
+ 427:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_48MHz
+ 428:lib/src/system_stm32f10x.c ****   SetSysClockTo48();
+ 429:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_56MHz
+ 430:lib/src/system_stm32f10x.c ****   SetSysClockTo56();  
+ 431:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_72MHz
+ 432:lib/src/system_stm32f10x.c ****   SetSysClockTo72();
+ 433:lib/src/system_stm32f10x.c **** #endif
+ 434:lib/src/system_stm32f10x.c ****  
+ 435:lib/src/system_stm32f10x.c ****  /* If none of the define above is enabled, the HSI is used as System clock
+ 436:lib/src/system_stm32f10x.c ****     source (default after reset) */ 
+ 437:lib/src/system_stm32f10x.c **** }
+ 438:lib/src/system_stm32f10x.c **** 
+ 439:lib/src/system_stm32f10x.c **** /**
+ 440:lib/src/system_stm32f10x.c ****   * @brief  Setup the external memory controller. Called in startup_stm32f10x.s 
+ 441:lib/src/system_stm32f10x.c ****   *          before jump to __main
+ 442:lib/src/system_stm32f10x.c ****   * @param  None
+ 443:lib/src/system_stm32f10x.c ****   * @retval None
+ 444:lib/src/system_stm32f10x.c ****   */ 
+ 445:lib/src/system_stm32f10x.c **** #ifdef DATA_IN_ExtSRAM
+ 446:lib/src/system_stm32f10x.c **** /**
+ 447:lib/src/system_stm32f10x.c ****   * @brief  Setup the external memory controller. 
+ 448:lib/src/system_stm32f10x.c ****   *         Called in startup_stm32f10x_xx.s/.c before jump to main.
+ 449:lib/src/system_stm32f10x.c ****   * 	      This function configures the external SRAM mounted on STM3210E-EVAL
+ 450:lib/src/system_stm32f10x.c ****   *         board (STM32 High density devices). This SRAM will be used as program
+ 451:lib/src/system_stm32f10x.c ****   *         data memory (including heap and stack).
+ 452:lib/src/system_stm32f10x.c ****   * @param  None
+ 453:lib/src/system_stm32f10x.c ****   * @retval None
+ARM GAS  /tmp/ccDWfJV2.s 			page 10
+
+
+ 454:lib/src/system_stm32f10x.c ****   */ 
+ 455:lib/src/system_stm32f10x.c **** void SystemInit_ExtMemCtl(void) 
+ 456:lib/src/system_stm32f10x.c **** {
+ 457:lib/src/system_stm32f10x.c **** /*!< FSMC Bank1 NOR/SRAM3 is used for the STM3210E-EVAL, if another Bank is 
+ 458:lib/src/system_stm32f10x.c ****   required, then adjust the Register Addresses */
+ 459:lib/src/system_stm32f10x.c **** 
+ 460:lib/src/system_stm32f10x.c ****   /* Enable FSMC clock */
+ 461:lib/src/system_stm32f10x.c ****   RCC->AHBENR = 0x00000114;
+ 462:lib/src/system_stm32f10x.c ****   
+ 463:lib/src/system_stm32f10x.c ****   /* Enable GPIOD, GPIOE, GPIOF and GPIOG clocks */  
+ 464:lib/src/system_stm32f10x.c ****   RCC->APB2ENR = 0x000001E0;
+ 465:lib/src/system_stm32f10x.c ****   
+ 466:lib/src/system_stm32f10x.c **** /* ---------------  SRAM Data lines, NOE and NWE configuration ---------------*/
+ 467:lib/src/system_stm32f10x.c **** /*----------------  SRAM Address lines configuration -------------------------*/
+ 468:lib/src/system_stm32f10x.c **** /*----------------  NOE and NWE configuration --------------------------------*/  
+ 469:lib/src/system_stm32f10x.c **** /*----------------  NE3 configuration ----------------------------------------*/
+ 470:lib/src/system_stm32f10x.c **** /*----------------  NBL0, NBL1 configuration ---------------------------------*/
+ 471:lib/src/system_stm32f10x.c ****   
+ 472:lib/src/system_stm32f10x.c ****   GPIOD->CRL = 0x44BB44BB;  
+ 473:lib/src/system_stm32f10x.c ****   GPIOD->CRH = 0xBBBBBBBB;
+ 474:lib/src/system_stm32f10x.c **** 
+ 475:lib/src/system_stm32f10x.c ****   GPIOE->CRL = 0xB44444BB;  
+ 476:lib/src/system_stm32f10x.c ****   GPIOE->CRH = 0xBBBBBBBB;
+ 477:lib/src/system_stm32f10x.c **** 
+ 478:lib/src/system_stm32f10x.c ****   GPIOF->CRL = 0x44BBBBBB;  
+ 479:lib/src/system_stm32f10x.c ****   GPIOF->CRH = 0xBBBB4444;
+ 480:lib/src/system_stm32f10x.c **** 
+ 481:lib/src/system_stm32f10x.c ****   GPIOG->CRL = 0x44BBBBBB;  
+ 482:lib/src/system_stm32f10x.c ****   GPIOG->CRH = 0x44444B44;
+ 483:lib/src/system_stm32f10x.c ****    
+ 484:lib/src/system_stm32f10x.c **** /*----------------  FSMC Configuration ---------------------------------------*/  
+ 485:lib/src/system_stm32f10x.c **** /*----------------  Enable FSMC Bank1_SRAM Bank ------------------------------*/
+ 486:lib/src/system_stm32f10x.c ****   
+ 487:lib/src/system_stm32f10x.c ****   FSMC_Bank1->BTCR[4] = 0x00001011;
+ 488:lib/src/system_stm32f10x.c ****   FSMC_Bank1->BTCR[5] = 0x00000200;
+ 489:lib/src/system_stm32f10x.c **** }
+ 490:lib/src/system_stm32f10x.c **** #endif /* DATA_IN_ExtSRAM */
+ 491:lib/src/system_stm32f10x.c **** 
+ 492:lib/src/system_stm32f10x.c **** #ifdef SYSCLK_FREQ_HSE
+ 493:lib/src/system_stm32f10x.c **** /**
+ 494:lib/src/system_stm32f10x.c ****   * @brief  Selects HSE as System clock source and configure HCLK, PCLK2
+ 495:lib/src/system_stm32f10x.c ****   *         and PCLK1 prescalers.
+ 496:lib/src/system_stm32f10x.c ****   * @note   This function should be used only after reset.
+ 497:lib/src/system_stm32f10x.c ****   * @param  None
+ 498:lib/src/system_stm32f10x.c ****   * @retval None
+ 499:lib/src/system_stm32f10x.c ****   */
+ 500:lib/src/system_stm32f10x.c **** static void SetSysClockToHSE(void)
+ 501:lib/src/system_stm32f10x.c **** {
+ 502:lib/src/system_stm32f10x.c ****   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+ 503:lib/src/system_stm32f10x.c ****   
+ 504:lib/src/system_stm32f10x.c ****   /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/    
+ 505:lib/src/system_stm32f10x.c ****   /* Enable HSE */    
+ 506:lib/src/system_stm32f10x.c ****   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
+ 507:lib/src/system_stm32f10x.c ****  
+ 508:lib/src/system_stm32f10x.c ****   /* Wait till HSE is ready and if Time out is reached exit */
+ 509:lib/src/system_stm32f10x.c ****   do
+ 510:lib/src/system_stm32f10x.c ****   {
+ARM GAS  /tmp/ccDWfJV2.s 			page 11
+
+
+ 511:lib/src/system_stm32f10x.c ****     HSEStatus = RCC->CR & RCC_CR_HSERDY;
+ 512:lib/src/system_stm32f10x.c ****     StartUpCounter++;  
+ 513:lib/src/system_stm32f10x.c ****   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+ 514:lib/src/system_stm32f10x.c **** 
+ 515:lib/src/system_stm32f10x.c ****   if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+ 516:lib/src/system_stm32f10x.c ****   {
+ 517:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x01;
+ 518:lib/src/system_stm32f10x.c ****   }
+ 519:lib/src/system_stm32f10x.c ****   else
+ 520:lib/src/system_stm32f10x.c ****   {
+ 521:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x00;
+ 522:lib/src/system_stm32f10x.c ****   }  
+ 523:lib/src/system_stm32f10x.c **** 
+ 524:lib/src/system_stm32f10x.c ****   if (HSEStatus == (uint32_t)0x01)
+ 525:lib/src/system_stm32f10x.c ****   {
+ 526:lib/src/system_stm32f10x.c **** 
+ 527:lib/src/system_stm32f10x.c **** #if !defined STM32F10X_LD_VL && !defined STM32F10X_MD_VL && !defined STM32F10X_HD_VL
+ 528:lib/src/system_stm32f10x.c ****     /* Enable Prefetch Buffer */
+ 529:lib/src/system_stm32f10x.c ****     FLASH->ACR |= FLASH_ACR_PRFTBE;
+ 530:lib/src/system_stm32f10x.c **** 
+ 531:lib/src/system_stm32f10x.c ****     /* Flash 0 wait state */
+ 532:lib/src/system_stm32f10x.c ****     FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
+ 533:lib/src/system_stm32f10x.c **** 
+ 534:lib/src/system_stm32f10x.c **** #ifndef STM32F10X_CL
+ 535:lib/src/system_stm32f10x.c ****     FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;
+ 536:lib/src/system_stm32f10x.c **** #else
+ 537:lib/src/system_stm32f10x.c ****     if (HSE_VALUE <= 24000000)
+ 538:lib/src/system_stm32f10x.c **** 	{
+ 539:lib/src/system_stm32f10x.c ****       FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;
+ 540:lib/src/system_stm32f10x.c **** 	}
+ 541:lib/src/system_stm32f10x.c **** 	else
+ 542:lib/src/system_stm32f10x.c **** 	{
+ 543:lib/src/system_stm32f10x.c ****       FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_1;
+ 544:lib/src/system_stm32f10x.c **** 	}
+ 545:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */
+ 546:lib/src/system_stm32f10x.c **** #endif
+ 547:lib/src/system_stm32f10x.c ****  
+ 548:lib/src/system_stm32f10x.c ****     /* HCLK = SYSCLK */
+ 549:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+ 550:lib/src/system_stm32f10x.c ****       
+ 551:lib/src/system_stm32f10x.c ****     /* PCLK2 = HCLK */
+ 552:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
+ 553:lib/src/system_stm32f10x.c ****     
+ 554:lib/src/system_stm32f10x.c ****     /* PCLK1 = HCLK */
+ 555:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
+ 556:lib/src/system_stm32f10x.c ****     
+ 557:lib/src/system_stm32f10x.c ****     /* Select HSE as system clock source */
+ 558:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+ 559:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_HSE;    
+ 560:lib/src/system_stm32f10x.c **** 
+ 561:lib/src/system_stm32f10x.c ****     /* Wait till HSE is used as system clock source */
+ 562:lib/src/system_stm32f10x.c ****     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x04)
+ 563:lib/src/system_stm32f10x.c ****     {
+ 564:lib/src/system_stm32f10x.c ****     }
+ 565:lib/src/system_stm32f10x.c ****   }
+ 566:lib/src/system_stm32f10x.c ****   else
+ 567:lib/src/system_stm32f10x.c ****   { /* If HSE fails to start-up, the application will have wrong clock 
+ARM GAS  /tmp/ccDWfJV2.s 			page 12
+
+
+ 568:lib/src/system_stm32f10x.c ****          configuration. User can add here some code to deal with this error */
+ 569:lib/src/system_stm32f10x.c ****   }  
+ 570:lib/src/system_stm32f10x.c **** }
+ 571:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_24MHz
+ 572:lib/src/system_stm32f10x.c **** /**
+ 573:lib/src/system_stm32f10x.c ****   * @brief  Sets System clock frequency to 24MHz and configure HCLK, PCLK2 
+ 574:lib/src/system_stm32f10x.c ****   *         and PCLK1 prescalers.
+ 575:lib/src/system_stm32f10x.c ****   * @note   This function should be used only after reset.
+ 576:lib/src/system_stm32f10x.c ****   * @param  None
+ 577:lib/src/system_stm32f10x.c ****   * @retval None
+ 578:lib/src/system_stm32f10x.c ****   */
+ 579:lib/src/system_stm32f10x.c **** static void SetSysClockTo24(void)
+ 580:lib/src/system_stm32f10x.c **** {
+ 581:lib/src/system_stm32f10x.c ****   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+ 582:lib/src/system_stm32f10x.c ****   
+ 583:lib/src/system_stm32f10x.c ****   /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/    
+ 584:lib/src/system_stm32f10x.c ****   /* Enable HSE */    
+ 585:lib/src/system_stm32f10x.c ****   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
+ 586:lib/src/system_stm32f10x.c ****  
+ 587:lib/src/system_stm32f10x.c ****   /* Wait till HSE is ready and if Time out is reached exit */
+ 588:lib/src/system_stm32f10x.c ****   do
+ 589:lib/src/system_stm32f10x.c ****   {
+ 590:lib/src/system_stm32f10x.c ****     HSEStatus = RCC->CR & RCC_CR_HSERDY;
+ 591:lib/src/system_stm32f10x.c ****     StartUpCounter++;  
+ 592:lib/src/system_stm32f10x.c ****   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+ 593:lib/src/system_stm32f10x.c **** 
+ 594:lib/src/system_stm32f10x.c ****   if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+ 595:lib/src/system_stm32f10x.c ****   {
+ 596:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x01;
+ 597:lib/src/system_stm32f10x.c ****   }
+ 598:lib/src/system_stm32f10x.c ****   else
+ 599:lib/src/system_stm32f10x.c ****   {
+ 600:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x00;
+ 601:lib/src/system_stm32f10x.c ****   }  
+ 602:lib/src/system_stm32f10x.c **** 
+ 603:lib/src/system_stm32f10x.c ****   if (HSEStatus == (uint32_t)0x01)
+ 604:lib/src/system_stm32f10x.c ****   {
+ 605:lib/src/system_stm32f10x.c **** #if !defined STM32F10X_LD_VL && !defined STM32F10X_MD_VL && !defined STM32F10X_HD_VL 
+ 606:lib/src/system_stm32f10x.c ****     /* Enable Prefetch Buffer */
+ 607:lib/src/system_stm32f10x.c ****     FLASH->ACR |= FLASH_ACR_PRFTBE;
+ 608:lib/src/system_stm32f10x.c **** 
+ 609:lib/src/system_stm32f10x.c ****     /* Flash 0 wait state */
+ 610:lib/src/system_stm32f10x.c ****     FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
+ 611:lib/src/system_stm32f10x.c ****     FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;    
+ 612:lib/src/system_stm32f10x.c **** #endif
+ 613:lib/src/system_stm32f10x.c ****  
+ 614:lib/src/system_stm32f10x.c ****     /* HCLK = SYSCLK */
+ 615:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+ 616:lib/src/system_stm32f10x.c ****       
+ 617:lib/src/system_stm32f10x.c ****     /* PCLK2 = HCLK */
+ 618:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
+ 619:lib/src/system_stm32f10x.c ****     
+ 620:lib/src/system_stm32f10x.c ****     /* PCLK1 = HCLK */
+ 621:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
+ 622:lib/src/system_stm32f10x.c ****     
+ 623:lib/src/system_stm32f10x.c **** #ifdef STM32F10X_CL
+ 624:lib/src/system_stm32f10x.c ****     /* Configure PLLs ------------------------------------------------------*/
+ARM GAS  /tmp/ccDWfJV2.s 			page 13
+
+
+ 625:lib/src/system_stm32f10x.c ****     /* PLL configuration: PLLCLK = PREDIV1 * 6 = 24 MHz */ 
+ 626:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
+ 627:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 | 
+ 628:lib/src/system_stm32f10x.c ****                             RCC_CFGR_PLLMULL6); 
+ 629:lib/src/system_stm32f10x.c **** 
+ 630:lib/src/system_stm32f10x.c ****     /* PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
+ 631:lib/src/system_stm32f10x.c ****     /* PREDIV1 configuration: PREDIV1CLK = PLL2 / 10 = 4 MHz */       
+ 632:lib/src/system_stm32f10x.c ****     RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |
+ 633:lib/src/system_stm32f10x.c ****                               RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
+ 634:lib/src/system_stm32f10x.c ****     RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |
+ 635:lib/src/system_stm32f10x.c ****                              RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV10);
+ 636:lib/src/system_stm32f10x.c ****   
+ 637:lib/src/system_stm32f10x.c ****     /* Enable PLL2 */
+ 638:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLL2ON;
+ 639:lib/src/system_stm32f10x.c ****     /* Wait till PLL2 is ready */
+ 640:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLL2RDY) == 0)
+ 641:lib/src/system_stm32f10x.c ****     {
+ 642:lib/src/system_stm32f10x.c ****     }   
+ 643:lib/src/system_stm32f10x.c **** #elif defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD_VL)
+ 644:lib/src/system_stm32f10x.c ****     /*  PLL configuration:  = (HSE / 2) * 6 = 24 MHz */
+ 645:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+ 646:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLL
+ 647:lib/src/system_stm32f10x.c **** #else    
+ 648:lib/src/system_stm32f10x.c ****     /*  PLL configuration:  = (HSE / 2) * 6 = 24 MHz */
+ 649:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+ 650:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLXTPRE_HSE_Div2 | RCC_CFGR_PLLMULL6);
+ 651:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */
+ 652:lib/src/system_stm32f10x.c **** 
+ 653:lib/src/system_stm32f10x.c ****     /* Enable PLL */
+ 654:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLLON;
+ 655:lib/src/system_stm32f10x.c **** 
+ 656:lib/src/system_stm32f10x.c ****     /* Wait till PLL is ready */
+ 657:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLLRDY) == 0)
+ 658:lib/src/system_stm32f10x.c ****     {
+ 659:lib/src/system_stm32f10x.c ****     }
+ 660:lib/src/system_stm32f10x.c **** 
+ 661:lib/src/system_stm32f10x.c ****     /* Select PLL as system clock source */
+ 662:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+ 663:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;    
+ 664:lib/src/system_stm32f10x.c **** 
+ 665:lib/src/system_stm32f10x.c ****     /* Wait till PLL is used as system clock source */
+ 666:lib/src/system_stm32f10x.c ****     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08)
+ 667:lib/src/system_stm32f10x.c ****     {
+ 668:lib/src/system_stm32f10x.c ****     }
+ 669:lib/src/system_stm32f10x.c ****   }
+ 670:lib/src/system_stm32f10x.c ****   else
+ 671:lib/src/system_stm32f10x.c ****   { /* If HSE fails to start-up, the application will have wrong clock 
+ 672:lib/src/system_stm32f10x.c ****          configuration. User can add here some code to deal with this error */
+ 673:lib/src/system_stm32f10x.c ****   } 
+ 674:lib/src/system_stm32f10x.c **** }
+ 675:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_36MHz
+ 676:lib/src/system_stm32f10x.c **** /**
+ 677:lib/src/system_stm32f10x.c ****   * @brief  Sets System clock frequency to 36MHz and configure HCLK, PCLK2 
+ 678:lib/src/system_stm32f10x.c ****   *         and PCLK1 prescalers. 
+ 679:lib/src/system_stm32f10x.c ****   * @note   This function should be used only after reset.
+ 680:lib/src/system_stm32f10x.c ****   * @param  None
+ 681:lib/src/system_stm32f10x.c ****   * @retval None
+ARM GAS  /tmp/ccDWfJV2.s 			page 14
+
+
+ 682:lib/src/system_stm32f10x.c ****   */
+ 683:lib/src/system_stm32f10x.c **** static void SetSysClockTo36(void)
+ 684:lib/src/system_stm32f10x.c **** {
+ 685:lib/src/system_stm32f10x.c ****   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+ 686:lib/src/system_stm32f10x.c ****   
+ 687:lib/src/system_stm32f10x.c ****   /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/    
+ 688:lib/src/system_stm32f10x.c ****   /* Enable HSE */    
+ 689:lib/src/system_stm32f10x.c ****   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
+ 690:lib/src/system_stm32f10x.c ****  
+ 691:lib/src/system_stm32f10x.c ****   /* Wait till HSE is ready and if Time out is reached exit */
+ 692:lib/src/system_stm32f10x.c ****   do
+ 693:lib/src/system_stm32f10x.c ****   {
+ 694:lib/src/system_stm32f10x.c ****     HSEStatus = RCC->CR & RCC_CR_HSERDY;
+ 695:lib/src/system_stm32f10x.c ****     StartUpCounter++;  
+ 696:lib/src/system_stm32f10x.c ****   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+ 697:lib/src/system_stm32f10x.c **** 
+ 698:lib/src/system_stm32f10x.c ****   if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+ 699:lib/src/system_stm32f10x.c ****   {
+ 700:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x01;
+ 701:lib/src/system_stm32f10x.c ****   }
+ 702:lib/src/system_stm32f10x.c ****   else
+ 703:lib/src/system_stm32f10x.c ****   {
+ 704:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x00;
+ 705:lib/src/system_stm32f10x.c ****   }  
+ 706:lib/src/system_stm32f10x.c **** 
+ 707:lib/src/system_stm32f10x.c ****   if (HSEStatus == (uint32_t)0x01)
+ 708:lib/src/system_stm32f10x.c ****   {
+ 709:lib/src/system_stm32f10x.c ****     /* Enable Prefetch Buffer */
+ 710:lib/src/system_stm32f10x.c ****     FLASH->ACR |= FLASH_ACR_PRFTBE;
+ 711:lib/src/system_stm32f10x.c **** 
+ 712:lib/src/system_stm32f10x.c ****     /* Flash 1 wait state */
+ 713:lib/src/system_stm32f10x.c ****     FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
+ 714:lib/src/system_stm32f10x.c ****     FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_1;    
+ 715:lib/src/system_stm32f10x.c ****  
+ 716:lib/src/system_stm32f10x.c ****     /* HCLK = SYSCLK */
+ 717:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+ 718:lib/src/system_stm32f10x.c ****       
+ 719:lib/src/system_stm32f10x.c ****     /* PCLK2 = HCLK */
+ 720:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
+ 721:lib/src/system_stm32f10x.c ****     
+ 722:lib/src/system_stm32f10x.c ****     /* PCLK1 = HCLK */
+ 723:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
+ 724:lib/src/system_stm32f10x.c ****     
+ 725:lib/src/system_stm32f10x.c **** #ifdef STM32F10X_CL
+ 726:lib/src/system_stm32f10x.c ****     /* Configure PLLs ------------------------------------------------------*/
+ 727:lib/src/system_stm32f10x.c ****     
+ 728:lib/src/system_stm32f10x.c ****     /* PLL configuration: PLLCLK = PREDIV1 * 9 = 36 MHz */ 
+ 729:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
+ 730:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 | 
+ 731:lib/src/system_stm32f10x.c ****                             RCC_CFGR_PLLMULL9); 
+ 732:lib/src/system_stm32f10x.c **** 
+ 733:lib/src/system_stm32f10x.c **** 	/*!< PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
+ 734:lib/src/system_stm32f10x.c ****     /* PREDIV1 configuration: PREDIV1CLK = PLL2 / 10 = 4 MHz */
+ 735:lib/src/system_stm32f10x.c ****         
+ 736:lib/src/system_stm32f10x.c ****     RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |
+ 737:lib/src/system_stm32f10x.c ****                               RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
+ 738:lib/src/system_stm32f10x.c ****     RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |
+ARM GAS  /tmp/ccDWfJV2.s 			page 15
+
+
+ 739:lib/src/system_stm32f10x.c ****                              RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV10);
+ 740:lib/src/system_stm32f10x.c ****   
+ 741:lib/src/system_stm32f10x.c ****     /* Enable PLL2 */
+ 742:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLL2ON;
+ 743:lib/src/system_stm32f10x.c ****     /* Wait till PLL2 is ready */
+ 744:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLL2RDY) == 0)
+ 745:lib/src/system_stm32f10x.c ****     {
+ 746:lib/src/system_stm32f10x.c ****     }
+ 747:lib/src/system_stm32f10x.c ****     
+ 748:lib/src/system_stm32f10x.c **** #else    
+ 749:lib/src/system_stm32f10x.c ****     /*  PLL configuration: PLLCLK = (HSE / 2) * 9 = 36 MHz */
+ 750:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+ 751:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLXTPRE_HSE_Div2 | RCC_CFGR_PLLMULL9);
+ 752:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */
+ 753:lib/src/system_stm32f10x.c **** 
+ 754:lib/src/system_stm32f10x.c ****     /* Enable PLL */
+ 755:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLLON;
+ 756:lib/src/system_stm32f10x.c **** 
+ 757:lib/src/system_stm32f10x.c ****     /* Wait till PLL is ready */
+ 758:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLLRDY) == 0)
+ 759:lib/src/system_stm32f10x.c ****     {
+ 760:lib/src/system_stm32f10x.c ****     }
+ 761:lib/src/system_stm32f10x.c **** 
+ 762:lib/src/system_stm32f10x.c ****     /* Select PLL as system clock source */
+ 763:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+ 764:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;    
+ 765:lib/src/system_stm32f10x.c **** 
+ 766:lib/src/system_stm32f10x.c ****     /* Wait till PLL is used as system clock source */
+ 767:lib/src/system_stm32f10x.c ****     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08)
+ 768:lib/src/system_stm32f10x.c ****     {
+ 769:lib/src/system_stm32f10x.c ****     }
+ 770:lib/src/system_stm32f10x.c ****   }
+ 771:lib/src/system_stm32f10x.c ****   else
+ 772:lib/src/system_stm32f10x.c ****   { /* If HSE fails to start-up, the application will have wrong clock 
+ 773:lib/src/system_stm32f10x.c ****          configuration. User can add here some code to deal with this error */
+ 774:lib/src/system_stm32f10x.c ****   } 
+ 775:lib/src/system_stm32f10x.c **** }
+ 776:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_48MHz
+ 777:lib/src/system_stm32f10x.c **** /**
+ 778:lib/src/system_stm32f10x.c ****   * @brief  Sets System clock frequency to 48MHz and configure HCLK, PCLK2 
+ 779:lib/src/system_stm32f10x.c ****   *         and PCLK1 prescalers. 
+ 780:lib/src/system_stm32f10x.c ****   * @note   This function should be used only after reset.
+ 781:lib/src/system_stm32f10x.c ****   * @param  None
+ 782:lib/src/system_stm32f10x.c ****   * @retval None
+ 783:lib/src/system_stm32f10x.c ****   */
+ 784:lib/src/system_stm32f10x.c **** static void SetSysClockTo48(void)
+ 785:lib/src/system_stm32f10x.c **** {
+ 786:lib/src/system_stm32f10x.c ****   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+ 787:lib/src/system_stm32f10x.c ****   
+ 788:lib/src/system_stm32f10x.c ****   /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/    
+ 789:lib/src/system_stm32f10x.c ****   /* Enable HSE */    
+ 790:lib/src/system_stm32f10x.c ****   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
+ 791:lib/src/system_stm32f10x.c ****  
+ 792:lib/src/system_stm32f10x.c ****   /* Wait till HSE is ready and if Time out is reached exit */
+ 793:lib/src/system_stm32f10x.c ****   do
+ 794:lib/src/system_stm32f10x.c ****   {
+ 795:lib/src/system_stm32f10x.c ****     HSEStatus = RCC->CR & RCC_CR_HSERDY;
+ARM GAS  /tmp/ccDWfJV2.s 			page 16
+
+
+ 796:lib/src/system_stm32f10x.c ****     StartUpCounter++;  
+ 797:lib/src/system_stm32f10x.c ****   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+ 798:lib/src/system_stm32f10x.c **** 
+ 799:lib/src/system_stm32f10x.c ****   if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+ 800:lib/src/system_stm32f10x.c ****   {
+ 801:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x01;
+ 802:lib/src/system_stm32f10x.c ****   }
+ 803:lib/src/system_stm32f10x.c ****   else
+ 804:lib/src/system_stm32f10x.c ****   {
+ 805:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x00;
+ 806:lib/src/system_stm32f10x.c ****   }  
+ 807:lib/src/system_stm32f10x.c **** 
+ 808:lib/src/system_stm32f10x.c ****   if (HSEStatus == (uint32_t)0x01)
+ 809:lib/src/system_stm32f10x.c ****   {
+ 810:lib/src/system_stm32f10x.c ****     /* Enable Prefetch Buffer */
+ 811:lib/src/system_stm32f10x.c ****     FLASH->ACR |= FLASH_ACR_PRFTBE;
+ 812:lib/src/system_stm32f10x.c **** 
+ 813:lib/src/system_stm32f10x.c ****     /* Flash 1 wait state */
+ 814:lib/src/system_stm32f10x.c ****     FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
+ 815:lib/src/system_stm32f10x.c ****     FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_1;    
+ 816:lib/src/system_stm32f10x.c ****  
+ 817:lib/src/system_stm32f10x.c ****     /* HCLK = SYSCLK */
+ 818:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+ 819:lib/src/system_stm32f10x.c ****       
+ 820:lib/src/system_stm32f10x.c ****     /* PCLK2 = HCLK */
+ 821:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
+ 822:lib/src/system_stm32f10x.c ****     
+ 823:lib/src/system_stm32f10x.c ****     /* PCLK1 = HCLK */
+ 824:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV2;
+ 825:lib/src/system_stm32f10x.c ****     
+ 826:lib/src/system_stm32f10x.c **** #ifdef STM32F10X_CL
+ 827:lib/src/system_stm32f10x.c ****     /* Configure PLLs ------------------------------------------------------*/
+ 828:lib/src/system_stm32f10x.c ****     /* PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
+ 829:lib/src/system_stm32f10x.c ****     /* PREDIV1 configuration: PREDIV1CLK = PLL2 / 5 = 8 MHz */
+ 830:lib/src/system_stm32f10x.c ****         
+ 831:lib/src/system_stm32f10x.c ****     RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |
+ 832:lib/src/system_stm32f10x.c ****                               RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
+ 833:lib/src/system_stm32f10x.c ****     RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |
+ 834:lib/src/system_stm32f10x.c ****                              RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV5);
+ 835:lib/src/system_stm32f10x.c ****   
+ 836:lib/src/system_stm32f10x.c ****     /* Enable PLL2 */
+ 837:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLL2ON;
+ 838:lib/src/system_stm32f10x.c ****     /* Wait till PLL2 is ready */
+ 839:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLL2RDY) == 0)
+ 840:lib/src/system_stm32f10x.c ****     {
+ 841:lib/src/system_stm32f10x.c ****     }
+ 842:lib/src/system_stm32f10x.c ****     
+ 843:lib/src/system_stm32f10x.c ****    
+ 844:lib/src/system_stm32f10x.c ****     /* PLL configuration: PLLCLK = PREDIV1 * 6 = 48 MHz */ 
+ 845:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
+ 846:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 | 
+ 847:lib/src/system_stm32f10x.c ****                             RCC_CFGR_PLLMULL6); 
+ 848:lib/src/system_stm32f10x.c **** #else    
+ 849:lib/src/system_stm32f10x.c ****     /*  PLL configuration: PLLCLK = HSE * 6 = 48 MHz */
+ 850:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+ 851:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL6);
+ 852:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */
+ARM GAS  /tmp/ccDWfJV2.s 			page 17
+
+
+ 853:lib/src/system_stm32f10x.c **** 
+ 854:lib/src/system_stm32f10x.c ****     /* Enable PLL */
+ 855:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLLON;
+ 856:lib/src/system_stm32f10x.c **** 
+ 857:lib/src/system_stm32f10x.c ****     /* Wait till PLL is ready */
+ 858:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLLRDY) == 0)
+ 859:lib/src/system_stm32f10x.c ****     {
+ 860:lib/src/system_stm32f10x.c ****     }
+ 861:lib/src/system_stm32f10x.c **** 
+ 862:lib/src/system_stm32f10x.c ****     /* Select PLL as system clock source */
+ 863:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+ 864:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;    
+ 865:lib/src/system_stm32f10x.c **** 
+ 866:lib/src/system_stm32f10x.c ****     /* Wait till PLL is used as system clock source */
+ 867:lib/src/system_stm32f10x.c ****     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08)
+ 868:lib/src/system_stm32f10x.c ****     {
+ 869:lib/src/system_stm32f10x.c ****     }
+ 870:lib/src/system_stm32f10x.c ****   }
+ 871:lib/src/system_stm32f10x.c ****   else
+ 872:lib/src/system_stm32f10x.c ****   { /* If HSE fails to start-up, the application will have wrong clock 
+ 873:lib/src/system_stm32f10x.c ****          configuration. User can add here some code to deal with this error */
+ 874:lib/src/system_stm32f10x.c ****   } 
+ 875:lib/src/system_stm32f10x.c **** }
+ 876:lib/src/system_stm32f10x.c **** 
+ 877:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_56MHz
+ 878:lib/src/system_stm32f10x.c **** /**
+ 879:lib/src/system_stm32f10x.c ****   * @brief  Sets System clock frequency to 56MHz and configure HCLK, PCLK2 
+ 880:lib/src/system_stm32f10x.c ****   *         and PCLK1 prescalers. 
+ 881:lib/src/system_stm32f10x.c ****   * @note   This function should be used only after reset.
+ 882:lib/src/system_stm32f10x.c ****   * @param  None
+ 883:lib/src/system_stm32f10x.c ****   * @retval None
+ 884:lib/src/system_stm32f10x.c ****   */
+ 885:lib/src/system_stm32f10x.c **** static void SetSysClockTo56(void)
+ 886:lib/src/system_stm32f10x.c **** {
+ 887:lib/src/system_stm32f10x.c ****   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+ 888:lib/src/system_stm32f10x.c ****   
+ 889:lib/src/system_stm32f10x.c ****   /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/   
+ 890:lib/src/system_stm32f10x.c ****   /* Enable HSE */    
+ 891:lib/src/system_stm32f10x.c ****   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
+ 892:lib/src/system_stm32f10x.c ****  
+ 893:lib/src/system_stm32f10x.c ****   /* Wait till HSE is ready and if Time out is reached exit */
+ 894:lib/src/system_stm32f10x.c ****   do
+ 895:lib/src/system_stm32f10x.c ****   {
+ 896:lib/src/system_stm32f10x.c ****     HSEStatus = RCC->CR & RCC_CR_HSERDY;
+ 897:lib/src/system_stm32f10x.c ****     StartUpCounter++;  
+ 898:lib/src/system_stm32f10x.c ****   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+ 899:lib/src/system_stm32f10x.c **** 
+ 900:lib/src/system_stm32f10x.c ****   if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+ 901:lib/src/system_stm32f10x.c ****   {
+ 902:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x01;
+ 903:lib/src/system_stm32f10x.c ****   }
+ 904:lib/src/system_stm32f10x.c ****   else
+ 905:lib/src/system_stm32f10x.c ****   {
+ 906:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x00;
+ 907:lib/src/system_stm32f10x.c ****   }  
+ 908:lib/src/system_stm32f10x.c **** 
+ 909:lib/src/system_stm32f10x.c ****   if (HSEStatus == (uint32_t)0x01)
+ARM GAS  /tmp/ccDWfJV2.s 			page 18
+
+
+ 910:lib/src/system_stm32f10x.c ****   {
+ 911:lib/src/system_stm32f10x.c ****     /* Enable Prefetch Buffer */
+ 912:lib/src/system_stm32f10x.c ****     FLASH->ACR |= FLASH_ACR_PRFTBE;
+ 913:lib/src/system_stm32f10x.c **** 
+ 914:lib/src/system_stm32f10x.c ****     /* Flash 2 wait state */
+ 915:lib/src/system_stm32f10x.c ****     FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
+ 916:lib/src/system_stm32f10x.c ****     FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_2;    
+ 917:lib/src/system_stm32f10x.c ****  
+ 918:lib/src/system_stm32f10x.c ****     /* HCLK = SYSCLK */
+ 919:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+ 920:lib/src/system_stm32f10x.c ****       
+ 921:lib/src/system_stm32f10x.c ****     /* PCLK2 = HCLK */
+ 922:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
+ 923:lib/src/system_stm32f10x.c ****     
+ 924:lib/src/system_stm32f10x.c ****     /* PCLK1 = HCLK */
+ 925:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV2;
+ 926:lib/src/system_stm32f10x.c **** 
+ 927:lib/src/system_stm32f10x.c **** #ifdef STM32F10X_CL
+ 928:lib/src/system_stm32f10x.c ****     /* Configure PLLs ------------------------------------------------------*/
+ 929:lib/src/system_stm32f10x.c ****     /* PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
+ 930:lib/src/system_stm32f10x.c ****     /* PREDIV1 configuration: PREDIV1CLK = PLL2 / 5 = 8 MHz */
+ 931:lib/src/system_stm32f10x.c ****         
+ 932:lib/src/system_stm32f10x.c ****     RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |
+ 933:lib/src/system_stm32f10x.c ****                               RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
+ 934:lib/src/system_stm32f10x.c ****     RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |
+ 935:lib/src/system_stm32f10x.c ****                              RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV5);
+ 936:lib/src/system_stm32f10x.c ****   
+ 937:lib/src/system_stm32f10x.c ****     /* Enable PLL2 */
+ 938:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLL2ON;
+ 939:lib/src/system_stm32f10x.c ****     /* Wait till PLL2 is ready */
+ 940:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLL2RDY) == 0)
+ 941:lib/src/system_stm32f10x.c ****     {
+ 942:lib/src/system_stm32f10x.c ****     }
+ 943:lib/src/system_stm32f10x.c ****     
+ 944:lib/src/system_stm32f10x.c ****    
+ 945:lib/src/system_stm32f10x.c ****     /* PLL configuration: PLLCLK = PREDIV1 * 7 = 56 MHz */ 
+ 946:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
+ 947:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 | 
+ 948:lib/src/system_stm32f10x.c ****                             RCC_CFGR_PLLMULL7); 
+ 949:lib/src/system_stm32f10x.c **** #else     
+ 950:lib/src/system_stm32f10x.c ****     /* PLL configuration: PLLCLK = HSE * 7 = 56 MHz */
+ 951:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+ 952:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL7);
+ 953:lib/src/system_stm32f10x.c **** 
+ 954:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */
+ 955:lib/src/system_stm32f10x.c **** 
+ 956:lib/src/system_stm32f10x.c ****     /* Enable PLL */
+ 957:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLLON;
+ 958:lib/src/system_stm32f10x.c **** 
+ 959:lib/src/system_stm32f10x.c ****     /* Wait till PLL is ready */
+ 960:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLLRDY) == 0)
+ 961:lib/src/system_stm32f10x.c ****     {
+ 962:lib/src/system_stm32f10x.c ****     }
+ 963:lib/src/system_stm32f10x.c **** 
+ 964:lib/src/system_stm32f10x.c ****     /* Select PLL as system clock source */
+ 965:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+ 966:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;    
+ARM GAS  /tmp/ccDWfJV2.s 			page 19
+
+
+ 967:lib/src/system_stm32f10x.c **** 
+ 968:lib/src/system_stm32f10x.c ****     /* Wait till PLL is used as system clock source */
+ 969:lib/src/system_stm32f10x.c ****     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08)
+ 970:lib/src/system_stm32f10x.c ****     {
+ 971:lib/src/system_stm32f10x.c ****     }
+ 972:lib/src/system_stm32f10x.c ****   }
+ 973:lib/src/system_stm32f10x.c ****   else
+ 974:lib/src/system_stm32f10x.c ****   { /* If HSE fails to start-up, the application will have wrong clock 
+ 975:lib/src/system_stm32f10x.c ****          configuration. User can add here some code to deal with this error */
+ 976:lib/src/system_stm32f10x.c ****   } 
+ 977:lib/src/system_stm32f10x.c **** }
+ 978:lib/src/system_stm32f10x.c **** 
+ 979:lib/src/system_stm32f10x.c **** #elif defined SYSCLK_FREQ_72MHz
+ 980:lib/src/system_stm32f10x.c **** /**
+ 981:lib/src/system_stm32f10x.c ****   * @brief  Sets System clock frequency to 72MHz and configure HCLK, PCLK2 
+ 982:lib/src/system_stm32f10x.c ****   *         and PCLK1 prescalers. 
+ 983:lib/src/system_stm32f10x.c ****   * @note   This function should be used only after reset.
+ 984:lib/src/system_stm32f10x.c ****   * @param  None
+ 985:lib/src/system_stm32f10x.c ****   * @retval None
+ 986:lib/src/system_stm32f10x.c ****   */
+ 987:lib/src/system_stm32f10x.c **** static void SetSysClockTo72(void)
+ 988:lib/src/system_stm32f10x.c **** {
+ 989:lib/src/system_stm32f10x.c ****   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+  61              		.loc 1 989 0
+  62 0036 0022     		movs	r2, #0
+  63 0038 0092     		str	r2, [sp]
+  64 003a 0192     		str	r2, [sp, #4]
+ 990:lib/src/system_stm32f10x.c ****   
+ 991:lib/src/system_stm32f10x.c ****   /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/    
+ 992:lib/src/system_stm32f10x.c ****   /* Enable HSE */    
+ 993:lib/src/system_stm32f10x.c ****   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
+  65              		.loc 1 993 0
+  66 003c 1A68     		ldr	r2, [r3]
+  67 003e 42F48032 		orr	r2, r2, #65536
+  68 0042 1A60     		str	r2, [r3]
+ 994:lib/src/system_stm32f10x.c ****  
+ 995:lib/src/system_stm32f10x.c ****   /* Wait till HSE is ready and if Time out is reached exit */
+ 996:lib/src/system_stm32f10x.c ****   do
+ 997:lib/src/system_stm32f10x.c ****   {
+ 998:lib/src/system_stm32f10x.c ****     HSEStatus = RCC->CR & RCC_CR_HSERDY;
+  69              		.loc 1 998 0
+  70 0044 1A46     		mov	r2, r3
+  71              	.L3:
+  72 0046 1368     		ldr	r3, [r2]
+  73 0048 03F40033 		and	r3, r3, #131072
+  74 004c 0193     		str	r3, [sp, #4]
+ 999:lib/src/system_stm32f10x.c ****     StartUpCounter++;  
+  75              		.loc 1 999 0
+  76 004e 009B     		ldr	r3, [sp]
+  77 0050 0133     		adds	r3, r3, #1
+  78 0052 0093     		str	r3, [sp]
+1000:lib/src/system_stm32f10x.c ****   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+  79              		.loc 1 1000 0
+  80 0054 019B     		ldr	r3, [sp, #4]
+  81 0056 1BB9     		cbnz	r3, .L2
+  82 0058 009B     		ldr	r3, [sp]
+  83 005a B3F5A06F 		cmp	r3, #1280
+ARM GAS  /tmp/ccDWfJV2.s 			page 20
+
+
+  84 005e F2D1     		bne	.L3
+  85              	.L2:
+1001:lib/src/system_stm32f10x.c **** 
+1002:lib/src/system_stm32f10x.c ****   if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+  86              		.loc 1 1002 0
+  87 0060 244B     		ldr	r3, .L14
+  88 0062 1B68     		ldr	r3, [r3]
+  89 0064 13F4003F 		tst	r3, #131072
+1003:lib/src/system_stm32f10x.c ****   {
+1004:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x01;
+  90              		.loc 1 1004 0
+  91 0068 14BF     		ite	ne
+  92 006a 0123     		movne	r3, #1
+1005:lib/src/system_stm32f10x.c ****   }
+1006:lib/src/system_stm32f10x.c ****   else
+1007:lib/src/system_stm32f10x.c ****   {
+1008:lib/src/system_stm32f10x.c ****     HSEStatus = (uint32_t)0x00;
+  93              		.loc 1 1008 0
+  94 006c 0023     		moveq	r3, #0
+  95 006e 0193     		str	r3, [sp, #4]
+1009:lib/src/system_stm32f10x.c ****   }  
+1010:lib/src/system_stm32f10x.c **** 
+1011:lib/src/system_stm32f10x.c ****   if (HSEStatus == (uint32_t)0x01)
+  96              		.loc 1 1011 0
+  97 0070 019B     		ldr	r3, [sp, #4]
+  98 0072 012B     		cmp	r3, #1
+  99 0074 05D0     		beq	.L13
+ 100              	.L6:
+ 101              	.LBE8:
+ 102              	.LBE7:
+ 103              	.LBE6:
+ 267:lib/src/system_stm32f10x.c **** #endif 
+ 104              		.loc 1 267 0
+ 105 0076 4FF00062 		mov	r2, #134217728
+ 106 007a 204B     		ldr	r3, .L14+8
+ 107 007c 9A60     		str	r2, [r3, #8]
+ 269:lib/src/system_stm32f10x.c **** 
+ 108              		.loc 1 269 0
+ 109 007e 02B0     		add	sp, sp, #8
+ 110              		.cfi_remember_state
+ 111              		.cfi_def_cfa_offset 0
+ 112              		@ sp needed
+ 113 0080 7047     		bx	lr
+ 114              	.L13:
+ 115              		.cfi_restore_state
+ 116              	.LBB11:
+ 117              	.LBB10:
+ 118              	.LBB9:
+1012:lib/src/system_stm32f10x.c ****   {
+1013:lib/src/system_stm32f10x.c ****     /* Enable Prefetch Buffer */
+1014:lib/src/system_stm32f10x.c ****     FLASH->ACR |= FLASH_ACR_PRFTBE;
+ 119              		.loc 1 1014 0
+ 120 0082 1F4B     		ldr	r3, .L14+12
+ 121 0084 1A68     		ldr	r2, [r3]
+ 122 0086 42F01002 		orr	r2, r2, #16
+ 123 008a 1A60     		str	r2, [r3]
+1015:lib/src/system_stm32f10x.c **** 
+ARM GAS  /tmp/ccDWfJV2.s 			page 21
+
+
+1016:lib/src/system_stm32f10x.c ****     /* Flash 2 wait state */
+1017:lib/src/system_stm32f10x.c ****     FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
+ 124              		.loc 1 1017 0
+ 125 008c 1A68     		ldr	r2, [r3]
+ 126 008e 22F00302 		bic	r2, r2, #3
+ 127 0092 1A60     		str	r2, [r3]
+1018:lib/src/system_stm32f10x.c ****     FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_2;    
+ 128              		.loc 1 1018 0
+ 129 0094 1A68     		ldr	r2, [r3]
+ 130 0096 42F00202 		orr	r2, r2, #2
+ 131 009a 1A60     		str	r2, [r3]
+1019:lib/src/system_stm32f10x.c **** 
+1020:lib/src/system_stm32f10x.c ****  
+1021:lib/src/system_stm32f10x.c ****     /* HCLK = SYSCLK */
+1022:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+ 132              		.loc 1 1022 0
+ 133 009c A3F58053 		sub	r3, r3, #4096
+ 134 00a0 5A68     		ldr	r2, [r3, #4]
+ 135 00a2 5A60     		str	r2, [r3, #4]
+1023:lib/src/system_stm32f10x.c ****       
+1024:lib/src/system_stm32f10x.c ****     /* PCLK2 = HCLK */
+1025:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
+ 136              		.loc 1 1025 0
+ 137 00a4 5A68     		ldr	r2, [r3, #4]
+ 138 00a6 5A60     		str	r2, [r3, #4]
+1026:lib/src/system_stm32f10x.c ****     
+1027:lib/src/system_stm32f10x.c ****     /* PCLK1 = HCLK */
+1028:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV2;
+ 139              		.loc 1 1028 0
+ 140 00a8 5A68     		ldr	r2, [r3, #4]
+ 141 00aa 42F48062 		orr	r2, r2, #1024
+ 142 00ae 5A60     		str	r2, [r3, #4]
+1029:lib/src/system_stm32f10x.c **** 
+1030:lib/src/system_stm32f10x.c **** #ifdef STM32F10X_CL
+1031:lib/src/system_stm32f10x.c ****     /* Configure PLLs ------------------------------------------------------*/
+1032:lib/src/system_stm32f10x.c ****     /* PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
+1033:lib/src/system_stm32f10x.c ****     /* PREDIV1 configuration: PREDIV1CLK = PLL2 / 5 = 8 MHz */
+1034:lib/src/system_stm32f10x.c ****         
+1035:lib/src/system_stm32f10x.c ****     RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |
+1036:lib/src/system_stm32f10x.c ****                               RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
+1037:lib/src/system_stm32f10x.c ****     RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |
+1038:lib/src/system_stm32f10x.c ****                              RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV5);
+1039:lib/src/system_stm32f10x.c ****   
+1040:lib/src/system_stm32f10x.c ****     /* Enable PLL2 */
+1041:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLL2ON;
+1042:lib/src/system_stm32f10x.c ****     /* Wait till PLL2 is ready */
+1043:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLL2RDY) == 0)
+1044:lib/src/system_stm32f10x.c ****     {
+1045:lib/src/system_stm32f10x.c ****     }
+1046:lib/src/system_stm32f10x.c ****     
+1047:lib/src/system_stm32f10x.c ****    
+1048:lib/src/system_stm32f10x.c ****     /* PLL configuration: PLLCLK = PREDIV1 * 9 = 72 MHz */ 
+1049:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
+1050:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 | 
+1051:lib/src/system_stm32f10x.c ****                             RCC_CFGR_PLLMULL9); 
+1052:lib/src/system_stm32f10x.c **** #else    
+1053:lib/src/system_stm32f10x.c ****     /*  PLL configuration: PLLCLK = HSE * 9 = 72 MHz */
+ARM GAS  /tmp/ccDWfJV2.s 			page 22
+
+
+1054:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE |
+ 143              		.loc 1 1054 0
+ 144 00b0 5A68     		ldr	r2, [r3, #4]
+ 145 00b2 22F47C12 		bic	r2, r2, #4128768
+ 146 00b6 5A60     		str	r2, [r3, #4]
+1055:lib/src/system_stm32f10x.c ****                                         RCC_CFGR_PLLMULL));
+1056:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL9);
+ 147              		.loc 1 1056 0
+ 148 00b8 5A68     		ldr	r2, [r3, #4]
+ 149 00ba 42F4E812 		orr	r2, r2, #1900544
+ 150 00be 5A60     		str	r2, [r3, #4]
+1057:lib/src/system_stm32f10x.c **** #endif /* STM32F10X_CL */
+1058:lib/src/system_stm32f10x.c **** 
+1059:lib/src/system_stm32f10x.c ****     /* Enable PLL */
+1060:lib/src/system_stm32f10x.c ****     RCC->CR |= RCC_CR_PLLON;
+ 151              		.loc 1 1060 0
+ 152 00c0 1A68     		ldr	r2, [r3]
+ 153 00c2 42F08072 		orr	r2, r2, #16777216
+ 154 00c6 1A60     		str	r2, [r3]
+1061:lib/src/system_stm32f10x.c **** 
+1062:lib/src/system_stm32f10x.c ****     /* Wait till PLL is ready */
+1063:lib/src/system_stm32f10x.c ****     while((RCC->CR & RCC_CR_PLLRDY) == 0)
+ 155              		.loc 1 1063 0
+ 156 00c8 1A46     		mov	r2, r3
+ 157              	.L7:
+ 158 00ca 1368     		ldr	r3, [r2]
+ 159 00cc 13F0007F 		tst	r3, #33554432
+ 160 00d0 FBD0     		beq	.L7
+1064:lib/src/system_stm32f10x.c ****     {
+1065:lib/src/system_stm32f10x.c ****     }
+1066:lib/src/system_stm32f10x.c ****     
+1067:lib/src/system_stm32f10x.c ****     /* Select PLL as system clock source */
+1068:lib/src/system_stm32f10x.c ****     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+ 161              		.loc 1 1068 0
+ 162 00d2 084B     		ldr	r3, .L14
+ 163 00d4 5A68     		ldr	r2, [r3, #4]
+ 164 00d6 22F00302 		bic	r2, r2, #3
+ 165 00da 5A60     		str	r2, [r3, #4]
+1069:lib/src/system_stm32f10x.c ****     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;    
+ 166              		.loc 1 1069 0
+ 167 00dc 5A68     		ldr	r2, [r3, #4]
+ 168 00de 42F00202 		orr	r2, r2, #2
+ 169 00e2 5A60     		str	r2, [r3, #4]
+1070:lib/src/system_stm32f10x.c **** 
+1071:lib/src/system_stm32f10x.c ****     /* Wait till PLL is used as system clock source */
+1072:lib/src/system_stm32f10x.c ****     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08)
+ 170              		.loc 1 1072 0
+ 171 00e4 1A46     		mov	r2, r3
+ 172              	.L8:
+ 173 00e6 5368     		ldr	r3, [r2, #4]
+ 174 00e8 03F00C03 		and	r3, r3, #12
+ 175 00ec 082B     		cmp	r3, #8
+ 176 00ee FAD1     		bne	.L8
+ 177 00f0 C1E7     		b	.L6
+ 178              	.L15:
+ 179 00f2 00BF     		.align	2
+ 180              	.L14:
+ARM GAS  /tmp/ccDWfJV2.s 			page 23
+
+
+ 181 00f4 00100240 		.word	1073876992
+ 182 00f8 0000FFF8 		.word	-117506048
+ 183 00fc 00ED00E0 		.word	-536810240
+ 184 0100 00200240 		.word	1073881088
+ 185              	.LBE9:
+ 186              	.LBE10:
+ 187              	.LBE11:
+ 188              		.cfi_endproc
+ 189              	.LFE63:
+ 190              		.size	SystemInit, .-SystemInit
+ 191              		.align	1
+ 192              		.global	SystemCoreClockUpdate
+ 193              		.syntax unified
+ 194              		.thumb
+ 195              		.thumb_func
+ 196              		.fpu softvfp
+ 197              		.type	SystemCoreClockUpdate, %function
+ 198              	SystemCoreClockUpdate:
+ 199              	.LFB64:
+ 307:lib/src/system_stm32f10x.c ****   uint32_t tmp = 0, pllmull = 0, pllsource = 0;
+ 200              		.loc 1 307 0
+ 201              		.cfi_startproc
+ 202              		@ args = 0, pretend = 0, frame = 0
+ 203              		@ frame_needed = 0, uses_anonymous_args = 0
+ 204              		@ link register save eliminated.
+ 205              	.LVL0:
+ 319:lib/src/system_stm32f10x.c ****   
+ 206              		.loc 1 319 0
+ 207 0104 1D4B     		ldr	r3, .L27
+ 208 0106 5B68     		ldr	r3, [r3, #4]
+ 209              	.LVL1:
+ 210 0108 03F00C03 		and	r3, r3, #12
+ 211              	.LVL2:
+ 321:lib/src/system_stm32f10x.c ****   {
+ 212              		.loc 1 321 0
+ 213 010c 042B     		cmp	r3, #4
+ 214 010e 15D0     		beq	.L18
+ 215 0110 082B     		cmp	r3, #8
+ 216 0112 17D0     		beq	.L19
+ 217 0114 1BB1     		cbz	r3, .L25
+ 403:lib/src/system_stm32f10x.c ****       break;
+ 218              		.loc 1 403 0
+ 219 0116 1A4A     		ldr	r2, .L27+4
+ 220 0118 1A4B     		ldr	r3, .L27+8
+ 221              	.LVL3:
+ 222 011a 1A60     		str	r2, [r3]
+ 404:lib/src/system_stm32f10x.c ****   }
+ 223              		.loc 1 404 0
+ 224 011c 02E0     		b	.L21
+ 225              	.LVL4:
+ 226              	.L25:
+ 324:lib/src/system_stm32f10x.c ****       break;
+ 227              		.loc 1 324 0
+ 228 011e 184A     		ldr	r2, .L27+4
+ 229 0120 184B     		ldr	r3, .L27+8
+ 230              	.LVL5:
+ 231 0122 1A60     		str	r2, [r3]
+ARM GAS  /tmp/ccDWfJV2.s 			page 24
+
+
+ 232              	.LVL6:
+ 233              	.L21:
+ 409:lib/src/system_stm32f10x.c ****   /* HCLK clock frequency */
+ 234              		.loc 1 409 0
+ 235 0124 154B     		ldr	r3, .L27
+ 236 0126 5B68     		ldr	r3, [r3, #4]
+ 237 0128 C3F30313 		ubfx	r3, r3, #4, #4
+ 238 012c 154A     		ldr	r2, .L27+8
+ 239 012e 1344     		add	r3, r3, r2
+ 240 0130 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 241 0132 D9B2     		uxtb	r1, r3
+ 242              	.LVL7:
+ 411:lib/src/system_stm32f10x.c **** }
+ 243              		.loc 1 411 0
+ 244 0134 1368     		ldr	r3, [r2]
+ 245 0136 CB40     		lsrs	r3, r3, r1
+ 246 0138 1360     		str	r3, [r2]
+ 247 013a 7047     		bx	lr
+ 248              	.LVL8:
+ 249              	.L18:
+ 327:lib/src/system_stm32f10x.c ****       break;
+ 250              		.loc 1 327 0
+ 251 013c 104A     		ldr	r2, .L27+4
+ 252 013e 114B     		ldr	r3, .L27+8
+ 253              	.LVL9:
+ 254 0140 1A60     		str	r2, [r3]
+ 328:lib/src/system_stm32f10x.c ****     case 0x08:  /* PLL used as system clock */
+ 255              		.loc 1 328 0
+ 256 0142 EFE7     		b	.L21
+ 257              	.LVL10:
+ 258              	.L19:
+ 332:lib/src/system_stm32f10x.c ****       pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
+ 259              		.loc 1 332 0
+ 260 0144 0D4A     		ldr	r2, .L27
+ 261 0146 5368     		ldr	r3, [r2, #4]
+ 262              	.LVL11:
+ 333:lib/src/system_stm32f10x.c ****       
+ 263              		.loc 1 333 0
+ 264 0148 5268     		ldr	r2, [r2, #4]
+ 265              	.LVL12:
+ 336:lib/src/system_stm32f10x.c ****       
+ 266              		.loc 1 336 0
+ 267 014a C3F38343 		ubfx	r3, r3, #18, #4
+ 268              	.LVL13:
+ 269 014e 0233     		adds	r3, r3, #2
+ 270              	.LVL14:
+ 338:lib/src/system_stm32f10x.c ****       {
+ 271              		.loc 1 338 0
+ 272 0150 12F4803F 		tst	r2, #65536
+ 273 0154 0BD0     		beq	.L26
+ 351:lib/src/system_stm32f10x.c ****         {/* HSE oscillator clock divided by 2 */
+ 274              		.loc 1 351 0
+ 275 0156 094A     		ldr	r2, .L27
+ 276              	.LVL15:
+ 277 0158 5268     		ldr	r2, [r2, #4]
+ 278 015a 12F4003F 		tst	r2, #131072
+ 353:lib/src/system_stm32f10x.c ****         }
+ARM GAS  /tmp/ccDWfJV2.s 			page 25
+
+
+ 279              		.loc 1 353 0
+ 280 015e 14BF     		ite	ne
+ 281 0160 094A     		ldrne	r2, .L27+12
+ 357:lib/src/system_stm32f10x.c ****         }
+ 282              		.loc 1 357 0
+ 283 0162 074A     		ldreq	r2, .L27+4
+ 284 0164 02FB03F3 		mul	r3, r2, r3
+ 285              	.LVL16:
+ 286 0168 064A     		ldr	r2, .L27+8
+ 287 016a 1360     		str	r3, [r2]
+ 288 016c DAE7     		b	.L21
+ 289              	.LVL17:
+ 290              	.L26:
+ 341:lib/src/system_stm32f10x.c ****       }
+ 291              		.loc 1 341 0
+ 292 016e 064A     		ldr	r2, .L27+12
+ 293              	.LVL18:
+ 294 0170 02FB03F3 		mul	r3, r2, r3
+ 295              	.LVL19:
+ 296 0174 034A     		ldr	r2, .L27+8
+ 297 0176 1360     		str	r3, [r2]
+ 298 0178 D4E7     		b	.L21
+ 299              	.L28:
+ 300 017a 00BF     		.align	2
+ 301              	.L27:
+ 302 017c 00100240 		.word	1073876992
+ 303 0180 00127A00 		.word	8000000
+ 304 0184 00000000 		.word	.LANCHOR0
+ 305 0188 00093D00 		.word	4000000
+ 306              		.cfi_endproc
+ 307              	.LFE64:
+ 308              		.size	SystemCoreClockUpdate, .-SystemCoreClockUpdate
+ 309              		.global	AHBPrescTable
+ 310              		.global	SystemCoreClock
+ 311              		.data
+ 312              		.align	2
+ 313              		.set	.LANCHOR0,. + 0
+ 314              		.type	SystemCoreClock, %object
+ 315              		.size	SystemCoreClock, 4
+ 316              	SystemCoreClock:
+ 317 0000 00A24A04 		.word	72000000
+ 318              		.type	AHBPrescTable, %object
+ 319              		.size	AHBPrescTable, 16
+ 320              	AHBPrescTable:
+ 321 0004 00       		.byte	0
+ 322 0005 00       		.byte	0
+ 323 0006 00       		.byte	0
+ 324 0007 00       		.byte	0
+ 325 0008 00       		.byte	0
+ 326 0009 00       		.byte	0
+ 327 000a 00       		.byte	0
+ 328 000b 00       		.byte	0
+ 329 000c 01       		.byte	1
+ 330 000d 02       		.byte	2
+ 331 000e 03       		.byte	3
+ 332 000f 04       		.byte	4
+ 333 0010 06       		.byte	6
+ARM GAS  /tmp/ccDWfJV2.s 			page 26
+
+
+ 334 0011 07       		.byte	7
+ 335 0012 08       		.byte	8
+ 336 0013 09       		.byte	9
+ 337              		.text
+ 338              	.Letext0:
+ 339              		.file 2 "/usr/arm-none-eabi/include/machine/_default_types.h"
+ 340              		.file 3 "/usr/arm-none-eabi/include/sys/_stdint.h"
+ 341              		.file 4 "cmsis/core_cm3.h"
+ 342              		.file 5 "lib/inc/system_stm32f10x.h"
+ 343              		.file 6 "lib/inc/stm32f10x.h"
+ 344              		.section	.debug_info,"",%progbits
+ 345              	.Ldebug_info0:
+ 346 0000 C7040000 		.4byte	0x4c7
+ 347 0004 0400     		.2byte	0x4
+ 348 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 349 000a 04       		.byte	0x4
+ 350 000b 01       		.uleb128 0x1
+ 351 000c 65000000 		.4byte	.LASF55
+ 352 0010 0C       		.byte	0xc
+ 353 0011 D9000000 		.4byte	.LASF56
+ 354 0015 66020000 		.4byte	.LASF57
+ 355 0019 00000000 		.4byte	.Ltext0
+ 356 001d 8C010000 		.4byte	.Letext0-.Ltext0
+ 357 0021 00000000 		.4byte	.Ldebug_line0
+ 358 0025 02       		.uleb128 0x2
+ 359 0026 01       		.byte	0x1
+ 360 0027 06       		.byte	0x6
+ 361 0028 77010000 		.4byte	.LASF0
+ 362 002c 03       		.uleb128 0x3
+ 363 002d 15010000 		.4byte	.LASF3
+ 364 0031 02       		.byte	0x2
+ 365 0032 1D       		.byte	0x1d
+ 366 0033 37000000 		.4byte	0x37
+ 367 0037 02       		.uleb128 0x2
+ 368 0038 01       		.byte	0x1
+ 369 0039 08       		.byte	0x8
+ 370 003a 43010000 		.4byte	.LASF1
+ 371 003e 02       		.uleb128 0x2
+ 372 003f 02       		.byte	0x2
+ 373 0040 05       		.byte	0x5
+ 374 0041 AF000000 		.4byte	.LASF2
+ 375 0045 03       		.uleb128 0x3
+ 376 0046 2E000000 		.4byte	.LASF4
+ 377 004a 02       		.byte	0x2
+ 378 004b 2B       		.byte	0x2b
+ 379 004c 50000000 		.4byte	0x50
+ 380 0050 02       		.uleb128 0x2
+ 381 0051 02       		.byte	0x2
+ 382 0052 07       		.byte	0x7
+ 383 0053 E6010000 		.4byte	.LASF5
+ 384 0057 03       		.uleb128 0x3
+ 385 0058 56020000 		.4byte	.LASF6
+ 386 005c 02       		.byte	0x2
+ 387 005d 3F       		.byte	0x3f
+ 388 005e 62000000 		.4byte	0x62
+ 389 0062 02       		.uleb128 0x2
+ 390 0063 04       		.byte	0x4
+ARM GAS  /tmp/ccDWfJV2.s 			page 27
+
+
+ 391 0064 05       		.byte	0x5
+ 392 0065 F4000000 		.4byte	.LASF7
+ 393 0069 03       		.uleb128 0x3
+ 394 006a 23000000 		.4byte	.LASF8
+ 395 006e 02       		.byte	0x2
+ 396 006f 41       		.byte	0x41
+ 397 0070 74000000 		.4byte	0x74
+ 398 0074 02       		.uleb128 0x2
+ 399 0075 04       		.byte	0x4
+ 400 0076 07       		.byte	0x7
+ 401 0077 44020000 		.4byte	.LASF9
+ 402 007b 02       		.uleb128 0x2
+ 403 007c 08       		.byte	0x8
+ 404 007d 05       		.byte	0x5
+ 405 007e C6000000 		.4byte	.LASF10
+ 406 0082 02       		.uleb128 0x2
+ 407 0083 08       		.byte	0x8
+ 408 0084 07       		.byte	0x7
+ 409 0085 83010000 		.4byte	.LASF11
+ 410 0089 04       		.uleb128 0x4
+ 411 008a 04       		.byte	0x4
+ 412 008b 05       		.byte	0x5
+ 413 008c 696E7400 		.ascii	"int\000"
+ 414 0090 02       		.uleb128 0x2
+ 415 0091 04       		.byte	0x4
+ 416 0092 07       		.byte	0x7
+ 417 0093 A3010000 		.4byte	.LASF12
+ 418 0097 03       		.uleb128 0x3
+ 419 0098 5D000000 		.4byte	.LASF13
+ 420 009c 03       		.byte	0x3
+ 421 009d 18       		.byte	0x18
+ 422 009e 2C000000 		.4byte	0x2c
+ 423 00a2 05       		.uleb128 0x5
+ 424 00a3 97000000 		.4byte	0x97
+ 425 00a7 06       		.uleb128 0x6
+ 426 00a8 97000000 		.4byte	0x97
+ 427 00ac 05       		.uleb128 0x5
+ 428 00ad A7000000 		.4byte	0xa7
+ 429 00b1 03       		.uleb128 0x3
+ 430 00b2 B0010000 		.4byte	.LASF14
+ 431 00b6 03       		.byte	0x3
+ 432 00b7 24       		.byte	0x24
+ 433 00b8 45000000 		.4byte	0x45
+ 434 00bc 03       		.uleb128 0x3
+ 435 00bd FE010000 		.4byte	.LASF15
+ 436 00c1 03       		.byte	0x3
+ 437 00c2 2C       		.byte	0x2c
+ 438 00c3 57000000 		.4byte	0x57
+ 439 00c7 05       		.uleb128 0x5
+ 440 00c8 BC000000 		.4byte	0xbc
+ 441 00cc 03       		.uleb128 0x3
+ 442 00cd 9A010000 		.4byte	.LASF16
+ 443 00d1 03       		.byte	0x3
+ 444 00d2 30       		.byte	0x30
+ 445 00d3 69000000 		.4byte	0x69
+ 446 00d7 05       		.uleb128 0x5
+ 447 00d8 CC000000 		.4byte	0xcc
+ARM GAS  /tmp/ccDWfJV2.s 			page 28
+
+
+ 448 00dc 06       		.uleb128 0x6
+ 449 00dd D7000000 		.4byte	0xd7
+ 450 00e1 02       		.uleb128 0x2
+ 451 00e2 04       		.byte	0x4
+ 452 00e3 07       		.byte	0x7
+ 453 00e4 15000000 		.4byte	.LASF17
+ 454 00e8 07       		.uleb128 0x7
+ 455 00e9 8C       		.byte	0x8c
+ 456 00ea 04       		.byte	0x4
+ 457 00eb A101     		.2byte	0x1a1
+ 458 00ed 03020000 		.4byte	0x203
+ 459 00f1 08       		.uleb128 0x8
+ 460 00f2 43000000 		.4byte	.LASF18
+ 461 00f6 04       		.byte	0x4
+ 462 00f7 A301     		.2byte	0x1a3
+ 463 00f9 DC000000 		.4byte	0xdc
+ 464 00fd 00       		.byte	0
+ 465 00fe 08       		.uleb128 0x8
+ 466 00ff B9000000 		.4byte	.LASF19
+ 467 0103 04       		.byte	0x4
+ 468 0104 A401     		.2byte	0x1a4
+ 469 0106 D7000000 		.4byte	0xd7
+ 470 010a 04       		.byte	0x4
+ 471 010b 08       		.uleb128 0x8
+ 472 010c F9010000 		.4byte	.LASF20
+ 473 0110 04       		.byte	0x4
+ 474 0111 A501     		.2byte	0x1a5
+ 475 0113 D7000000 		.4byte	0xd7
+ 476 0117 08       		.byte	0x8
+ 477 0118 08       		.uleb128 0x8
+ 478 0119 51010000 		.4byte	.LASF21
+ 479 011d 04       		.byte	0x4
+ 480 011e A601     		.2byte	0x1a6
+ 481 0120 D7000000 		.4byte	0xd7
+ 482 0124 0C       		.byte	0xc
+ 483 0125 09       		.uleb128 0x9
+ 484 0126 53435200 		.ascii	"SCR\000"
+ 485 012a 04       		.byte	0x4
+ 486 012b A701     		.2byte	0x1a7
+ 487 012d D7000000 		.4byte	0xd7
+ 488 0131 10       		.byte	0x10
+ 489 0132 09       		.uleb128 0x9
+ 490 0133 43435200 		.ascii	"CCR\000"
+ 491 0137 04       		.byte	0x4
+ 492 0138 A801     		.2byte	0x1a8
+ 493 013a D7000000 		.4byte	0xd7
+ 494 013e 14       		.byte	0x14
+ 495 013f 09       		.uleb128 0x9
+ 496 0140 53485000 		.ascii	"SHP\000"
+ 497 0144 04       		.byte	0x4
+ 498 0145 A901     		.2byte	0x1a9
+ 499 0147 13020000 		.4byte	0x213
+ 500 014b 18       		.byte	0x18
+ 501 014c 08       		.uleb128 0x8
+ 502 014d B9010000 		.4byte	.LASF22
+ 503 0151 04       		.byte	0x4
+ 504 0152 AA01     		.2byte	0x1aa
+ARM GAS  /tmp/ccDWfJV2.s 			page 29
+
+
+ 505 0154 D7000000 		.4byte	0xd7
+ 506 0158 24       		.byte	0x24
+ 507 0159 08       		.uleb128 0x8
+ 508 015a 24010000 		.4byte	.LASF23
+ 509 015e 04       		.byte	0x4
+ 510 015f AB01     		.2byte	0x1ab
+ 511 0161 D7000000 		.4byte	0xd7
+ 512 0165 28       		.byte	0x28
+ 513 0166 08       		.uleb128 0x8
+ 514 0167 20020000 		.4byte	.LASF24
+ 515 016b 04       		.byte	0x4
+ 516 016c AC01     		.2byte	0x1ac
+ 517 016e D7000000 		.4byte	0xd7
+ 518 0172 2C       		.byte	0x2c
+ 519 0173 08       		.uleb128 0x8
+ 520 0174 0B020000 		.4byte	.LASF25
+ 521 0178 04       		.byte	0x4
+ 522 0179 AD01     		.2byte	0x1ad
+ 523 017b D7000000 		.4byte	0xd7
+ 524 017f 30       		.byte	0x30
+ 525 0180 08       		.uleb128 0x8
+ 526 0181 D5010000 		.4byte	.LASF26
+ 527 0185 04       		.byte	0x4
+ 528 0186 AE01     		.2byte	0x1ae
+ 529 0188 D7000000 		.4byte	0xd7
+ 530 018c 34       		.byte	0x34
+ 531 018d 08       		.uleb128 0x8
+ 532 018e D4000000 		.4byte	.LASF27
+ 533 0192 04       		.byte	0x4
+ 534 0193 AF01     		.2byte	0x1af
+ 535 0195 D7000000 		.4byte	0xd7
+ 536 0199 38       		.byte	0x38
+ 537 019a 08       		.uleb128 0x8
+ 538 019b 98020000 		.4byte	.LASF28
+ 539 019f 04       		.byte	0x4
+ 540 01a0 B001     		.2byte	0x1b0
+ 541 01a2 D7000000 		.4byte	0xd7
+ 542 01a6 3C       		.byte	0x3c
+ 543 01a7 09       		.uleb128 0x9
+ 544 01a8 50465200 		.ascii	"PFR\000"
+ 545 01ac 04       		.byte	0x4
+ 546 01ad B101     		.2byte	0x1b1
+ 547 01af 2D020000 		.4byte	0x22d
+ 548 01b3 40       		.byte	0x40
+ 549 01b4 09       		.uleb128 0x9
+ 550 01b5 44465200 		.ascii	"DFR\000"
+ 551 01b9 04       		.byte	0x4
+ 552 01ba B201     		.2byte	0x1b2
+ 553 01bc DC000000 		.4byte	0xdc
+ 554 01c0 48       		.byte	0x48
+ 555 01c1 09       		.uleb128 0x9
+ 556 01c2 41445200 		.ascii	"ADR\000"
+ 557 01c6 04       		.byte	0x4
+ 558 01c7 B301     		.2byte	0x1b3
+ 559 01c9 DC000000 		.4byte	0xdc
+ 560 01cd 4C       		.byte	0x4c
+ 561 01ce 08       		.uleb128 0x8
+ARM GAS  /tmp/ccDWfJV2.s 			page 30
+
+
+ 562 01cf 25020000 		.4byte	.LASF29
+ 563 01d3 04       		.byte	0x4
+ 564 01d4 B401     		.2byte	0x1b4
+ 565 01d6 47020000 		.4byte	0x247
+ 566 01da 50       		.byte	0x50
+ 567 01db 08       		.uleb128 0x8
+ 568 01dc 06020000 		.4byte	.LASF30
+ 569 01e0 04       		.byte	0x4
+ 570 01e1 B501     		.2byte	0x1b5
+ 571 01e3 61020000 		.4byte	0x261
+ 572 01e7 60       		.byte	0x60
+ 573 01e8 08       		.uleb128 0x8
+ 574 01e9 4E000000 		.4byte	.LASF31
+ 575 01ed 04       		.byte	0x4
+ 576 01ee B601     		.2byte	0x1b6
+ 577 01f0 66020000 		.4byte	0x266
+ 578 01f4 74       		.byte	0x74
+ 579 01f5 08       		.uleb128 0x8
+ 580 01f6 C1020000 		.4byte	.LASF32
+ 581 01fa 04       		.byte	0x4
+ 582 01fb B701     		.2byte	0x1b7
+ 583 01fd D7000000 		.4byte	0xd7
+ 584 0201 88       		.byte	0x88
+ 585 0202 00       		.byte	0
+ 586 0203 0A       		.uleb128 0xa
+ 587 0204 A2000000 		.4byte	0xa2
+ 588 0208 13020000 		.4byte	0x213
+ 589 020c 0B       		.uleb128 0xb
+ 590 020d E1000000 		.4byte	0xe1
+ 591 0211 0B       		.byte	0xb
+ 592 0212 00       		.byte	0
+ 593 0213 05       		.uleb128 0x5
+ 594 0214 03020000 		.4byte	0x203
+ 595 0218 0A       		.uleb128 0xa
+ 596 0219 DC000000 		.4byte	0xdc
+ 597 021d 28020000 		.4byte	0x228
+ 598 0221 0B       		.uleb128 0xb
+ 599 0222 E1000000 		.4byte	0xe1
+ 600 0226 01       		.byte	0x1
+ 601 0227 00       		.byte	0
+ 602 0228 06       		.uleb128 0x6
+ 603 0229 18020000 		.4byte	0x218
+ 604 022d 05       		.uleb128 0x5
+ 605 022e 28020000 		.4byte	0x228
+ 606 0232 0A       		.uleb128 0xa
+ 607 0233 DC000000 		.4byte	0xdc
+ 608 0237 42020000 		.4byte	0x242
+ 609 023b 0B       		.uleb128 0xb
+ 610 023c E1000000 		.4byte	0xe1
+ 611 0240 03       		.byte	0x3
+ 612 0241 00       		.byte	0
+ 613 0242 06       		.uleb128 0x6
+ 614 0243 32020000 		.4byte	0x232
+ 615 0247 05       		.uleb128 0x5
+ 616 0248 42020000 		.4byte	0x242
+ 617 024c 0A       		.uleb128 0xa
+ 618 024d DC000000 		.4byte	0xdc
+ARM GAS  /tmp/ccDWfJV2.s 			page 31
+
+
+ 619 0251 5C020000 		.4byte	0x25c
+ 620 0255 0B       		.uleb128 0xb
+ 621 0256 E1000000 		.4byte	0xe1
+ 622 025a 04       		.byte	0x4
+ 623 025b 00       		.byte	0
+ 624 025c 06       		.uleb128 0x6
+ 625 025d 4C020000 		.4byte	0x24c
+ 626 0261 05       		.uleb128 0x5
+ 627 0262 5C020000 		.4byte	0x25c
+ 628 0266 0A       		.uleb128 0xa
+ 629 0267 CC000000 		.4byte	0xcc
+ 630 026b 76020000 		.4byte	0x276
+ 631 026f 0B       		.uleb128 0xb
+ 632 0270 E1000000 		.4byte	0xe1
+ 633 0274 04       		.byte	0x4
+ 634 0275 00       		.byte	0
+ 635 0276 0C       		.uleb128 0xc
+ 636 0277 57010000 		.4byte	.LASF33
+ 637 027b 04       		.byte	0x4
+ 638 027c B801     		.2byte	0x1b8
+ 639 027e E8000000 		.4byte	0xe8
+ 640 0282 0D       		.uleb128 0xd
+ 641 0283 B4020000 		.4byte	.LASF34
+ 642 0287 04       		.byte	0x4
+ 643 0288 9606     		.2byte	0x696
+ 644 028a C7000000 		.4byte	0xc7
+ 645 028e 0E       		.uleb128 0xe
+ 646 028f 10020000 		.4byte	.LASF35
+ 647 0293 05       		.byte	0x5
+ 648 0294 35       		.byte	0x35
+ 649 0295 CC000000 		.4byte	0xcc
+ 650 0299 0F       		.uleb128 0xf
+ 651 029a 01       		.byte	0x1
+ 652 029b 37000000 		.4byte	0x37
+ 653 029f 06       		.byte	0x6
+ 654 02a0 0702     		.2byte	0x207
+ 655 02a2 B3020000 		.4byte	0x2b3
+ 656 02a6 10       		.uleb128 0x10
+ 657 02a7 60020000 		.4byte	.LASF36
+ 658 02ab 00       		.byte	0
+ 659 02ac 11       		.uleb128 0x11
+ 660 02ad 53455400 		.ascii	"SET\000"
+ 661 02b1 01       		.byte	0x1
+ 662 02b2 00       		.byte	0
+ 663 02b3 07       		.uleb128 0x7
+ 664 02b4 24       		.byte	0x24
+ 665 02b5 06       		.byte	0x6
+ 666 02b6 8503     		.2byte	0x385
+ 667 02b8 2F030000 		.4byte	0x32f
+ 668 02bc 09       		.uleb128 0x9
+ 669 02bd 41435200 		.ascii	"ACR\000"
+ 670 02c1 06       		.byte	0x6
+ 671 02c2 8703     		.2byte	0x387
+ 672 02c4 D7000000 		.4byte	0xd7
+ 673 02c8 00       		.byte	0
+ 674 02c9 08       		.uleb128 0x8
+ 675 02ca 49000000 		.4byte	.LASF37
+ARM GAS  /tmp/ccDWfJV2.s 			page 32
+
+
+ 676 02ce 06       		.byte	0x6
+ 677 02cf 8803     		.2byte	0x388
+ 678 02d1 D7000000 		.4byte	0xd7
+ 679 02d5 04       		.byte	0x4
+ 680 02d6 08       		.uleb128 0x8
+ 681 02d7 BE000000 		.4byte	.LASF38
+ 682 02db 06       		.byte	0x6
+ 683 02dc 8903     		.2byte	0x389
+ 684 02de D7000000 		.4byte	0xd7
+ 685 02e2 08       		.byte	0x8
+ 686 02e3 09       		.uleb128 0x9
+ 687 02e4 535200   		.ascii	"SR\000"
+ 688 02e7 06       		.byte	0x6
+ 689 02e8 8A03     		.2byte	0x38a
+ 690 02ea D7000000 		.4byte	0xd7
+ 691 02ee 0C       		.byte	0xc
+ 692 02ef 09       		.uleb128 0x9
+ 693 02f0 435200   		.ascii	"CR\000"
+ 694 02f3 06       		.byte	0x6
+ 695 02f4 8B03     		.2byte	0x38b
+ 696 02f6 D7000000 		.4byte	0xd7
+ 697 02fa 10       		.byte	0x10
+ 698 02fb 09       		.uleb128 0x9
+ 699 02fc 415200   		.ascii	"AR\000"
+ 700 02ff 06       		.byte	0x6
+ 701 0300 8C03     		.2byte	0x38c
+ 702 0302 D7000000 		.4byte	0xd7
+ 703 0306 14       		.byte	0x14
+ 704 0307 08       		.uleb128 0x8
+ 705 0308 9D020000 		.4byte	.LASF39
+ 706 030c 06       		.byte	0x6
+ 707 030d 8D03     		.2byte	0x38d
+ 708 030f D7000000 		.4byte	0xd7
+ 709 0313 18       		.byte	0x18
+ 710 0314 09       		.uleb128 0x9
+ 711 0315 4F425200 		.ascii	"OBR\000"
+ 712 0319 06       		.byte	0x6
+ 713 031a 8E03     		.2byte	0x38e
+ 714 031c D7000000 		.4byte	0xd7
+ 715 0320 1C       		.byte	0x1c
+ 716 0321 08       		.uleb128 0x8
+ 717 0322 1F010000 		.4byte	.LASF40
+ 718 0326 06       		.byte	0x6
+ 719 0327 8F03     		.2byte	0x38f
+ 720 0329 D7000000 		.4byte	0xd7
+ 721 032d 20       		.byte	0x20
+ 722 032e 00       		.byte	0
+ 723 032f 0C       		.uleb128 0xc
+ 724 0330 A6020000 		.4byte	.LASF41
+ 725 0334 06       		.byte	0x6
+ 726 0335 9803     		.2byte	0x398
+ 727 0337 B3020000 		.4byte	0x2b3
+ 728 033b 07       		.uleb128 0x7
+ 729 033c 28       		.byte	0x28
+ 730 033d 06       		.byte	0x6
+ 731 033e 3404     		.2byte	0x434
+ 732 0340 C6030000 		.4byte	0x3c6
+ARM GAS  /tmp/ccDWfJV2.s 			page 33
+
+
+ 733 0344 09       		.uleb128 0x9
+ 734 0345 435200   		.ascii	"CR\000"
+ 735 0348 06       		.byte	0x6
+ 736 0349 3604     		.2byte	0x436
+ 737 034b D7000000 		.4byte	0xd7
+ 738 034f 00       		.byte	0
+ 739 0350 08       		.uleb128 0x8
+ 740 0351 58000000 		.4byte	.LASF42
+ 741 0355 06       		.byte	0x6
+ 742 0356 3704     		.2byte	0x437
+ 743 0358 D7000000 		.4byte	0xd7
+ 744 035c 04       		.byte	0x4
+ 745 035d 09       		.uleb128 0x9
+ 746 035e 43495200 		.ascii	"CIR\000"
+ 747 0362 06       		.byte	0x6
+ 748 0363 3804     		.2byte	0x438
+ 749 0365 D7000000 		.4byte	0xd7
+ 750 0369 08       		.byte	0x8
+ 751 036a 08       		.uleb128 0x8
+ 752 036b 0C010000 		.4byte	.LASF43
+ 753 036f 06       		.byte	0x6
+ 754 0370 3904     		.2byte	0x439
+ 755 0372 D7000000 		.4byte	0xd7
+ 756 0376 0C       		.byte	0xc
+ 757 0377 08       		.uleb128 0x8
+ 758 0378 0C000000 		.4byte	.LASF44
+ 759 037c 06       		.byte	0x6
+ 760 037d 3A04     		.2byte	0x43a
+ 761 037f D7000000 		.4byte	0xd7
+ 762 0383 10       		.byte	0x10
+ 763 0384 08       		.uleb128 0x8
+ 764 0385 05010000 		.4byte	.LASF45
+ 765 0389 06       		.byte	0x6
+ 766 038a 3B04     		.2byte	0x43b
+ 767 038c D7000000 		.4byte	0xd7
+ 768 0390 14       		.byte	0x14
+ 769 0391 08       		.uleb128 0x8
+ 770 0392 60010000 		.4byte	.LASF46
+ 771 0396 06       		.byte	0x6
+ 772 0397 3C04     		.2byte	0x43c
+ 773 0399 D7000000 		.4byte	0xd7
+ 774 039d 18       		.byte	0x18
+ 775 039e 08       		.uleb128 0x8
+ 776 039f A7000000 		.4byte	.LASF47
+ 777 03a3 06       		.byte	0x6
+ 778 03a4 3D04     		.2byte	0x43d
+ 779 03a6 D7000000 		.4byte	0xd7
+ 780 03aa 1C       		.byte	0x1c
+ 781 03ab 08       		.uleb128 0x8
+ 782 03ac 1E000000 		.4byte	.LASF48
+ 783 03b0 06       		.byte	0x6
+ 784 03b1 3E04     		.2byte	0x43e
+ 785 03b3 D7000000 		.4byte	0xd7
+ 786 03b7 20       		.byte	0x20
+ 787 03b8 09       		.uleb128 0x9
+ 788 03b9 43535200 		.ascii	"CSR\000"
+ 789 03bd 06       		.byte	0x6
+ARM GAS  /tmp/ccDWfJV2.s 			page 34
+
+
+ 790 03be 3F04     		.2byte	0x43f
+ 791 03c0 D7000000 		.4byte	0xd7
+ 792 03c4 24       		.byte	0x24
+ 793 03c5 00       		.byte	0
+ 794 03c6 0C       		.uleb128 0xc
+ 795 03c7 00000000 		.4byte	.LASF49
+ 796 03cb 06       		.byte	0x6
+ 797 03cc 4A04     		.2byte	0x44a
+ 798 03ce 3B030000 		.4byte	0x33b
+ 799 03d2 12       		.uleb128 0x12
+ 800 03d3 8E020000 		.4byte	0x28e
+ 801 03d7 01       		.byte	0x1
+ 802 03d8 A2       		.byte	0xa2
+ 803 03d9 05       		.uleb128 0x5
+ 804 03da 03       		.byte	0x3
+ 805 03db 00000000 		.4byte	SystemCoreClock
+ 806 03df 0A       		.uleb128 0xa
+ 807 03e0 AC000000 		.4byte	0xac
+ 808 03e4 EF030000 		.4byte	0x3ef
+ 809 03e8 0B       		.uleb128 0xb
+ 810 03e9 E1000000 		.4byte	0xe1
+ 811 03ed 0F       		.byte	0xf
+ 812 03ee 00       		.byte	0
+ 813 03ef 06       		.uleb128 0x6
+ 814 03f0 DF030000 		.4byte	0x3df
+ 815 03f4 05       		.uleb128 0x5
+ 816 03f5 EF030000 		.4byte	0x3ef
+ 817 03f9 13       		.uleb128 0x13
+ 818 03fa 2A020000 		.4byte	.LASF50
+ 819 03fe 01       		.byte	0x1
+ 820 03ff A7       		.byte	0xa7
+ 821 0400 F4030000 		.4byte	0x3f4
+ 822 0404 05       		.uleb128 0x5
+ 823 0405 03       		.byte	0x3
+ 824 0406 00000000 		.4byte	AHBPrescTable
+ 825 040a 14       		.uleb128 0x14
+ 826 040b 29010000 		.4byte	.LASF58
+ 827 040f 01       		.byte	0x1
+ 828 0410 DB03     		.2byte	0x3db
+ 829 0412 01       		.byte	0x1
+ 830 0413 30040000 		.4byte	0x430
+ 831 0417 15       		.uleb128 0x15
+ 832 0418 68010000 		.4byte	.LASF51
+ 833 041c 01       		.byte	0x1
+ 834 041d DD03     		.2byte	0x3dd
+ 835 041f D7000000 		.4byte	0xd7
+ 836 0423 15       		.uleb128 0x15
+ 837 0424 39000000 		.4byte	.LASF52
+ 838 0428 01       		.byte	0x1
+ 839 0429 DD03     		.2byte	0x3dd
+ 840 042b D7000000 		.4byte	0xd7
+ 841 042f 00       		.byte	0
+ 842 0430 16       		.uleb128 0x16
+ 843 0431 38020000 		.4byte	.LASF59
+ 844 0435 01       		.byte	0x1
+ 845 0436 A301     		.2byte	0x1a3
+ 846 0438 01       		.byte	0x1
+ARM GAS  /tmp/ccDWfJV2.s 			page 35
+
+
+ 847 0439 17       		.uleb128 0x17
+ 848 043a BF010000 		.4byte	.LASF60
+ 849 043e 01       		.byte	0x1
+ 850 043f 3201     		.2byte	0x132
+ 851 0441 04010000 		.4byte	.LFB64
+ 852 0445 88000000 		.4byte	.LFE64-.LFB64
+ 853 0449 01       		.uleb128 0x1
+ 854 044a 9C       		.byte	0x9c
+ 855 044b 80040000 		.4byte	0x480
+ 856 044f 18       		.uleb128 0x18
+ 857 0450 746D7000 		.ascii	"tmp\000"
+ 858 0454 01       		.byte	0x1
+ 859 0455 3401     		.2byte	0x134
+ 860 0457 CC000000 		.4byte	0xcc
+ 861 045b 00000000 		.4byte	.LLST0
+ 862 045f 19       		.uleb128 0x19
+ 863 0460 FD000000 		.4byte	.LASF53
+ 864 0464 01       		.byte	0x1
+ 865 0465 3401     		.2byte	0x134
+ 866 0467 CC000000 		.4byte	0xcc
+ 867 046b 5F000000 		.4byte	.LLST1
+ 868 046f 19       		.uleb128 0x19
+ 869 0470 39010000 		.4byte	.LASF54
+ 870 0474 01       		.byte	0x1
+ 871 0475 3401     		.2byte	0x134
+ 872 0477 CC000000 		.4byte	0xcc
+ 873 047b A6000000 		.4byte	.LLST2
+ 874 047f 00       		.byte	0
+ 875 0480 1A       		.uleb128 0x1a
+ 876 0481 DB010000 		.4byte	.LASF61
+ 877 0485 01       		.byte	0x1
+ 878 0486 D4       		.byte	0xd4
+ 879 0487 00000000 		.4byte	.LFB63
+ 880 048b 04010000 		.4byte	.LFE63-.LFB63
+ 881 048f 01       		.uleb128 0x1
+ 882 0490 9C       		.byte	0x9c
+ 883 0491 1B       		.uleb128 0x1b
+ 884 0492 30040000 		.4byte	0x430
+ 885 0496 36000000 		.4byte	.LBB6
+ 886 049a 00000000 		.4byte	.Ldebug_ranges0+0
+ 887 049e 01       		.byte	0x1
+ 888 049f 0601     		.2byte	0x106
+ 889 04a1 1B       		.uleb128 0x1b
+ 890 04a2 0A040000 		.4byte	0x40a
+ 891 04a6 36000000 		.4byte	.LBB7
+ 892 04aa 00000000 		.4byte	.Ldebug_ranges0+0
+ 893 04ae 01       		.byte	0x1
+ 894 04af B001     		.2byte	0x1b0
+ 895 04b1 1C       		.uleb128 0x1c
+ 896 04b2 00000000 		.4byte	.Ldebug_ranges0+0
+ 897 04b6 1D       		.uleb128 0x1d
+ 898 04b7 17040000 		.4byte	0x417
+ 899 04bb 02       		.uleb128 0x2
+ 900 04bc 91       		.byte	0x91
+ 901 04bd 78       		.sleb128 -8
+ 902 04be 1D       		.uleb128 0x1d
+ 903 04bf 23040000 		.4byte	0x423
+ARM GAS  /tmp/ccDWfJV2.s 			page 36
+
+
+ 904 04c3 02       		.uleb128 0x2
+ 905 04c4 91       		.byte	0x91
+ 906 04c5 7C       		.sleb128 -4
+ 907 04c6 00       		.byte	0
+ 908 04c7 00       		.byte	0
+ 909 04c8 00       		.byte	0
+ 910 04c9 00       		.byte	0
+ 911 04ca 00       		.byte	0
+ 912              		.section	.debug_abbrev,"",%progbits
+ 913              	.Ldebug_abbrev0:
+ 914 0000 01       		.uleb128 0x1
+ 915 0001 11       		.uleb128 0x11
+ 916 0002 01       		.byte	0x1
+ 917 0003 25       		.uleb128 0x25
+ 918 0004 0E       		.uleb128 0xe
+ 919 0005 13       		.uleb128 0x13
+ 920 0006 0B       		.uleb128 0xb
+ 921 0007 03       		.uleb128 0x3
+ 922 0008 0E       		.uleb128 0xe
+ 923 0009 1B       		.uleb128 0x1b
+ 924 000a 0E       		.uleb128 0xe
+ 925 000b 11       		.uleb128 0x11
+ 926 000c 01       		.uleb128 0x1
+ 927 000d 12       		.uleb128 0x12
+ 928 000e 06       		.uleb128 0x6
+ 929 000f 10       		.uleb128 0x10
+ 930 0010 17       		.uleb128 0x17
+ 931 0011 00       		.byte	0
+ 932 0012 00       		.byte	0
+ 933 0013 02       		.uleb128 0x2
+ 934 0014 24       		.uleb128 0x24
+ 935 0015 00       		.byte	0
+ 936 0016 0B       		.uleb128 0xb
+ 937 0017 0B       		.uleb128 0xb
+ 938 0018 3E       		.uleb128 0x3e
+ 939 0019 0B       		.uleb128 0xb
+ 940 001a 03       		.uleb128 0x3
+ 941 001b 0E       		.uleb128 0xe
+ 942 001c 00       		.byte	0
+ 943 001d 00       		.byte	0
+ 944 001e 03       		.uleb128 0x3
+ 945 001f 16       		.uleb128 0x16
+ 946 0020 00       		.byte	0
+ 947 0021 03       		.uleb128 0x3
+ 948 0022 0E       		.uleb128 0xe
+ 949 0023 3A       		.uleb128 0x3a
+ 950 0024 0B       		.uleb128 0xb
+ 951 0025 3B       		.uleb128 0x3b
+ 952 0026 0B       		.uleb128 0xb
+ 953 0027 49       		.uleb128 0x49
+ 954 0028 13       		.uleb128 0x13
+ 955 0029 00       		.byte	0
+ 956 002a 00       		.byte	0
+ 957 002b 04       		.uleb128 0x4
+ 958 002c 24       		.uleb128 0x24
+ 959 002d 00       		.byte	0
+ 960 002e 0B       		.uleb128 0xb
+ARM GAS  /tmp/ccDWfJV2.s 			page 37
+
+
+ 961 002f 0B       		.uleb128 0xb
+ 962 0030 3E       		.uleb128 0x3e
+ 963 0031 0B       		.uleb128 0xb
+ 964 0032 03       		.uleb128 0x3
+ 965 0033 08       		.uleb128 0x8
+ 966 0034 00       		.byte	0
+ 967 0035 00       		.byte	0
+ 968 0036 05       		.uleb128 0x5
+ 969 0037 35       		.uleb128 0x35
+ 970 0038 00       		.byte	0
+ 971 0039 49       		.uleb128 0x49
+ 972 003a 13       		.uleb128 0x13
+ 973 003b 00       		.byte	0
+ 974 003c 00       		.byte	0
+ 975 003d 06       		.uleb128 0x6
+ 976 003e 26       		.uleb128 0x26
+ 977 003f 00       		.byte	0
+ 978 0040 49       		.uleb128 0x49
+ 979 0041 13       		.uleb128 0x13
+ 980 0042 00       		.byte	0
+ 981 0043 00       		.byte	0
+ 982 0044 07       		.uleb128 0x7
+ 983 0045 13       		.uleb128 0x13
+ 984 0046 01       		.byte	0x1
+ 985 0047 0B       		.uleb128 0xb
+ 986 0048 0B       		.uleb128 0xb
+ 987 0049 3A       		.uleb128 0x3a
+ 988 004a 0B       		.uleb128 0xb
+ 989 004b 3B       		.uleb128 0x3b
+ 990 004c 05       		.uleb128 0x5
+ 991 004d 01       		.uleb128 0x1
+ 992 004e 13       		.uleb128 0x13
+ 993 004f 00       		.byte	0
+ 994 0050 00       		.byte	0
+ 995 0051 08       		.uleb128 0x8
+ 996 0052 0D       		.uleb128 0xd
+ 997 0053 00       		.byte	0
+ 998 0054 03       		.uleb128 0x3
+ 999 0055 0E       		.uleb128 0xe
+ 1000 0056 3A       		.uleb128 0x3a
+ 1001 0057 0B       		.uleb128 0xb
+ 1002 0058 3B       		.uleb128 0x3b
+ 1003 0059 05       		.uleb128 0x5
+ 1004 005a 49       		.uleb128 0x49
+ 1005 005b 13       		.uleb128 0x13
+ 1006 005c 38       		.uleb128 0x38
+ 1007 005d 0B       		.uleb128 0xb
+ 1008 005e 00       		.byte	0
+ 1009 005f 00       		.byte	0
+ 1010 0060 09       		.uleb128 0x9
+ 1011 0061 0D       		.uleb128 0xd
+ 1012 0062 00       		.byte	0
+ 1013 0063 03       		.uleb128 0x3
+ 1014 0064 08       		.uleb128 0x8
+ 1015 0065 3A       		.uleb128 0x3a
+ 1016 0066 0B       		.uleb128 0xb
+ 1017 0067 3B       		.uleb128 0x3b
+ARM GAS  /tmp/ccDWfJV2.s 			page 38
+
+
+ 1018 0068 05       		.uleb128 0x5
+ 1019 0069 49       		.uleb128 0x49
+ 1020 006a 13       		.uleb128 0x13
+ 1021 006b 38       		.uleb128 0x38
+ 1022 006c 0B       		.uleb128 0xb
+ 1023 006d 00       		.byte	0
+ 1024 006e 00       		.byte	0
+ 1025 006f 0A       		.uleb128 0xa
+ 1026 0070 01       		.uleb128 0x1
+ 1027 0071 01       		.byte	0x1
+ 1028 0072 49       		.uleb128 0x49
+ 1029 0073 13       		.uleb128 0x13
+ 1030 0074 01       		.uleb128 0x1
+ 1031 0075 13       		.uleb128 0x13
+ 1032 0076 00       		.byte	0
+ 1033 0077 00       		.byte	0
+ 1034 0078 0B       		.uleb128 0xb
+ 1035 0079 21       		.uleb128 0x21
+ 1036 007a 00       		.byte	0
+ 1037 007b 49       		.uleb128 0x49
+ 1038 007c 13       		.uleb128 0x13
+ 1039 007d 2F       		.uleb128 0x2f
+ 1040 007e 0B       		.uleb128 0xb
+ 1041 007f 00       		.byte	0
+ 1042 0080 00       		.byte	0
+ 1043 0081 0C       		.uleb128 0xc
+ 1044 0082 16       		.uleb128 0x16
+ 1045 0083 00       		.byte	0
+ 1046 0084 03       		.uleb128 0x3
+ 1047 0085 0E       		.uleb128 0xe
+ 1048 0086 3A       		.uleb128 0x3a
+ 1049 0087 0B       		.uleb128 0xb
+ 1050 0088 3B       		.uleb128 0x3b
+ 1051 0089 05       		.uleb128 0x5
+ 1052 008a 49       		.uleb128 0x49
+ 1053 008b 13       		.uleb128 0x13
+ 1054 008c 00       		.byte	0
+ 1055 008d 00       		.byte	0
+ 1056 008e 0D       		.uleb128 0xd
+ 1057 008f 34       		.uleb128 0x34
+ 1058 0090 00       		.byte	0
+ 1059 0091 03       		.uleb128 0x3
+ 1060 0092 0E       		.uleb128 0xe
+ 1061 0093 3A       		.uleb128 0x3a
+ 1062 0094 0B       		.uleb128 0xb
+ 1063 0095 3B       		.uleb128 0x3b
+ 1064 0096 05       		.uleb128 0x5
+ 1065 0097 49       		.uleb128 0x49
+ 1066 0098 13       		.uleb128 0x13
+ 1067 0099 3F       		.uleb128 0x3f
+ 1068 009a 19       		.uleb128 0x19
+ 1069 009b 3C       		.uleb128 0x3c
+ 1070 009c 19       		.uleb128 0x19
+ 1071 009d 00       		.byte	0
+ 1072 009e 00       		.byte	0
+ 1073 009f 0E       		.uleb128 0xe
+ 1074 00a0 34       		.uleb128 0x34
+ARM GAS  /tmp/ccDWfJV2.s 			page 39
+
+
+ 1075 00a1 00       		.byte	0
+ 1076 00a2 03       		.uleb128 0x3
+ 1077 00a3 0E       		.uleb128 0xe
+ 1078 00a4 3A       		.uleb128 0x3a
+ 1079 00a5 0B       		.uleb128 0xb
+ 1080 00a6 3B       		.uleb128 0x3b
+ 1081 00a7 0B       		.uleb128 0xb
+ 1082 00a8 49       		.uleb128 0x49
+ 1083 00a9 13       		.uleb128 0x13
+ 1084 00aa 3F       		.uleb128 0x3f
+ 1085 00ab 19       		.uleb128 0x19
+ 1086 00ac 3C       		.uleb128 0x3c
+ 1087 00ad 19       		.uleb128 0x19
+ 1088 00ae 00       		.byte	0
+ 1089 00af 00       		.byte	0
+ 1090 00b0 0F       		.uleb128 0xf
+ 1091 00b1 04       		.uleb128 0x4
+ 1092 00b2 01       		.byte	0x1
+ 1093 00b3 0B       		.uleb128 0xb
+ 1094 00b4 0B       		.uleb128 0xb
+ 1095 00b5 49       		.uleb128 0x49
+ 1096 00b6 13       		.uleb128 0x13
+ 1097 00b7 3A       		.uleb128 0x3a
+ 1098 00b8 0B       		.uleb128 0xb
+ 1099 00b9 3B       		.uleb128 0x3b
+ 1100 00ba 05       		.uleb128 0x5
+ 1101 00bb 01       		.uleb128 0x1
+ 1102 00bc 13       		.uleb128 0x13
+ 1103 00bd 00       		.byte	0
+ 1104 00be 00       		.byte	0
+ 1105 00bf 10       		.uleb128 0x10
+ 1106 00c0 28       		.uleb128 0x28
+ 1107 00c1 00       		.byte	0
+ 1108 00c2 03       		.uleb128 0x3
+ 1109 00c3 0E       		.uleb128 0xe
+ 1110 00c4 1C       		.uleb128 0x1c
+ 1111 00c5 0B       		.uleb128 0xb
+ 1112 00c6 00       		.byte	0
+ 1113 00c7 00       		.byte	0
+ 1114 00c8 11       		.uleb128 0x11
+ 1115 00c9 28       		.uleb128 0x28
+ 1116 00ca 00       		.byte	0
+ 1117 00cb 03       		.uleb128 0x3
+ 1118 00cc 08       		.uleb128 0x8
+ 1119 00cd 1C       		.uleb128 0x1c
+ 1120 00ce 0B       		.uleb128 0xb
+ 1121 00cf 00       		.byte	0
+ 1122 00d0 00       		.byte	0
+ 1123 00d1 12       		.uleb128 0x12
+ 1124 00d2 34       		.uleb128 0x34
+ 1125 00d3 00       		.byte	0
+ 1126 00d4 47       		.uleb128 0x47
+ 1127 00d5 13       		.uleb128 0x13
+ 1128 00d6 3A       		.uleb128 0x3a
+ 1129 00d7 0B       		.uleb128 0xb
+ 1130 00d8 3B       		.uleb128 0x3b
+ 1131 00d9 0B       		.uleb128 0xb
+ARM GAS  /tmp/ccDWfJV2.s 			page 40
+
+
+ 1132 00da 02       		.uleb128 0x2
+ 1133 00db 18       		.uleb128 0x18
+ 1134 00dc 00       		.byte	0
+ 1135 00dd 00       		.byte	0
+ 1136 00de 13       		.uleb128 0x13
+ 1137 00df 34       		.uleb128 0x34
+ 1138 00e0 00       		.byte	0
+ 1139 00e1 03       		.uleb128 0x3
+ 1140 00e2 0E       		.uleb128 0xe
+ 1141 00e3 3A       		.uleb128 0x3a
+ 1142 00e4 0B       		.uleb128 0xb
+ 1143 00e5 3B       		.uleb128 0x3b
+ 1144 00e6 0B       		.uleb128 0xb
+ 1145 00e7 49       		.uleb128 0x49
+ 1146 00e8 13       		.uleb128 0x13
+ 1147 00e9 3F       		.uleb128 0x3f
+ 1148 00ea 19       		.uleb128 0x19
+ 1149 00eb 02       		.uleb128 0x2
+ 1150 00ec 18       		.uleb128 0x18
+ 1151 00ed 00       		.byte	0
+ 1152 00ee 00       		.byte	0
+ 1153 00ef 14       		.uleb128 0x14
+ 1154 00f0 2E       		.uleb128 0x2e
+ 1155 00f1 01       		.byte	0x1
+ 1156 00f2 03       		.uleb128 0x3
+ 1157 00f3 0E       		.uleb128 0xe
+ 1158 00f4 3A       		.uleb128 0x3a
+ 1159 00f5 0B       		.uleb128 0xb
+ 1160 00f6 3B       		.uleb128 0x3b
+ 1161 00f7 05       		.uleb128 0x5
+ 1162 00f8 27       		.uleb128 0x27
+ 1163 00f9 19       		.uleb128 0x19
+ 1164 00fa 20       		.uleb128 0x20
+ 1165 00fb 0B       		.uleb128 0xb
+ 1166 00fc 01       		.uleb128 0x1
+ 1167 00fd 13       		.uleb128 0x13
+ 1168 00fe 00       		.byte	0
+ 1169 00ff 00       		.byte	0
+ 1170 0100 15       		.uleb128 0x15
+ 1171 0101 34       		.uleb128 0x34
+ 1172 0102 00       		.byte	0
+ 1173 0103 03       		.uleb128 0x3
+ 1174 0104 0E       		.uleb128 0xe
+ 1175 0105 3A       		.uleb128 0x3a
+ 1176 0106 0B       		.uleb128 0xb
+ 1177 0107 3B       		.uleb128 0x3b
+ 1178 0108 05       		.uleb128 0x5
+ 1179 0109 49       		.uleb128 0x49
+ 1180 010a 13       		.uleb128 0x13
+ 1181 010b 00       		.byte	0
+ 1182 010c 00       		.byte	0
+ 1183 010d 16       		.uleb128 0x16
+ 1184 010e 2E       		.uleb128 0x2e
+ 1185 010f 00       		.byte	0
+ 1186 0110 03       		.uleb128 0x3
+ 1187 0111 0E       		.uleb128 0xe
+ 1188 0112 3A       		.uleb128 0x3a
+ARM GAS  /tmp/ccDWfJV2.s 			page 41
+
+
+ 1189 0113 0B       		.uleb128 0xb
+ 1190 0114 3B       		.uleb128 0x3b
+ 1191 0115 05       		.uleb128 0x5
+ 1192 0116 27       		.uleb128 0x27
+ 1193 0117 19       		.uleb128 0x19
+ 1194 0118 20       		.uleb128 0x20
+ 1195 0119 0B       		.uleb128 0xb
+ 1196 011a 00       		.byte	0
+ 1197 011b 00       		.byte	0
+ 1198 011c 17       		.uleb128 0x17
+ 1199 011d 2E       		.uleb128 0x2e
+ 1200 011e 01       		.byte	0x1
+ 1201 011f 3F       		.uleb128 0x3f
+ 1202 0120 19       		.uleb128 0x19
+ 1203 0121 03       		.uleb128 0x3
+ 1204 0122 0E       		.uleb128 0xe
+ 1205 0123 3A       		.uleb128 0x3a
+ 1206 0124 0B       		.uleb128 0xb
+ 1207 0125 3B       		.uleb128 0x3b
+ 1208 0126 05       		.uleb128 0x5
+ 1209 0127 27       		.uleb128 0x27
+ 1210 0128 19       		.uleb128 0x19
+ 1211 0129 11       		.uleb128 0x11
+ 1212 012a 01       		.uleb128 0x1
+ 1213 012b 12       		.uleb128 0x12
+ 1214 012c 06       		.uleb128 0x6
+ 1215 012d 40       		.uleb128 0x40
+ 1216 012e 18       		.uleb128 0x18
+ 1217 012f 9742     		.uleb128 0x2117
+ 1218 0131 19       		.uleb128 0x19
+ 1219 0132 01       		.uleb128 0x1
+ 1220 0133 13       		.uleb128 0x13
+ 1221 0134 00       		.byte	0
+ 1222 0135 00       		.byte	0
+ 1223 0136 18       		.uleb128 0x18
+ 1224 0137 34       		.uleb128 0x34
+ 1225 0138 00       		.byte	0
+ 1226 0139 03       		.uleb128 0x3
+ 1227 013a 08       		.uleb128 0x8
+ 1228 013b 3A       		.uleb128 0x3a
+ 1229 013c 0B       		.uleb128 0xb
+ 1230 013d 3B       		.uleb128 0x3b
+ 1231 013e 05       		.uleb128 0x5
+ 1232 013f 49       		.uleb128 0x49
+ 1233 0140 13       		.uleb128 0x13
+ 1234 0141 02       		.uleb128 0x2
+ 1235 0142 17       		.uleb128 0x17
+ 1236 0143 00       		.byte	0
+ 1237 0144 00       		.byte	0
+ 1238 0145 19       		.uleb128 0x19
+ 1239 0146 34       		.uleb128 0x34
+ 1240 0147 00       		.byte	0
+ 1241 0148 03       		.uleb128 0x3
+ 1242 0149 0E       		.uleb128 0xe
+ 1243 014a 3A       		.uleb128 0x3a
+ 1244 014b 0B       		.uleb128 0xb
+ 1245 014c 3B       		.uleb128 0x3b
+ARM GAS  /tmp/ccDWfJV2.s 			page 42
+
+
+ 1246 014d 05       		.uleb128 0x5
+ 1247 014e 49       		.uleb128 0x49
+ 1248 014f 13       		.uleb128 0x13
+ 1249 0150 02       		.uleb128 0x2
+ 1250 0151 17       		.uleb128 0x17
+ 1251 0152 00       		.byte	0
+ 1252 0153 00       		.byte	0
+ 1253 0154 1A       		.uleb128 0x1a
+ 1254 0155 2E       		.uleb128 0x2e
+ 1255 0156 01       		.byte	0x1
+ 1256 0157 3F       		.uleb128 0x3f
+ 1257 0158 19       		.uleb128 0x19
+ 1258 0159 03       		.uleb128 0x3
+ 1259 015a 0E       		.uleb128 0xe
+ 1260 015b 3A       		.uleb128 0x3a
+ 1261 015c 0B       		.uleb128 0xb
+ 1262 015d 3B       		.uleb128 0x3b
+ 1263 015e 0B       		.uleb128 0xb
+ 1264 015f 27       		.uleb128 0x27
+ 1265 0160 19       		.uleb128 0x19
+ 1266 0161 11       		.uleb128 0x11
+ 1267 0162 01       		.uleb128 0x1
+ 1268 0163 12       		.uleb128 0x12
+ 1269 0164 06       		.uleb128 0x6
+ 1270 0165 40       		.uleb128 0x40
+ 1271 0166 18       		.uleb128 0x18
+ 1272 0167 9742     		.uleb128 0x2117
+ 1273 0169 19       		.uleb128 0x19
+ 1274 016a 00       		.byte	0
+ 1275 016b 00       		.byte	0
+ 1276 016c 1B       		.uleb128 0x1b
+ 1277 016d 1D       		.uleb128 0x1d
+ 1278 016e 01       		.byte	0x1
+ 1279 016f 31       		.uleb128 0x31
+ 1280 0170 13       		.uleb128 0x13
+ 1281 0171 52       		.uleb128 0x52
+ 1282 0172 01       		.uleb128 0x1
+ 1283 0173 55       		.uleb128 0x55
+ 1284 0174 17       		.uleb128 0x17
+ 1285 0175 58       		.uleb128 0x58
+ 1286 0176 0B       		.uleb128 0xb
+ 1287 0177 59       		.uleb128 0x59
+ 1288 0178 05       		.uleb128 0x5
+ 1289 0179 00       		.byte	0
+ 1290 017a 00       		.byte	0
+ 1291 017b 1C       		.uleb128 0x1c
+ 1292 017c 0B       		.uleb128 0xb
+ 1293 017d 01       		.byte	0x1
+ 1294 017e 55       		.uleb128 0x55
+ 1295 017f 17       		.uleb128 0x17
+ 1296 0180 00       		.byte	0
+ 1297 0181 00       		.byte	0
+ 1298 0182 1D       		.uleb128 0x1d
+ 1299 0183 34       		.uleb128 0x34
+ 1300 0184 00       		.byte	0
+ 1301 0185 31       		.uleb128 0x31
+ 1302 0186 13       		.uleb128 0x13
+ARM GAS  /tmp/ccDWfJV2.s 			page 43
+
+
+ 1303 0187 02       		.uleb128 0x2
+ 1304 0188 18       		.uleb128 0x18
+ 1305 0189 00       		.byte	0
+ 1306 018a 00       		.byte	0
+ 1307 018b 00       		.byte	0
+ 1308              		.section	.debug_loc,"",%progbits
+ 1309              	.Ldebug_loc0:
+ 1310              	.LLST0:
+ 1311 0000 04010000 		.4byte	.LVL0-.Ltext0
+ 1312 0004 08010000 		.4byte	.LVL1-.Ltext0
+ 1313 0008 0200     		.2byte	0x2
+ 1314 000a 30       		.byte	0x30
+ 1315 000b 9F       		.byte	0x9f
+ 1316 000c 08010000 		.4byte	.LVL1-.Ltext0
+ 1317 0010 0C010000 		.4byte	.LVL2-.Ltext0
+ 1318 0014 0500     		.2byte	0x5
+ 1319 0016 73       		.byte	0x73
+ 1320 0017 00       		.sleb128 0
+ 1321 0018 3C       		.byte	0x3c
+ 1322 0019 1A       		.byte	0x1a
+ 1323 001a 9F       		.byte	0x9f
+ 1324 001b 0C010000 		.4byte	.LVL2-.Ltext0
+ 1325 001f 1A010000 		.4byte	.LVL3-.Ltext0
+ 1326 0023 0100     		.2byte	0x1
+ 1327 0025 53       		.byte	0x53
+ 1328 0026 1E010000 		.4byte	.LVL4-.Ltext0
+ 1329 002a 22010000 		.4byte	.LVL5-.Ltext0
+ 1330 002e 0100     		.2byte	0x1
+ 1331 0030 53       		.byte	0x53
+ 1332 0031 34010000 		.4byte	.LVL7-.Ltext0
+ 1333 0035 3C010000 		.4byte	.LVL8-.Ltext0
+ 1334 0039 0600     		.2byte	0x6
+ 1335 003b 71       		.byte	0x71
+ 1336 003c 00       		.sleb128 0
+ 1337 003d 08       		.byte	0x8
+ 1338 003e FF       		.byte	0xff
+ 1339 003f 1A       		.byte	0x1a
+ 1340 0040 9F       		.byte	0x9f
+ 1341 0041 3C010000 		.4byte	.LVL8-.Ltext0
+ 1342 0045 40010000 		.4byte	.LVL9-.Ltext0
+ 1343 0049 0100     		.2byte	0x1
+ 1344 004b 53       		.byte	0x53
+ 1345 004c 44010000 		.4byte	.LVL10-.Ltext0
+ 1346 0050 48010000 		.4byte	.LVL11-.Ltext0
+ 1347 0054 0100     		.2byte	0x1
+ 1348 0056 53       		.byte	0x53
+ 1349 0057 00000000 		.4byte	0
+ 1350 005b 00000000 		.4byte	0
+ 1351              	.LLST1:
+ 1352 005f 04010000 		.4byte	.LVL0-.Ltext0
+ 1353 0063 24010000 		.4byte	.LVL6-.Ltext0
+ 1354 0067 0200     		.2byte	0x2
+ 1355 0069 30       		.byte	0x30
+ 1356 006a 9F       		.byte	0x9f
+ 1357 006b 3C010000 		.4byte	.LVL8-.Ltext0
+ 1358 006f 48010000 		.4byte	.LVL11-.Ltext0
+ 1359 0073 0200     		.2byte	0x2
+ARM GAS  /tmp/ccDWfJV2.s 			page 44
+
+
+ 1360 0075 30       		.byte	0x30
+ 1361 0076 9F       		.byte	0x9f
+ 1362 0077 48010000 		.4byte	.LVL11-.Ltext0
+ 1363 007b 4E010000 		.4byte	.LVL13-.Ltext0
+ 1364 007f 0700     		.2byte	0x7
+ 1365 0081 73       		.byte	0x73
+ 1366 0082 00       		.sleb128 0
+ 1367 0083 4E       		.byte	0x4e
+ 1368 0084 41       		.byte	0x41
+ 1369 0085 24       		.byte	0x24
+ 1370 0086 1A       		.byte	0x1a
+ 1371 0087 9F       		.byte	0x9f
+ 1372 0088 50010000 		.4byte	.LVL14-.Ltext0
+ 1373 008c 68010000 		.4byte	.LVL16-.Ltext0
+ 1374 0090 0100     		.2byte	0x1
+ 1375 0092 53       		.byte	0x53
+ 1376 0093 6E010000 		.4byte	.LVL17-.Ltext0
+ 1377 0097 74010000 		.4byte	.LVL19-.Ltext0
+ 1378 009b 0100     		.2byte	0x1
+ 1379 009d 53       		.byte	0x53
+ 1380 009e 00000000 		.4byte	0
+ 1381 00a2 00000000 		.4byte	0
+ 1382              	.LLST2:
+ 1383 00a6 04010000 		.4byte	.LVL0-.Ltext0
+ 1384 00aa 24010000 		.4byte	.LVL6-.Ltext0
+ 1385 00ae 0200     		.2byte	0x2
+ 1386 00b0 30       		.byte	0x30
+ 1387 00b1 9F       		.byte	0x9f
+ 1388 00b2 3C010000 		.4byte	.LVL8-.Ltext0
+ 1389 00b6 4A010000 		.4byte	.LVL12-.Ltext0
+ 1390 00ba 0200     		.2byte	0x2
+ 1391 00bc 30       		.byte	0x30
+ 1392 00bd 9F       		.byte	0x9f
+ 1393 00be 4A010000 		.4byte	.LVL12-.Ltext0
+ 1394 00c2 58010000 		.4byte	.LVL15-.Ltext0
+ 1395 00c6 0700     		.2byte	0x7
+ 1396 00c8 72       		.byte	0x72
+ 1397 00c9 00       		.sleb128 0
+ 1398 00ca 40       		.byte	0x40
+ 1399 00cb 3C       		.byte	0x3c
+ 1400 00cc 24       		.byte	0x24
+ 1401 00cd 1A       		.byte	0x1a
+ 1402 00ce 9F       		.byte	0x9f
+ 1403 00cf 6E010000 		.4byte	.LVL17-.Ltext0
+ 1404 00d3 70010000 		.4byte	.LVL18-.Ltext0
+ 1405 00d7 0700     		.2byte	0x7
+ 1406 00d9 72       		.byte	0x72
+ 1407 00da 00       		.sleb128 0
+ 1408 00db 40       		.byte	0x40
+ 1409 00dc 3C       		.byte	0x3c
+ 1410 00dd 24       		.byte	0x24
+ 1411 00de 1A       		.byte	0x1a
+ 1412 00df 9F       		.byte	0x9f
+ 1413 00e0 00000000 		.4byte	0
+ 1414 00e4 00000000 		.4byte	0
+ 1415              		.section	.debug_aranges,"",%progbits
+ 1416 0000 1C000000 		.4byte	0x1c
+ARM GAS  /tmp/ccDWfJV2.s 			page 45
+
+
+ 1417 0004 0200     		.2byte	0x2
+ 1418 0006 00000000 		.4byte	.Ldebug_info0
+ 1419 000a 04       		.byte	0x4
+ 1420 000b 00       		.byte	0
+ 1421 000c 0000     		.2byte	0
+ 1422 000e 0000     		.2byte	0
+ 1423 0010 00000000 		.4byte	.Ltext0
+ 1424 0014 8C010000 		.4byte	.Letext0-.Ltext0
+ 1425 0018 00000000 		.4byte	0
+ 1426 001c 00000000 		.4byte	0
+ 1427              		.section	.debug_ranges,"",%progbits
+ 1428              	.Ldebug_ranges0:
+ 1429 0000 36000000 		.4byte	.LBB6-.Ltext0
+ 1430 0004 76000000 		.4byte	.LBE6-.Ltext0
+ 1431 0008 82000000 		.4byte	.LBB11-.Ltext0
+ 1432 000c 04010000 		.4byte	.LBE11-.Ltext0
+ 1433 0010 00000000 		.4byte	0
+ 1434 0014 00000000 		.4byte	0
+ 1435              		.section	.debug_line,"",%progbits
+ 1436              	.Ldebug_line0:
+ 1437 0000 3D010000 		.section	.debug_str,"MS",%progbits,1
+ 1437      0200D500 
+ 1437      00000201 
+ 1437      FB0E0D00 
+ 1437      01010101 
+ 1438              	.LASF49:
+ 1439 0000 5243435F 		.ascii	"RCC_TypeDef\000"
+ 1439      54797065 
+ 1439      44656600 
+ 1440              	.LASF44:
+ 1441 000c 41504231 		.ascii	"APB1RSTR\000"
+ 1441      52535452 
+ 1441      00
+ 1442              	.LASF17:
+ 1443 0015 73697A65 		.ascii	"sizetype\000"
+ 1443      74797065 
+ 1443      00
+ 1444              	.LASF48:
+ 1445 001e 42444352 		.ascii	"BDCR\000"
+ 1445      00
+ 1446              	.LASF8:
+ 1447 0023 5F5F7569 		.ascii	"__uint32_t\000"
+ 1447      6E743332 
+ 1447      5F7400
+ 1448              	.LASF4:
+ 1449 002e 5F5F7569 		.ascii	"__uint16_t\000"
+ 1449      6E743136 
+ 1449      5F7400
+ 1450              	.LASF52:
+ 1451 0039 48534553 		.ascii	"HSEStatus\000"
+ 1451      74617475 
+ 1451      7300
+ 1452              	.LASF18:
+ 1453 0043 43505549 		.ascii	"CPUID\000"
+ 1453      4400
+ 1454              	.LASF37:
+ 1455 0049 4B455952 		.ascii	"KEYR\000"
+ARM GAS  /tmp/ccDWfJV2.s 			page 46
+
+
+ 1455      00
+ 1456              	.LASF31:
+ 1457 004e 52455345 		.ascii	"RESERVED0\000"
+ 1457      52564544 
+ 1457      3000
+ 1458              	.LASF42:
+ 1459 0058 43464752 		.ascii	"CFGR\000"
+ 1459      00
+ 1460              	.LASF13:
+ 1461 005d 75696E74 		.ascii	"uint8_t\000"
+ 1461      385F7400 
+ 1462              	.LASF55:
+ 1463 0065 474E5520 		.ascii	"GNU C11 6.1.1 20160526 -mcpu=cortex-m3 -mthumb -g -"
+ 1463      43313120 
+ 1463      362E312E 
+ 1463      31203230 
+ 1463      31363035 
+ 1464 0098 4F31202D 		.ascii	"O1 -fno-common\000"
+ 1464      666E6F2D 
+ 1464      636F6D6D 
+ 1464      6F6E00
+ 1465              	.LASF47:
+ 1466 00a7 41504231 		.ascii	"APB1ENR\000"
+ 1466      454E5200 
+ 1467              	.LASF2:
+ 1468 00af 73686F72 		.ascii	"short int\000"
+ 1468      7420696E 
+ 1468      7400
+ 1469              	.LASF19:
+ 1470 00b9 49435352 		.ascii	"ICSR\000"
+ 1470      00
+ 1471              	.LASF38:
+ 1472 00be 4F50544B 		.ascii	"OPTKEYR\000"
+ 1472      45595200 
+ 1473              	.LASF10:
+ 1474 00c6 6C6F6E67 		.ascii	"long long int\000"
+ 1474      206C6F6E 
+ 1474      6720696E 
+ 1474      7400
+ 1475              	.LASF27:
+ 1476 00d4 42464152 		.ascii	"BFAR\000"
+ 1476      00
+ 1477              	.LASF56:
+ 1478 00d9 6C69622F 		.ascii	"lib/src/system_stm32f10x.c\000"
+ 1478      7372632F 
+ 1478      73797374 
+ 1478      656D5F73 
+ 1478      746D3332 
+ 1479              	.LASF7:
+ 1480 00f4 6C6F6E67 		.ascii	"long int\000"
+ 1480      20696E74 
+ 1480      00
+ 1481              	.LASF53:
+ 1482 00fd 706C6C6D 		.ascii	"pllmull\000"
+ 1482      756C6C00 
+ 1483              	.LASF45:
+ 1484 0105 41484245 		.ascii	"AHBENR\000"
+ARM GAS  /tmp/ccDWfJV2.s 			page 47
+
+
+ 1484      4E5200
+ 1485              	.LASF43:
+ 1486 010c 41504232 		.ascii	"APB2RSTR\000"
+ 1486      52535452 
+ 1486      00
+ 1487              	.LASF3:
+ 1488 0115 5F5F7569 		.ascii	"__uint8_t\000"
+ 1488      6E74385F 
+ 1488      7400
+ 1489              	.LASF40:
+ 1490 011f 57525052 		.ascii	"WRPR\000"
+ 1490      00
+ 1491              	.LASF23:
+ 1492 0124 43465352 		.ascii	"CFSR\000"
+ 1492      00
+ 1493              	.LASF58:
+ 1494 0129 53657453 		.ascii	"SetSysClockTo72\000"
+ 1494      7973436C 
+ 1494      6F636B54 
+ 1494      6F373200 
+ 1495              	.LASF54:
+ 1496 0139 706C6C73 		.ascii	"pllsource\000"
+ 1496      6F757263 
+ 1496      6500
+ 1497              	.LASF1:
+ 1498 0143 756E7369 		.ascii	"unsigned char\000"
+ 1498      676E6564 
+ 1498      20636861 
+ 1498      7200
+ 1499              	.LASF21:
+ 1500 0151 41495243 		.ascii	"AIRCR\000"
+ 1500      5200
+ 1501              	.LASF33:
+ 1502 0157 5343425F 		.ascii	"SCB_Type\000"
+ 1502      54797065 
+ 1502      00
+ 1503              	.LASF46:
+ 1504 0160 41504232 		.ascii	"APB2ENR\000"
+ 1504      454E5200 
+ 1505              	.LASF51:
+ 1506 0168 53746172 		.ascii	"StartUpCounter\000"
+ 1506      74557043 
+ 1506      6F756E74 
+ 1506      657200
+ 1507              	.LASF0:
+ 1508 0177 7369676E 		.ascii	"signed char\000"
+ 1508      65642063 
+ 1508      68617200 
+ 1509              	.LASF11:
+ 1510 0183 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1510      206C6F6E 
+ 1510      6720756E 
+ 1510      7369676E 
+ 1510      65642069 
+ 1511              	.LASF16:
+ 1512 019a 75696E74 		.ascii	"uint32_t\000"
+ 1512      33325F74 
+ARM GAS  /tmp/ccDWfJV2.s 			page 48
+
+
+ 1512      00
+ 1513              	.LASF12:
+ 1514 01a3 756E7369 		.ascii	"unsigned int\000"
+ 1514      676E6564 
+ 1514      20696E74 
+ 1514      00
+ 1515              	.LASF14:
+ 1516 01b0 75696E74 		.ascii	"uint16_t\000"
+ 1516      31365F74 
+ 1516      00
+ 1517              	.LASF22:
+ 1518 01b9 53484353 		.ascii	"SHCSR\000"
+ 1518      5200
+ 1519              	.LASF60:
+ 1520 01bf 53797374 		.ascii	"SystemCoreClockUpdate\000"
+ 1520      656D436F 
+ 1520      7265436C 
+ 1520      6F636B55 
+ 1520      70646174 
+ 1521              	.LASF26:
+ 1522 01d5 4D4D4641 		.ascii	"MMFAR\000"
+ 1522      5200
+ 1523              	.LASF61:
+ 1524 01db 53797374 		.ascii	"SystemInit\000"
+ 1524      656D496E 
+ 1524      697400
+ 1525              	.LASF5:
+ 1526 01e6 73686F72 		.ascii	"short unsigned int\000"
+ 1526      7420756E 
+ 1526      7369676E 
+ 1526      65642069 
+ 1526      6E7400
+ 1527              	.LASF20:
+ 1528 01f9 56544F52 		.ascii	"VTOR\000"
+ 1528      00
+ 1529              	.LASF15:
+ 1530 01fe 696E7433 		.ascii	"int32_t\000"
+ 1530      325F7400 
+ 1531              	.LASF30:
+ 1532 0206 49534152 		.ascii	"ISAR\000"
+ 1532      00
+ 1533              	.LASF25:
+ 1534 020b 44465352 		.ascii	"DFSR\000"
+ 1534      00
+ 1535              	.LASF35:
+ 1536 0210 53797374 		.ascii	"SystemCoreClock\000"
+ 1536      656D436F 
+ 1536      7265436C 
+ 1536      6F636B00 
+ 1537              	.LASF24:
+ 1538 0220 48465352 		.ascii	"HFSR\000"
+ 1538      00
+ 1539              	.LASF29:
+ 1540 0225 4D4D4652 		.ascii	"MMFR\000"
+ 1540      00
+ 1541              	.LASF50:
+ 1542 022a 41484250 		.ascii	"AHBPrescTable\000"
+ARM GAS  /tmp/ccDWfJV2.s 			page 49
+
+
+ 1542      72657363 
+ 1542      5461626C 
+ 1542      6500
+ 1543              	.LASF59:
+ 1544 0238 53657453 		.ascii	"SetSysClock\000"
+ 1544      7973436C 
+ 1544      6F636B00 
+ 1545              	.LASF9:
+ 1546 0244 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1546      20756E73 
+ 1546      69676E65 
+ 1546      6420696E 
+ 1546      7400
+ 1547              	.LASF6:
+ 1548 0256 5F5F696E 		.ascii	"__int32_t\000"
+ 1548      7433325F 
+ 1548      7400
+ 1549              	.LASF36:
+ 1550 0260 52455345 		.ascii	"RESET\000"
+ 1550      5400
+ 1551              	.LASF57:
+ 1552 0266 2F686F6D 		.ascii	"/home/faker/Documents/code/STM/stm32-quadrocopter\000"
+ 1552      652F6661 
+ 1552      6B65722F 
+ 1552      446F6375 
+ 1552      6D656E74 
+ 1553              	.LASF28:
+ 1554 0298 41465352 		.ascii	"AFSR\000"
+ 1554      00
+ 1555              	.LASF39:
+ 1556 029d 52455345 		.ascii	"RESERVED\000"
+ 1556      52564544 
+ 1556      00
+ 1557              	.LASF41:
+ 1558 02a6 464C4153 		.ascii	"FLASH_TypeDef\000"
+ 1558      485F5479 
+ 1558      70654465 
+ 1558      6600
+ 1559              	.LASF34:
+ 1560 02b4 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1560      52784275 
+ 1560      66666572 
+ 1560      00
+ 1561              	.LASF32:
+ 1562 02c1 43504143 		.ascii	"CPACR\000"
+ 1562      5200
+ 1563              		.ident	"GCC: (Arch Repository) 6.1.1 20160526"
+ARM GAS  /tmp/ccDWfJV2.s 			page 50
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 system_stm32f10x.c
+     /tmp/ccDWfJV2.s:15     .text:0000000000000000 $t
+     /tmp/ccDWfJV2.s:22     .text:0000000000000000 SystemInit
+     /tmp/ccDWfJV2.s:181    .text:00000000000000f4 $d
+     /tmp/ccDWfJV2.s:191    .text:0000000000000104 $t
+     /tmp/ccDWfJV2.s:198    .text:0000000000000104 SystemCoreClockUpdate
+     /tmp/ccDWfJV2.s:302    .text:000000000000017c $d
+     /tmp/ccDWfJV2.s:320    .data:0000000000000004 AHBPrescTable
+     /tmp/ccDWfJV2.s:316    .data:0000000000000000 SystemCoreClock
+     /tmp/ccDWfJV2.s:312    .data:0000000000000000 $d
+                     .debug_frame:0000000000000010 $d
+
+NO UNDEFINED SYMBOLS

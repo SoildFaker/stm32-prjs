@@ -17,7 +17,6 @@ int main(void)
   gyroRange = MPU6050_GetFullScaleGyroRange();
   accelRange = MPU6050_GetFullScaleAccelRange();
 
-
   while (1) {
     getAttitude(AccelGyro);
     printf("height:%d\r\n", HCSR04_Get());
@@ -31,7 +30,7 @@ int main(void)
 
 #ifdef  DEBUG
 void assert_failed(u8* file, u32 line)
-{ 
+{
   while (1)
   {
   }
