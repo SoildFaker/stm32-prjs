@@ -30,7 +30,7 @@
 #include "nvic.h"
 #include "MPU6050.h"
 
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <errno.h>

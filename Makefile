@@ -23,14 +23,14 @@ ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(DRVDIR)/*.s)
 INCLUDE  = -Icmsis -Ilib/inc -Idrivers 
 
 # Linker 
-LSCRIPT = STM32F103X8_FLASH.ld
+LSCRIPT = STM32F103XB.ld
 
 # C Flags
 GCFLAGS  = -Wall -fno-common -mcpu=$(CPU) -mthumb --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
 GCFLAGS += -O1
 GCFLAGS += $(INCLUDE)
-LDFLAGS += -T$(LSCRIPT) -mcpu=$(CPU) --specs=nosys.specs
-LDFLAGS += -fno-math-errno -msoft-float -lm -mthumb -u _printf_float -u _scanf_float
+LDFLAGS += -T$(LSCRIPT) -mcpu=$(CPU) -mthumb --specs=nosys.specs
+LDFLAGS += -fno-math-errno -lm -u _printf_float -u _scanf_float
 ASFLAGS += -mcpu=$(CPU)
 
 # Flashing
