@@ -14,12 +14,10 @@ void UserInit(void)
 {
   RCC_Conf();
   GPIO_Conf();
-  NVIC_Conf();
   TIMER_Conf();
   USART_Conf();
-
-  MPU6050_I2C_Init();
-  MPU6050_Initialize();
+  I2C_Conf();
+  NVIC_Conf();
 }
  
 void print_int(int num, int mode, int flag)  
@@ -178,45 +176,19 @@ float HCSR04_Get(void)
   GPIO_WriteBit(GPIOA,GPIO_Pin_1,0);
   //计数器清0
   TIM2->CNT = 0;
-  TIM_Cmd(TIM2, ENABLE);// TIM2 enable counter [允许tim2计数]
   while(!GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && TIM2->CNT<1000);
   TIM2->CNT = 0;
-  while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && TIM2->CNT<60000);
-  TIM_Cmd(TIM2, DISABLE);
+  tim2_count = 0;
+  while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && tim2_count<9);
 
-  length = TIM2->CNT/58.8;
+  length = (tim2_count*0xffff+TIM2->CNT)/58.8;
   return length;
 }
 
-void getAttitude(float* attitude)
-{
-  double gyrofac = 16384;
-  double accelfac = 131.072;
-  int16_t AccelGyro[6];
-  float result[6];
-  double x,y,z;
-  MPU6050_GetRawAccelGyro(AccelGyro);
-  result[0]=AccelGyro[0]/gyrofac; 
-  result[1]=AccelGyro[1]/gyrofac;
-  result[2]=AccelGyro[2]/gyrofac;
-  result[3]=AccelGyro[3]/accelfac; 
-  result[4]=AccelGyro[5]/accelfac;
-  result[5]=AccelGyro[2]/accelfac;
-  x=result[0];y=result[1];z=result[2];
-  /*attitude[0] = atan(y/x);*/
-  /*attitude[1] = atan(x/y);*/
-  /*attitude[2] = atan(x/z);*/
-  attitude[0] = result[0];
-  attitude[1] = result[1];
-  attitude[2] = result[2];
-  attitude[3] = result[3];
-  attitude[4] = result[4];
-  attitude[5] = result[5];
-}
 //初始化延迟函数
 void DelayInit(u8 SYSCLK)
-{
-	fac_us=SYSCLK/8;		//不论是否使用ucos,fac_us都需要使用
+{ 
+  fac_us=SYSCLK/8;		//不论是否使用ucos,fac_us都需要使用
 	fac_ms=(u16)fac_us*1000;//非ucos下,代表每个ms需要的systick时钟数
 }
 
