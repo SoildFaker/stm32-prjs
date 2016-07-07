@@ -1,8 +1,11 @@
 #include "tools.h"
+#include "nvic.h"
 #include <stdarg.h>  
 
 static u8  fac_us=0;//us延时倍乘数
 static u16 fac_ms=0;//ms延时倍乘数
+
+extern uint16_t timer_counter;
 
 va_list args;  
   
@@ -177,11 +180,19 @@ float HCSR04_Get(void)
   //计数器清0
   TIM2->CNT = 0;
   while(!GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && TIM2->CNT<1000);
+  timer_counter = 0;
   TIM2->CNT = 0;
+<<<<<<< HEAD
+  while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && timer_counter < 9);
+  TIM_Cmd(TIM2, DISABLE);
+
+  length = (0xffff*timer_counter+TIM2->CNT)/58.8;
+=======
   tim2_count = 0;
   while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && tim2_count<9);
 
   length = (tim2_count*0xffff+TIM2->CNT)/58.8;
+>>>>>>> dev
   return length;
 }
 
@@ -190,6 +201,12 @@ void DelayInit(u8 SYSCLK)
 { 
   fac_us=SYSCLK/8;		//不论是否使用ucos,fac_us都需要使用
 	fac_ms=(u16)fac_us*1000;//非ucos下,代表每个ms需要的systick时钟数
+}
+
+int get_tick_count(unsigned long *count)
+{
+  count[0] = SysTick->CTRL;
+	return 0;
 }
 
 //延时nus
