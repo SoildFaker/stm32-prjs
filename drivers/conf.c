@@ -1,44 +1,9 @@
 #include "conf.h"
 
-ErrorStatus HSEStartUpStatus;
-// 串口相关配置
-void USART_Conf(void)
-{
-  USART_InitTypeDef USART_InitStructure;
-  //串口配置： 波特率 115200 数据位 8 停止位 1  奇偶位 NONE  
-  USART_InitStructure.USART_BaudRate = 115200;
-  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-  USART_InitStructure.USART_StopBits = USART_StopBits_1;
-  USART_InitStructure.USART_Parity =  USART_Parity_No ;
-  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-  //初始化串口
-  USART_Init(USART2, &USART_InitStructure);
-  //启动串口
-  USART_Cmd(USART2, ENABLE);
-}
-
-// I2C通讯的配置，主要用来和陀螺仪芯片通讯
-void I2C_Conf(void)
-{
-  I2C_InitTypeDef  I2C_InitStructure; 
-
-  /*[> I2C configuration <]*/
-  I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
-  I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
-  I2C_InitStructure.I2C_OwnAddress1 = I2C_SLAVE_ADDRESS;
-  I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
-  I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-  I2C_InitStructure.I2C_ClockSpeed = I2C_Speed;
-  
-  /*[> Apply I2C configuration after enabling it <]*/
-  I2C_Init(MPU_I2Cx, &I2C_InitStructure);
-  /*[> I2C Peripheral Enable <]*/
-  I2C_Cmd(MPU_I2Cx, ENABLE);
-}
 
 void RCC_Conf(void)
 {
+  ErrorStatus HSEStartUpStatus;
   //复位RCC外部设备寄存器到默认值
   RCC_DeInit();  
   //打开外部高速晶振
@@ -72,16 +37,51 @@ void RCC_Conf(void)
   
   //开启AFIO时钟
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	//Enable clock source for i2c
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
   //Enable GPIO timer
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
   //Enable serial timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-
+  //Timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIM2
-
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //配置RCC，使能TIM3
+	
 }
 
+// 串口相关配置
+void USART_Conf(void)
+{
+  USART_InitTypeDef USART_InitStructure;
+  //串口配置： 波特率 115200 数据位 8 停止位 1  奇偶位 NONE  
+  USART_InitStructure.USART_BaudRate = 115200;
+  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  USART_InitStructure.USART_Parity =  USART_Parity_No ;
+  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  //初始化串口
+  USART_Init(USART2, &USART_InitStructure);
+  //启动串口
+  USART_Cmd(USART2, ENABLE);
+}
+
+// I2C通讯的配置，主要用来和陀螺仪芯片通讯
+void I2C_Conf(void)
+{
+	I2C_InitTypeDef I2C_InitStructure;
+	
+	//Configuration I2C
+	I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
+	I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+	I2C_InitStructure.I2C_ClockSpeed = I2C_Speed;
+	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
+	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
+	I2C_InitStructure.I2C_OwnAddress1 = 0x01;
+	I2C_Init(MPU_I2Cx,&I2C_InitStructure);
+	I2C_Cmd(MPU_I2Cx,ENABLE);
+}
 // 定时器设置 
 void TIMER_Conf(void)
 {
@@ -95,6 +95,13 @@ void TIMER_Conf(void)
   TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure); //初始化定时器2
   TIM_ClearFlag(TIM2, TIM_FLAG_Update);
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
+  TIM_Cmd(TIM2, ENABLE);// TIM2 enable counter [允许tim2计数]
+
+  TIM_TimeBaseStructure.TIM_Period = 50000;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
+  TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //初始化定时器3
+  TIM_ClearFlag(TIM3, TIM_FLAG_Update);
+  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
+  TIM_Cmd(TIM3, ENABLE);//允许tim3计数
 
 }
 
@@ -102,15 +109,13 @@ void GPIO_Conf(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   
-  //USARTx_Tx为复合推挽输出
+  //USART
   GPIO_InitStructure.GPIO_Pin = GPIO_TxPin;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;//USARTx_Tx为复合推挽输出
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-  
-  //USARTx_Rx 为浮空输入
   GPIO_InitStructure.GPIO_Pin = GPIO_RxPin;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;//USARTx_Rx 为浮空输入
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   
   //HC-SR04 
@@ -120,6 +125,13 @@ void GPIO_Conf(void)
   GPIO_InitStructure.GPIO_Pin = ECHO_Pin; 
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
+  
+	//MPU6050-IIC
+	GPIO_InitStructure.GPIO_Pin = SCL_Pin | SDA_Pin;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz; 
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD; 
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	
 }
 
 // 系统中断控制
@@ -131,6 +143,12 @@ void NVIC_Conf(void)
 
   // 打开TIM2中断
   NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;

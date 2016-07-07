@@ -1,7 +1,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "nvic.h"
 
-uint16_t timer_counter;
+uint16_t tim2_count=0;
+uint16_t tim3_count=0;
 
 void NMI_Handler(void)
 {
@@ -134,10 +135,18 @@ void TIM2_IRQHandler(void)
   if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
     //清除TIM2的中断待处理位
     TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
-    timer_counter++;
+    tim2_count++;
   }
 }
 
+void TIM3_IRQHandler(void)
+{
+  //检测是否发生溢出更新事件
+  if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET) {
+    TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
+    tim3_count++;
+  }
+}
 /**
   * @brief  This function handles RCC interrupt request. 
   * @param  None
