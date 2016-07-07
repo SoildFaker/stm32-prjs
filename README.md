@@ -1,4 +1,4 @@
-# NUEDC(电子设计大赛)
+# NUEDC
 # Working Around
 Basically this project is developing on Archlinux(amd64) with STLINK V2 & OpenOCD supports.
 ##Materials needed
