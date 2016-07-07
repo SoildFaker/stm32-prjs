@@ -14,13 +14,12 @@
 #define betaDef   0.1f    // 2 * proportional gain
 
 // Variable definitions
-
 volatile float beta = betaDef;                // 2 * proportional gain (Kp)
 volatile float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;  // quaternion of sensor frame relative to auxiliary frame
 volatile float rpy[3],Eangle[3];
 /*float roll = 1.0f, pitch = 1.0f, yaw = 1.0f;*/
-// Function declarations
 
+// Function declarations
 float invSqrt(float x);
 
 // IMU algorithm update
