@@ -1,6 +1,55 @@
 #include "conf.h"
 
-ErrorStatus HSEStartUpStatus;
+
+void RCC_Conf(void)
+{
+  ErrorStatus HSEStartUpStatus;
+  //复位RCC外部设备寄存器到默认值
+  RCC_DeInit();  
+  //打开外部高速晶振
+  RCC_HSEConfig(RCC_HSE_ON); 
+  //等待外部高速时钟准备好
+  HSEStartUpStatus = RCC_WaitForHSEStartUp(); 
+  if(HSEStartUpStatus == SUCCESS){
+    FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
+    FLASH_SetLatency(FLASH_Latency_2);
+    //配置AHB(HCLK)时钟=SYSCLK
+    RCC_HCLKConfig(RCC_SYSCLK_Div1);
+    //配置APB2(PCLK2)钟=AHB时钟
+    RCC_PCLK2Config(RCC_HCLK_Div1); 
+    //配置APB1(PCLK1)钟=AHB 1/2时钟
+    RCC_PCLK1Config(RCC_HCLK_Div2);  
+    //配置ADC时钟=PCLK2 1/4
+    RCC_ADCCLKConfig(RCC_PCLK2_Div4); 
+    //配置PLL时钟 == 外部高速晶体时钟*9
+    RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9); 
+    //配置ADC时钟= PCLK2/4
+    RCC_ADCCLKConfig(RCC_PCLK2_Div4);
+    //使能PLL时钟
+    RCC_PLLCmd(ENABLE);  
+    //等待PLL时钟就绪
+    while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
+    //配置系统时钟 = PLL时钟
+    RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK); 
+    //检查PLL时钟是否作为系统时钟
+    while(RCC_GetSYSCLKSource() != 0x08);
+  }
+  
+  //开启AFIO时钟
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	//Enable clock source for i2c
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
+  //Enable GPIO timer
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+  //Enable serial timer
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+  //Timer
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIM2
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //配置RCC，使能TIM3
+	
+}
+
 // 串口相关配置
 void USART_Conf(void)
 {
@@ -21,69 +70,18 @@ void USART_Conf(void)
 // I2C通讯的配置，主要用来和陀螺仪芯片通讯
 void I2C_Conf(void)
 {
-  I2C_InitTypeDef  I2C_InitStructure; 
-
-  /*[> I2C configuration <]*/
-  I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
-  I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
-  I2C_InitStructure.I2C_OwnAddress1 = I2C_SLAVE_ADDRESS;
-  I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
-  I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-  I2C_InitStructure.I2C_ClockSpeed = I2C_Speed;
-  
-  /*[> Apply I2C configuration after enabling it <]*/
-  I2C_Init(MPU_I2Cx, &I2C_InitStructure);
-  /*[> I2C Peripheral Enable <]*/
-  I2C_Cmd(MPU_I2Cx, ENABLE);
+	I2C_InitTypeDef I2C_InitStructure;
+	
+	//Configuration I2C
+	I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
+	I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+	I2C_InitStructure.I2C_ClockSpeed = I2C_Speed;
+	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
+	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
+	I2C_InitStructure.I2C_OwnAddress1 = 0x01;
+	I2C_Init(MPU_I2Cx,&I2C_InitStructure);
+	I2C_Cmd(MPU_I2Cx,ENABLE);
 }
-
-void RCC_Conf(void)
-{
-  //复位RCC外部设备寄存器到默认值
-  RCC_DeInit();  
-  //打开外部高速晶振
-  RCC_HSEConfig(RCC_HSE_ON); 
-  //等待外部高速时钟准备好
-  HSEStartUpStatus = RCC_WaitForHSEStartUp(); 
-  if(HSEStartUpStatus == SUCCESS){
-  FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
-  FLASH_SetLatency(FLASH_Latency_2);
-  //配置AHB(HCLK)时钟=SYSCLK
-  RCC_HCLKConfig(RCC_SYSCLK_Div1);
-  //配置APB2(PCLK2)钟=AHB时钟
-  RCC_PCLK2Config(RCC_HCLK_Div1); 
-  //配置APB1(PCLK1)钟=AHB 1/2时钟
-  RCC_PCLK1Config(RCC_HCLK_Div2);  
-  //配置ADC时钟=PCLK2 1/4
-  RCC_ADCCLKConfig(RCC_PCLK2_Div4); 
-  //配置PLL时钟 == 外部高速晶体时钟*9
-  RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9); 
-  //配置ADC时钟= PCLK2/4
-  RCC_ADCCLKConfig(RCC_PCLK2_Div4);
-  //使能PLL时钟
-  RCC_PLLCmd(ENABLE);  
-  //等待PLL时钟就绪
-  while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET)  {
-  }
-  //配置系统时钟 = PLL时钟
-  RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK); 
-  //检查PLL时钟是否作为系统时钟
-  while(RCC_GetSYSCLKSource() != 0x08)  {
-  }
-  }
-  
-  //开启AFIO时钟
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-  //Enable GPIO timer
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-
-  //Enable serial timer
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIM2
-
-}
-
 // 定时器设置 
 void TIMER_Conf(void)
 {
@@ -97,24 +95,27 @@ void TIMER_Conf(void)
   TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure); //初始化定时器2
   TIM_ClearFlag(TIM2, TIM_FLAG_Update);
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
+  TIM_Cmd(TIM2, ENABLE);// TIM2 enable counter [允许tim2计数]
+
+  TIM_TimeBaseStructure.TIM_Period = 50000;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
+  TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //初始化定时器3
+  TIM_ClearFlag(TIM3, TIM_FLAG_Update);
+  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
+  TIM_Cmd(TIM3, ENABLE);//允许tim3计数
 
 }
-
-
 
 void GPIO_Conf(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   
-  //USARTx_Tx为复合推挽输出
+  //USART
   GPIO_InitStructure.GPIO_Pin = GPIO_TxPin;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;//USARTx_Tx为复合推挽输出
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-  
-  //USARTx_Rx 为浮空输入
   GPIO_InitStructure.GPIO_Pin = GPIO_RxPin;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;//USARTx_Rx 为浮空输入
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   
   //HC-SR04 
@@ -124,6 +125,13 @@ void GPIO_Conf(void)
   GPIO_InitStructure.GPIO_Pin = ECHO_Pin; 
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
+  
+	//MPU6050-IIC
+	GPIO_InitStructure.GPIO_Pin = SCL_Pin | SDA_Pin;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz; 
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD; 
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	
 }
 
 // 系统中断控制
@@ -135,6 +143,12 @@ void NVIC_Conf(void)
 
   // 打开TIM2中断
   NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;

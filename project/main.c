@@ -3,26 +3,36 @@
  */
 #include "tools.h"
 #include "conf.h"
-#include "MPU6050.h"
 
 /* Exported constants --------------------------------------------------------*/
 
 int main(void)
 {
-  int16_t AccelGyro[6];
-  uint8_t gyroRange, accelRange;
   SystemInit();
   UserInit();
   DelayInit(72);
-  gyroRange = MPU6050_GetFullScaleGyroRange();
-  accelRange = MPU6050_GetFullScaleAccelRange();
+
+  mpu_6050_init();
+
+  uint8_t a = 0;
+
+  uint16_t dt = 0;
 
   while (1) {
-    getAttitude(AccelGyro);
-    printf("height:%d\r\n", HCSR04_Get());
-    printf("accel:%d\t%d\t%d\r\n", AccelGyro[0], AccelGyro[1], AccelGyro[2]);
-    printf("anglr:%d\t%d\t%d\r\n", AccelGyro[3], AccelGyro[4], AccelGyro[5]);
-    DelayMs(1000);
+    dt = TIM3->CNT;
+    TIM3->CNT = 0;
+    mpu6050_get_value();
+    get_acc_value();
+    get_gyro_rate();
+    //ahrs computing ---------------          
+    MadgwickAHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180,
+                      acc_x_temp,acc_y_temp,acc_z_temp);
+    getRollPitchYaw();
+    a++;
+    if ( a == 0 ){
+      myprintf("height:%f\tdt:%d\r\n", HCSR04_Get(), dt);
+      myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", rpy[0], rpy[1], rpy[2]);
+    }
   }
   return 0;
 }

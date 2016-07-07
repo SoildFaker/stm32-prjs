@@ -26,11 +26,13 @@
 #include "stm32f10x_flash.h"
 #include "stm32f10x_usart.h"
 #include "stm32f10x.h"
+#include "ahrs.h"
 #include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
 #include "nvic.h"
-#include "MPU6050.h"
+#include "mpu6050.h"
+#include "kalman.h"
 
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <errno.h>
@@ -47,13 +49,12 @@
 #define  SDA_Pin                  GPIO_Pin_11
 #define  SCL_Pin                  GPIO_Pin_10
 #define  MPU_I2Cx                 I2C2
-#define  I2C_Speed                400000
-#define  I2C_SLAVE_ADDRESS        0xD0
-#define  I2C_PageSize             8
+#define  I2C_Speed                100000
 
 #define  TRUE                     1
 #define  FALSE                    0
 
+#define M_PI  3.14159265358979323846  /* pi */
 #define SYSCLK_FREQ_72MHz
 #define _DLIB_PRINTF_SPECIFIER_FLOAT
 
