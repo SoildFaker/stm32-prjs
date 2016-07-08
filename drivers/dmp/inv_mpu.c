@@ -36,18 +36,18 @@
  * fabsf(float x)
  * min(int a, int b)
  */
+#define EMPL_TARGET_STM32F4 
+#define MPU6050 
 #if defined EMPL_TARGET_STM32F4
 #include "i2c.h"   
-#include "main.h"
-#include "log.h"
-#include "board-st_discovery.h"
+#include "tools.h"
    
-#define i2c_write   Sensors_I2C_WriteRegister
-#define i2c_read    Sensors_I2C_ReadRegister 
-#define delay_ms    mdelay
-#define get_ms      get_tick_count
-#define log_i       MPL_LOGI
-#define log_e       MPL_LOGE
+#define i2c_write   i2cWrite
+#define i2c_read    i2cRead 
+#define delay_ms    DelayMs
+#define get_ms      get_ms
+#define log_i       myprintf
+#define log_e       myprintf
 #define min(a,b) ((a<b)?a:b)
    
 #elif defined MOTION_DRIVER_TARGET_MSP430

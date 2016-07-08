@@ -5,8 +5,6 @@
 static u8  fac_us=0;//us延时倍乘数
 static u16 fac_ms=0;//ms延时倍乘数
 
-extern uint16_t timer_counter;
-
 va_list args;  
   
 char sign[] = { '0','1','2','3','4','5',  
@@ -19,7 +17,7 @@ void UserInit(void)
   GPIO_Conf();
   TIMER_Conf();
   USART_Conf();
-  I2C_Conf();
+  /*I2C_Conf();*/
   NVIC_Conf();
 }
  
@@ -180,19 +178,11 @@ float HCSR04_Get(void)
   //计数器清0
   TIM2->CNT = 0;
   while(!GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && TIM2->CNT<1000);
-  timer_counter = 0;
   TIM2->CNT = 0;
-<<<<<<< HEAD
-  while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && timer_counter < 9);
-  TIM_Cmd(TIM2, DISABLE);
-
-  length = (0xffff*timer_counter+TIM2->CNT)/58.8;
-=======
   tim2_count = 0;
   while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && tim2_count<9);
 
   length = (tim2_count*0xffff+TIM2->CNT)/58.8;
->>>>>>> dev
   return length;
 }
 
@@ -209,6 +199,9 @@ int get_tick_count(unsigned long *count)
 	return 0;
 }
 
+void get_ms(unsigned long *time)
+{
+}
 //延时nus
 //nus为要延时的us数.
 void DelayUs(u32 nus)

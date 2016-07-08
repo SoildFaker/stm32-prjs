@@ -24,6 +24,7 @@
 #include "dmpKey.h"
 #include "dmpmap.h"
 
+
 /* The following functions must be defined for this platform:
  * i2c_write(unsigned char slave_addr, unsigned char reg_addr,
  *      unsigned char length, unsigned char const *data)
@@ -32,14 +33,15 @@
  * delay_ms(unsigned long num_ms)
  * get_ms(unsigned long *count)
  */
+#define EMPL_TARGET_STM32F4
+#define MPU6050
 #if defined EMPL_TARGET_STM32F4
 #include "i2c.h"   
-#include "main.h"
-#include "board-st_discovery.h"
+#include "tools.h"
    
-#define i2c_write   Sensors_I2C_WriteRegister
-#define i2c_read    Sensors_I2C_ReadRegister
-#define get_ms      get_tick_count
+#define i2c_write   i2cWrite
+#define i2c_read    i2cRead
+#define get_ms      get_ms
 
 #elif defined MOTION_DRIVER_TARGET_MSP430
 #include "msp430.h"
@@ -635,7 +637,7 @@ int dmp_set_accel_bias(long *bias)
 
     mpu_get_accel_sens(&accel_sens);
     accel_sf = (long long)accel_sens << 15;
-    __no_operation();
+    /*__no_operation();*/
 
     accel_bias_body[0] = bias[dmp.orient & 3];
     if (dmp.orient & 4)

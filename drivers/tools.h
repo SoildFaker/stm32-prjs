@@ -9,6 +9,7 @@ void getAttitude(float* AccelGyro);
 uint8_t UsartGet(void);
 void myprintf( const char *format, ... );
 void print_int( int num, int mode, int flag );
+void get_ms(unsigned long *time);
 void print_str( char const *str );
 void print_float( float num );
 void DelayInit(u8 SYSCLK);

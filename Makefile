@@ -10,17 +10,18 @@ SRCDIR = project
 BINDIR = project/bin
 OBJDIR = project/obj
 DRVDIR = drivers
+DMPDIR = drivers/dmp
 LIBDIR = lib/src
 
 # Project target
 CPU = cortex-m3
 
 # Sources
-SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(DRVDIR)/*.c) $(wildcard $(LIBDIR)/*.c)
+SRC = $(wildcard $(SRCDIR)/*.c) $(wildcard $(DMPDIR)/*.c) $(wildcard $(DRVDIR)/*.c) $(wildcard $(LIBDIR)/*.c)
 ASM = $(wildcard $(SRCDIR)/*.s) $(wildcard $(DRVDIR)/*.s)
 
 # Include directories
-INCLUDE  = -Icmsis -Ilib/inc -Idrivers 
+INCLUDE  = -Icmsis -Ilib/inc -Idrivers -Idrivers/dmp
 
 # Linker 
 LSCRIPT = STM32F103XB.ld
@@ -108,6 +109,10 @@ $(OBJDIR)/%.o: $(LIBDIR)/%.s
 	$(AS) $(ASFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o: $(DRVDIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(GCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(DMPDIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(GCFLAGS) -c $< -o $@
 
