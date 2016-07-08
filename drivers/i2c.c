@@ -1,286 +1,358 @@
-#include "conf.h"
+#include "i2c.h"
 
-/*标志是否读出数据*/
-uint8_t i2c_test=0;
-/*I2C从设备*/
-/*模拟I2C端口输出输入定义*/
-#define SCL_H     GPIOB->BSRR = GPIO_Pin_10
-#define SCL_L     GPIOB->BRR  = GPIO_Pin_10 
-#define SDA_H     GPIOB->BSRR = GPIO_Pin_11
-#define SDA_L     GPIOB->BRR  = GPIO_Pin_11
-#define SCL_read    GPIOB->IDR  & GPIO_Pin_10
-#define SDA_read    GPIOB->IDR  & GPIO_Pin_11
-
-/*I2C的延时函数-----------------------------------------*/
-void I2C_delay(void)
+/**************************实现函数********************************************
+*函数原型:		void IIC_Init(void)
+*功　　能:		初始化I2C对应的接口引脚。
+*******************************************************************************/
+void IIC_Init(void)
+{			
+	RCC->APB1ENR|=1<<2;//先使能外设IO PORTA时钟 							 
+	GPIOB->CRH&=0XFFFF0FF0;//PA8/11 推挽输出
+	GPIOB->CRH|=0X00003003;	   
+}
+/**************************实现函数********************************************
+*函数原型:		void IIC_Start(void)
+*功　　能:		产生IIC起始信号
+*******************************************************************************/
+int IIC_Start(void)
 {
-  uint8_t i=30; //这里可以优化速度  ，经测试最低到5还能写入
-  while(i) 
-  { 
-    i--; 
-  }  
+	SDA_OUT();     //sda线输出
+	IIC_SDA=1;
+	if(!READ_SDA)return 0;	
+	IIC_SCL=1;
+	DelayUs(1);
+ 	IIC_SDA=0;//START:when CLK is high,DATA change form high to low 
+	if(READ_SDA)return 0;
+	DelayUs(1);
+	IIC_SCL=0;//钳住I2C总线，准备发送或接收数据 
+	return 1;
 }
 
-/*I2C的等待5ms函数--------------------------------------*/
-void delay5ms(void)
+/**************************实现函数********************************************
+*函数原型:		void IIC_Stop(void)
+*功　　能:	    //产生IIC停止信号
+*******************************************************************************/	  
+void IIC_Stop(void)
 {
-  int i=5000;  
-  while(i) 
-  { 
-    i--; 
-  }  
+	SDA_OUT();//sda线输出
+	IIC_SCL=0;
+	IIC_SDA=0;//STOP:when CLK is high DATA change form low to high
+ 	DelayUs(1);
+	IIC_SCL=1; 
+	IIC_SDA=1;//发送I2C总线结束信号
+	DelayUs(1);							   	
 }
 
-/*I2C启动函数-------------------------------------------*/
-uint8_t I2C_Start(void)
+/**************************实现函数********************************************
+*函数原型:		u8 IIC_Wait_Ack(void)
+*功　　能:	    等待应答信号到来 
+//返回值：1，接收应答失败
+//        0，接收应答成功
+*******************************************************************************/
+int IIC_Wait_Ack(void)
 {
-  SDA_H;
-  SCL_H;
-  I2C_delay();
-  if(!SDA_read)return FALSE;  //SDA线为低电平则总线忙,退出
-  SDA_L;
-  I2C_delay();
-  if(SDA_read) return FALSE;  //SDA线为高电平则总线出错,退出
-  SDA_L;
-  I2C_delay();
-  return TRUE;
-}
-
-/*I2C停止函数-------------------------------------------*/
-void I2C_Stop(void)
-{
-  SCL_L;
-  I2C_delay();
-  SDA_L;
-  I2C_delay();
-  SCL_H;
-  I2C_delay();
-  SDA_H;
-  I2C_delay();
+	u8 ucErrTime=0;
+	SDA_IN();      //SDA设置为输入  
+	IIC_SDA=1;
+	DelayUs(1);	   
+	IIC_SCL=1;
+	DelayUs(1);	 
+	while(READ_SDA)
+	{
+		ucErrTime++;
+		if(ucErrTime>50)
+		{
+			IIC_Stop();
+			return 0;
+		}
+	  DelayUs(1);
+	}
+	IIC_SCL=0;//时钟输出0 	   
+	return 1;  
 } 
 
-/*I2C的ACK函数------------------------------------------*/
-void I2C_Ack(void)
-{  
-  SCL_L;
-  I2C_delay();
-  SDA_L;
-  I2C_delay();
-  SCL_H;
-  I2C_delay();
-  SCL_L;
-  I2C_delay();
-}   
-
-/*I2C的NoACK函数----------------------------------------*/
-void I2C_NoAck(void)
-{  
-  SCL_L;
-  I2C_delay();
-  SDA_H;
-  I2C_delay();
-  SCL_H;
-  I2C_delay();
-  SCL_L;
-  I2C_delay();
-} 
-
-/*I2C等待ACK函数----------------------------------------*/
-uint8_t I2C_WaitAck(void)    //返回为:=1有ACK,=0无ACK
+/**************************实现函数********************************************
+*函数原型:		void IIC_Ack(void)
+*功　　能:	    产生ACK应答
+*******************************************************************************/
+void IIC_Ack(void)
 {
-  SCL_L;
-  I2C_delay();
-  SDA_H;      
-  I2C_delay();
-  SCL_H;
-  I2C_delay();
-  if(SDA_read)
-  {
-    SCL_L;
-    I2C_delay();
-    return FALSE;
-  }
-  SCL_L;
-  I2C_delay();
-  return TRUE;
+	IIC_SCL=0;
+	SDA_OUT();
+	IIC_SDA=0;
+	DelayUs(1);
+	IIC_SCL=1;
+	DelayUs(1);
+	IIC_SCL=0;
 }
-
-/*I2C发送一个uint8_t数据函数---------------------------------*/
-void I2C_SendByte(uint8_t SendByte) //数据从高位到低位//
-{
-  uint8_t i=8;
-  while(i--)
-  {
-    SCL_L;
-    I2C_delay();
-    if(SendByte&0x80)
-      SDA_H;  
-    else 
-      SDA_L;   
-    SendByte<<=1;
-    I2C_delay();
-    SCL_H;
-    I2C_delay();
-  }
-  SCL_L;
-}  
-
-/*I2C读取一个uint8_t数据函数---------------------------------*/
-uint8_t I2C_ReadByte(void)  //数据从高位到低位//
-{ 
-  uint8_t i=8;
-  uint8_t ReceiveByte=0;
-  
-  SDA_H;        
-  while(i--)
-  {
-    ReceiveByte<<=1;    
-    SCL_L;
-    I2C_delay();
-    SCL_H;
-    I2C_delay();  
-    if(SDA_read)
-    {
-      ReceiveByte|=0x01;
-    }
-  }
-  SCL_L;
-  return ReceiveByte;
-}  
-
-/*I2C向指定设备指定地址写入uint8_t数据-----------------------*/
-void I2C_Write(uint8_t SlaveAddress, uint8_t REG_Address,uint8_t REG_data)//单字节写入
-{
-  if(!I2C_Start())return;
-  I2C_SendByte(SlaveAddress);   //发送设备地址+写信号//I2C_SendByte(((REG_Address & 0x0700) >>7) | SlaveAddress & 0xFFFE);//设置高起始地址+器件地址 
-  if(!I2C_WaitAck()){I2C_Stop(); return;}
-  I2C_SendByte(REG_Address );   //设置低起始地址    
-  I2C_WaitAck();  
-  I2C_SendByte(REG_data);
-  I2C_WaitAck();   
-  I2C_Stop(); 
-  delay5ms();
-}
-
-uint8_t I2C_ReadOneByte(uint8_t I2C_Addr,uint8_t addr)
-{
-	uint8_t res=0;
 	
-	I2C_Start();	
-	I2C_SendByte(I2C_Addr);	   //发送写命令
-	res++;
-	I2C_WaitAck();
-	I2C_SendByte(addr); res++;  //发送地址
-	I2C_WaitAck();	  
-	//I2C_Stop();//产生一个停止条件	
-	I2C_Start();
-	I2C_SendByte(I2C_Addr+1); res++;          //进入接收模式			   
-	I2C_WaitAck();
-	res=I2C_ReadByte();	   
-  I2C_NoAck();
-  I2C_Stop();//产生一个停止条件
-
-	return res;
+/**************************实现函数********************************************
+*函数原型:		void IIC_NAck(void)
+*功　　能:	    产生NACK应答
+*******************************************************************************/	    
+void IIC_NAck(void)
+{
+	IIC_SCL=0;
+	SDA_OUT();
+	IIC_SDA=1;
+	DelayUs(1);
+	IIC_SCL=1;
+	DelayUs(1);
+	IIC_SCL=0;
 }
-/*I2C向指定设备指定地址读出uint8_t数据-----------------------*/
-uint8_t I2C_Read(uint8_t SlaveAddress, uint8_t REG_Address)//读取单字节
-{   
-  uint8_t REG_data;     
-  if(!I2C_Start())return FALSE;
-  I2C_SendByte(SlaveAddress); //I2C_SendByte(((REG_Address & 0x0700) >>7) | REG_Address & 0xFFFE);//设置高起始地址+器件地址 
-  if(!I2C_WaitAck()){I2C_Stop();i2c_test=1; return FALSE;}
-  I2C_SendByte((uint8_t) REG_Address);   //设置低起始地址    
-  I2C_WaitAck();
-  I2C_Start();
-  I2C_SendByte(SlaveAddress+1);
-  I2C_WaitAck();
+/**************************实现函数********************************************
+*函数原型:		void IIC_Send_Byte(u8 txd)
+*功　　能:	    IIC发送一个字节
+*******************************************************************************/		  
+void IIC_Send_Byte(u8 txd)
+{                        
+    u8 t;   
+	SDA_OUT(); 	    
+    IIC_SCL=0;//拉低时钟开始数据传输
+    for(t=0;t<8;t++)
+    {              
+        IIC_SDA=(txd&0x80)>>7;
+        txd<<=1; 	  
+		DelayUs(1);   
+		IIC_SCL=1;
+		DelayUs(1); 
+		IIC_SCL=0;	
+		DelayUs(1);
+    }	 
+} 	 
   
-  REG_data= I2C_ReadByte();
-  I2C_NoAck();
-  I2C_Stop();
-  //return TRUE;
-  return REG_data;
-}
-
+/**************************实现函数********************************************
+*函数原型:		bool i2cWrite(uint8_t addr, uint8_t reg, uint8_t data)
+*功　　能:		
+*******************************************************************************/
 int i2cWrite(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data)
 {
 		int i;
-  if (!I2C_Start())
-    return 1;
-  I2C_SendByte(addr << 1 );
-  if (!I2C_WaitAck()) {
-    I2C_Stop();
-    return 1;
-  }
-  I2C_SendByte(reg);
-  I2C_WaitAck();
-		for (i = 0; i < len; i++) {
-    I2C_SendByte(data[i]);
-    if (!I2C_WaitAck()) {
-      I2C_Stop();
-      return 0;
+    if (!IIC_Start())
+        return 1;
+    IIC_Send_Byte(addr << 1 );
+    if (!IIC_Wait_Ack()) {
+        IIC_Stop();
+        return 1;
     }
-  }
-  I2C_Stop();
-  return 0;
+    IIC_Send_Byte(reg);
+    IIC_Wait_Ack();
+		for (i = 0; i < len; i++) {
+        IIC_Send_Byte(data[i]);
+        if (!IIC_Wait_Ack()) {
+            IIC_Stop();
+            return 0;
+        }
+    }
+    IIC_Stop();
+    return 0;
 }
-
+/**************************实现函数********************************************
+*函数原型:		bool i2cWrite(uint8_t addr, uint8_t reg, uint8_t data)
+*功　　能:		
+*******************************************************************************/
 int i2cRead(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *buf)
 {
-  if (!I2C_Start())
-    return 1;
-  I2C_SendByte(addr << 1);
-  if (!I2C_WaitAck()) {
-    I2C_Stop();
-    return 1;
-  }
-  I2C_SendByte(reg);
-  I2C_WaitAck();
-  I2C_Start();
-  I2C_SendByte((addr << 1)+1);
-  I2C_WaitAck();
-  while (len) {
-    if (len == 1){
-      *buf = I2C_ReadByte();
-      I2C_NoAck();
-    }else{
-      *buf = I2C_ReadByte();
-      I2C_Ack();
+    if (!IIC_Start())
+        return 1;
+    IIC_Send_Byte(addr << 1);
+    if (!IIC_Wait_Ack()) {
+        IIC_Stop();
+        return 1;
     }
-    buf++;
-    len--;
-  }
-  I2C_Stop();
-  return 0;
-}
-uint8_t I2CreadByte(uint8_t dev, uint8_t reg, uint8_t *data){
-	*data=I2C_ReadOneByte(dev, reg);
-  return 1;
+    IIC_Send_Byte(reg);
+    IIC_Wait_Ack();
+    IIC_Start();
+    IIC_Send_Byte((addr << 1)+1);
+    IIC_Wait_Ack();
+    while (len) {
+        if (len == 1)
+            *buf = IIC_Read_Byte(0);
+        else
+            *buf = IIC_Read_Byte(1);
+        buf++;
+        len--;
+    }
+    IIC_Stop();
+    return 0;
 }
 
-uint8_t I2CwriteByte(uint8_t dev, uint8_t reg, uint8_t data){
-    return i2cWrite(dev, reg, 1, &data);
+
+/**************************实现函数********************************************
+*函数原型:		u8 IIC_Read_Byte(unsigned char ack)
+*功　　能:	    //读1个字节，ack=1时，发送ACK，ack=0，发送nACK 
+*******************************************************************************/  
+u8 IIC_Read_Byte(unsigned char ack)
+{
+	unsigned char i,receive=0;
+	SDA_IN();//SDA设置为输入
+    for(i=0;i<8;i++ )
+	{
+        IIC_SCL=0; 
+        DelayUs(2);
+		IIC_SCL=1;
+        receive<<=1;
+        if(READ_SDA)receive++;   
+		DelayUs(2); 
+    }					 
+    if (ack)
+        IIC_Ack(); //发送ACK 
+    else
+        IIC_NAck();//发送nACK  
+    return receive;
 }
-uint8_t I2CwriteBits(uint8_t dev,uint8_t reg,uint8_t bitStart,uint8_t length,uint8_t data)
+
+/**************************实现函数********************************************
+*函数原型:		unsigned char I2C_ReadOneByte(unsigned char I2C_Addr,unsigned char addr)
+*功　　能:	    读取指定设备 指定寄存器的一个值
+输入	I2C_Addr  目标设备地址
+		addr	   寄存器地址
+返回   读出来的值
+*******************************************************************************/ 
+unsigned char I2C_ReadOneByte(unsigned char I2C_Addr,unsigned char addr)
+{
+	unsigned char res=0;
+	
+	IIC_Start();	
+	IIC_Send_Byte(I2C_Addr);	   //发送写命令
+	res++;
+	IIC_Wait_Ack();
+	IIC_Send_Byte(addr); res++;  //发送地址
+	IIC_Wait_Ack();	  
+	//IIC_Stop();//产生一个停止条件	
+	IIC_Start();
+	IIC_Send_Byte(I2C_Addr+1); res++;          //进入接收模式			   
+	IIC_Wait_Ack();
+	res=IIC_Read_Byte(0);	   
+    IIC_Stop();//产生一个停止条件
+
+	return res;
+}
+
+
+/**************************实现函数********************************************
+*函数原型:		u8 IICreadBytes(u8 dev, u8 reg, u8 length, u8 *data)
+*功　　能:	    读取指定设备 指定寄存器的 length个值
+输入	dev  目标设备地址
+		reg	  寄存器地址
+		length 要读的字节数
+		*data  读出的数据将要存放的指针
+返回   读出来的字节数量
+*******************************************************************************/ 
+u8 IICreadBytes(u8 dev, u8 reg, u8 length, u8 *data){
+    u8 count = 0;
+	
+	IIC_Start();
+	IIC_Send_Byte(dev);	   //发送写命令
+	IIC_Wait_Ack();
+	IIC_Send_Byte(reg);   //发送地址
+    IIC_Wait_Ack();	  
+	IIC_Start();
+	IIC_Send_Byte(dev+1);  //进入接收模式	
+	IIC_Wait_Ack();
+	
+    for(count=0;count<length;count++){
+		 
+		 if(count!=length-1)data[count]=IIC_Read_Byte(1);  //带ACK的读数据
+		 	else  data[count]=IIC_Read_Byte(0);	 //最后一个字节NACK
+	}
+    IIC_Stop();//产生一个停止条件
+    return count;
+}
+
+/**************************实现函数********************************************
+*函数原型:		u8 IICwriteBytes(u8 dev, u8 reg, u8 length, u8* data)
+*功　　能:	    将多个字节写入指定设备 指定寄存器
+输入	dev  目标设备地址
+		reg	  寄存器地址
+		length 要写的字节数
+		*data  将要写的数据的首地址
+返回   返回是否成功
+*******************************************************************************/ 
+u8 IICwriteBytes(u8 dev, u8 reg, u8 length, u8* data){
+  
+ 	u8 count = 0;
+	IIC_Start();
+	IIC_Send_Byte(dev);	   //发送写命令
+	IIC_Wait_Ack();
+	IIC_Send_Byte(reg);   //发送地址
+    IIC_Wait_Ack();	  
+	for(count=0;count<length;count++){
+		IIC_Send_Byte(data[count]); 
+		IIC_Wait_Ack(); 
+	 }
+	IIC_Stop();//产生一个停止条件
+
+    return 1; //status == 0;
+}
+
+/**************************实现函数********************************************
+*函数原型:		u8 IICreadByte(u8 dev, u8 reg, u8 *data)
+*功　　能:	    读取指定设备 指定寄存器的一个值
+输入	dev  目标设备地址
+		reg	   寄存器地址
+		*data  读出的数据将要存放的地址
+返回   1
+*******************************************************************************/ 
+u8 IICreadByte(u8 dev, u8 reg, u8 *data){
+	*data=I2C_ReadOneByte(dev, reg);
+    return 1;
+}
+
+/**************************实现函数********************************************
+*函数原型:		unsigned char IICwriteByte(unsigned char dev, unsigned char reg, unsigned char data)
+*功　　能:	    写入指定设备 指定寄存器一个字节
+输入	dev  目标设备地址
+		reg	   寄存器地址
+		data  将要写入的字节
+返回   1
+*******************************************************************************/ 
+unsigned char IICwriteByte(unsigned char dev, unsigned char reg, unsigned char data){
+    return IICwriteBytes(dev, reg, 1, &data);
+}
+
+/**************************实现函数********************************************
+*函数原型:		u8 IICwriteBits(u8 dev,u8 reg,u8 bitStart,u8 length,u8 data)
+*功　　能:	    读 修改 写 指定设备 指定寄存器一个字节 中的多个位
+输入	dev  目标设备地址
+		reg	   寄存器地址
+		bitStart  目标字节的起始位
+		length   位长度
+		data    存放改变目标字节位的值
+返回   成功 为1 
+ 		失败为0
+*******************************************************************************/ 
+u8 IICwriteBits(u8 dev,u8 reg,u8 bitStart,u8 length,u8 data)
 {
 
-    uint8_t b;
-    if (I2CreadByte(dev, reg, &b) != 0) {
-        uint8_t mask = (0xFF << (bitStart + 1)) | 0xFF >> ((8 - bitStart) + length - 1);
+    u8 b;
+    if (IICreadByte(dev, reg, &b) != 0) {
+        u8 mask = (0xFF << (bitStart + 1)) | 0xFF >> ((8 - bitStart) + length - 1);
         data <<= (8 - length);
         data >>= (7 - bitStart);
         b &= mask;
         b |= data;
-        return I2CwriteByte(dev, reg, b);
+        return IICwriteByte(dev, reg, b);
     } else {
         return 0;
     }
 }
 
-uint8_t I2CwriteBit(uint8_t dev, uint8_t reg, uint8_t bitNum, uint8_t data)
-{
-    uint8_t b;
-    I2CreadByte(dev, reg, &b);
+/**************************实现函数********************************************
+*函数原型:		u8 IICwriteBit(u8 dev, u8 reg, u8 bitNum, u8 data)
+*功　　能:	    读 修改 写 指定设备 指定寄存器一个字节 中的1个位
+输入	dev  目标设备地址
+		reg	   寄存器地址
+		bitNum  要修改目标字节的bitNum位
+		data  为0 时，目标位将被清0 否则将被置位
+返回   成功 为1 
+ 		失败为0
+*******************************************************************************/ 
+u8 IICwriteBit(u8 dev, u8 reg, u8 bitNum, u8 data){
+    u8 b;
+    IICreadByte(dev, reg, &b);
     b = (data != 0) ? (b | (1 << bitNum)) : (b & ~(1 << bitNum));
-    return I2CwriteByte(dev, reg, b);
+    return IICwriteByte(dev, reg, b);
 }
+
+//------------------End of File----------------------------

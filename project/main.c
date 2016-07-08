@@ -11,6 +11,7 @@ int main(void)
   SystemInit();
   UserInit();
   DelayInit(72);
+  IIC_Init();
   MPU6050_Init();
   DMP_Init();
 

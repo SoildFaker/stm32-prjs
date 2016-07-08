@@ -36,7 +36,7 @@
  * fabsf(float x)
  * min(int a, int b)
  */
-#define EMPL_TARGET_STM32F4 
+#define EMPL_TARGET_STM32F4
 #define MPU6050 
 #if defined EMPL_TARGET_STM32F4
 #include "i2c.h"   
@@ -51,21 +51,20 @@
 #define min(a,b) ((a<b)?a:b)
    
 #elif defined MOTION_DRIVER_TARGET_MSP430
-#include "msp430.h"
-#include "msp430_i2c.h"
-#include "msp430_clock.h"
-#include "msp430_interrupt.h"
-#define i2c_write   msp430_i2c_write
-#define i2c_read    msp430_i2c_read
-#define delay_ms    msp430_delay_ms
-#define get_ms      msp430_get_clock_ms
+#include "i2c.h"   
+#include "tools.h"
+#define i2c_write   i2cWrite
+#define i2c_read    i2cRead 
+#define delay_ms    DelayMs
+#define get_ms      get_ms
 static inline int reg_int_cb(struct int_param_s *int_param)
 {
-    return msp430_reg_int_cb(int_param->cb, int_param->pin, int_param->lp_exit,
-        int_param->active_low);
+  return 0;
+    /*return msp430_reg_int_cb(int_param->cb, int_param->pin, int_param->lp_exit,*/
+        /*int_param->active_low);*/
 }
-#define log_i(...)     do {} while (0)
-#define log_e(...)     do {} while (0)
+#define log_i       myprintf
+#define log_e       myprintf
 /* labs is already defined by TI's toolchain. */
 /* fabs is for doubles. fabsf is for floats. */
 #define fabs        fabsf
