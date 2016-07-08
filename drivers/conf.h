@@ -62,6 +62,7 @@
 #define MAX(a, b)			(((a) > (b)) ? (a) : (b))
 #define MINMAX(x, min, max)	(MIN(MAX((x), (min)), (max)))
 #define CONSTRAIN(x, a)		(MINMAX(x, -(a), (a)))
+
 /* functions -----------------------------------------------------------------*/
 void USART_Conf(void);
 void I2C_Conf(void);

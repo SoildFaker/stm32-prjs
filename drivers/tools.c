@@ -179,8 +179,7 @@ float HCSR04_Get(void)
   while(!GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && TIM2->CNT<1000);
   TIM2->CNT = 0;
   tim2_count = 0;
-  while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && tim2_count<9);
-
+  while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && tim2_count < 9);
   length = (tim2_count*0xffff+TIM2->CNT)/58.8;
   return length;
 }
