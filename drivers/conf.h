@@ -42,6 +42,11 @@
 //串口通讯接口 GPIOA
 #define  GPIO_RxPin               GPIO_Pin_3              
 #define  GPIO_TxPin               GPIO_Pin_2              
+//PWM电调接口 GPIOA
+#define  CW1_Pin                  GPIO_Pin_4
+#define  CW2_Pin                  GPIO_Pin_5
+#define  CCW1_Pin                 GPIO_Pin_7
+#define  CCW2_Pin                 GPIO_Pin_6
 //超声波测距接口 GPIOA
 #define  TRIG_Pin                 GPIO_Pin_1
 #define  ECHO_Pin                 GPIO_Pin_0
