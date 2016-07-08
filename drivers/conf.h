@@ -58,6 +58,10 @@
 #define SYSCLK_FREQ_72MHz
 #define _DLIB_PRINTF_SPECIFIER_FLOAT
 
+#define MIN(a, b)			(((a) < (b)) ? (a) : (b))
+#define MAX(a, b)			(((a) > (b)) ? (a) : (b))
+#define MINMAX(x, min, max)	(MIN(MAX((x), (min)), (max)))
+#define CONSTRAIN(x, a)		(MINMAX(x, -(a), (a)))
 /* functions -----------------------------------------------------------------*/
 void USART_Conf(void);
 void I2C_Conf(void);
