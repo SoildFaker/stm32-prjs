@@ -1,9 +1,7 @@
 #ifndef _PID_H_
 #define _PID_H_
 
-
-#include "conf.h"
-
+#include "stm32f10x.h"
 //-----constants -----------------------------------
 #define IG_MAX 400.0
 #define I_MAX 200.0
@@ -46,12 +44,12 @@ extern float loop_time;
 
 
 //------------- functions -------------------------
-void PID_x_update(void);
-void PID_y_update(void);
-void PID_z_update(void);
-void Set_pid_gain_value(void);
-void Get_pid_gain_value(void);
-void Send_pid_gain(void);
-void MORTOR_output(void);
+void PIDx_Update(void);
+void PIDy_Update(void);
+void PIDz_Update(void);
+void PID_SetGainValue(void);
+void PID_GetGainValue(void);
+void PID_SendGain(void);
+void MORTOR_Output(void);
 //-------------------------------------------------
 #endif

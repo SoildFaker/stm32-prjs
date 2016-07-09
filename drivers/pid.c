@@ -2,7 +2,7 @@
 #include "motor.h"
 #include "ahrs.h"
 #include "mpu6050.h"
-/*#include "conf.h"*/
+#include "stm32f10x.h"
 
 uint8_t control_mode = 1;
 float loop_time = 0.0f;
@@ -13,7 +13,6 @@ float rx_value[6] = {0.00f,0.00f,0.28f,0.0f,0.0f,0.0f};//store the pulse times o
 									// rx_value[3]: target_z_angle/target_z_rate
 									// rx_value[4]: (unused)
 									// rx_value[5]: (unused)
-//------- variables -------------------------------
 float pid_gain_vl[18];
 /*
 	pid_gain_vl[0]=Kg_x_P
@@ -56,14 +55,12 @@ float Pg_temp,Ig_temp,Dg_temp;
 float P_imu_temp,I_imu_temp,D_imu_temp;
 
 float PID_x,PID_y,PID_z;
-//-------------------------------------------------
 
 
-//------------- functions -------------------------
 /*
 	PID gain value setup
 */
-void Set_pid_gain_value(void)
+void PID_SetGainValue(void)
 {
 	pid_gain_vl[0]=7.077;
 	pid_gain_vl[1]=0.002;
@@ -93,7 +90,7 @@ void Set_pid_gain_value(void)
 /*
 	Get PID gain value from Processing
 */
-void Get_pid_gain_value(void)
+void PID_GetGainValue(void)
 {
 	if(pid_pt>8)
 	{
@@ -109,7 +106,7 @@ void Get_pid_gain_value(void)
 /*
 	Send pid_gain data to Processing
 */
-void Send_pid_gain(void)
+void PID_SendGain(void)
 {
 	if(read_request)
 	{
@@ -135,7 +132,7 @@ void Send_pid_gain(void)
 /*
 	PID update for X axis
 */
-void PID_x_update(void)
+void PIDx_Update(void)
 {
 	if(control_mode)
 	{
@@ -172,7 +169,7 @@ void PID_x_update(void)
 /*
 	PID update for Y axis
 */
-void PID_y_update(void)
+void PIDy_Update(void)
 {
 	if(control_mode)
 	{
@@ -214,7 +211,7 @@ void PID_y_update(void)
 /*
 	PID update for z axis
 */
-void PID_z_update(void)
+void PIDz_Update(void)
 {
 	if(rx_value[3]==0)//auto hold mode, increas pid_z_out_temp 0.5 by one step to prevent ocilation
 	{
@@ -237,7 +234,7 @@ void PID_z_update(void)
 	PID_z= (int) CONSTRAIN(Pg_temp+Dg_temp,pid_z_out_temp);	
 }
 
-void MORTOR_output(void)
+void MORTOR_Output(void)
 {
 //////Quad X configuration
 //////MT4 (CW)			MT3(CCW)	

@@ -1,9 +1,11 @@
 #ifndef __TOOLS
 #define __TOOLS value
 
-#include "conf.h"
+#include "stm32f10x.h"
 
 float HCSR04_Get(void);
+void State_Update(void);
+void PID_Update(float time);
 uint8_t UsartPut(uint8_t ch);
 void getAttitude(float* AccelGyro);
 uint8_t UsartGet(void);

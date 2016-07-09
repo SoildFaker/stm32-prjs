@@ -16,12 +16,12 @@ extern uint8_t test,i2c_sdata[20],i2c_rdata[20];
 
 
 //-------------- functions ----------------------
-void mpu6050_write_block(uint8_t adr, uint8_t data[], uint8_t data_len);
-void mpu6050_read_block(uint8_t adr, uint8_t data[], uint8_t data_len);
-void mpu_6050_init(void);
-void mpu6050_get_value(void);
-void get_gyro_rate(void);
-void get_acc_value(void);
+void MPU6050_WriteBlock(uint8_t adr, uint8_t data[], uint8_t data_len);
+void MPU6050_ReadBlock(uint8_t adr, uint8_t data[], uint8_t data_len);
+void MPU6050_Init(void);
+void MPU6050_Read(void);
+void MPU_GetGyroRate(void);
+void MPU_GetAccValue(void);
 //void get_acce_angle(void);
 //-----------------------------------------------
 #endif

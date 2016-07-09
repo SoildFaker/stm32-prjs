@@ -1,4 +1,9 @@
 #include "tools.h"
+#include "pid.h"
+#include "mpu6050.h"
+#include "stm32f10x_usart.h"
+#include "stm32f10x.h"
+#include "conf.h"
 #include <stdarg.h>  
 
 static u8  fac_us=0;//us延时倍乘数
@@ -21,6 +26,24 @@ void UserInit(void)
   NVIC_Conf();
 }
  
+void State_Update(void)
+{
+  MPU6050_Read();
+  MPU_GetAccValue();
+  MPU_GetGyroRate();
+  MadgwickAHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp);
+  AHRS_GetRPY();
+}
+
+void PID_Update(float time)
+{
+  loop_time = time;
+  PID_GetGainValue();
+  PIDx_Update();
+  PIDy_Update();
+  PIDz_Update();
+}
+
 void print_int(int num, int mode, int flag)  
 {  
   if(num == 0){  

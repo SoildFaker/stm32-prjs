@@ -52,7 +52,7 @@
 //超声波测距接口 GPIOA
 #define  TRIG_Pin                 GPIO_Pin_1
 #define  ECHO_Pin                 GPIO_Pin_0
-//陀螺仪接口 GPIOB
+//陀螺仪IIC接口 GPIOB
 #define  SDA_Pin                  GPIO_Pin_11
 #define  SCL_Pin                  GPIO_Pin_10
 #define  MPU_I2Cx                 I2C2

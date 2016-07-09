@@ -1,5 +1,6 @@
 #include "motor.h"
-#include "nvic.h"
+#include "stm32f10x_tim.h"
+#include "pid.h"
 
 void Motor_Disabled(void)
 {
@@ -9,16 +10,13 @@ void Motor_Disabled(void)
 	TIM4->CCR4=0;
 }
 
-void Motor_init(void)
+void Motor_Init(void)
 {
 	TIM4->CCR1=STOP_PWM;
 	TIM4->CCR2=STOP_PWM;
 	TIM4->CCR3=STOP_PWM;
 	TIM4->CCR4=STOP_PWM;
+
+  PID_SetGainValue();
 }
 
-void Motor_Start(void)
-{
-  uint16_t counter = tim4_count;
-  
-}
