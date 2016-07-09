@@ -1,4 +1,5 @@
 #include "motor.h"
+#include "nvic.h"
 
 void Motor_Disabled(void)
 {
@@ -14,4 +15,10 @@ void Motor_init(void)
 	TIM4->CCR2=STOP_PWM;
 	TIM4->CCR3=STOP_PWM;
 	TIM4->CCR4=STOP_PWM;
+}
+
+void Motor_Start(void)
+{
+  uint16_t counter = tim4_count;
+  
 }

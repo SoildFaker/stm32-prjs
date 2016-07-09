@@ -1,11 +1,17 @@
 #include "pid.h"
-#include "math.h"
-#include "rx.h"
-#include "i2c_sensors.h"
-#include "pwm_tm2.h"
-#include "AHRS.h"
-#include "timer1_ovf.h"
-#include <stdio.h>
+#include "motor.h"
+#include "ahrs.h"
+/*#include "conf.h"*/
+
+uint8_t control_mode = 1;
+float loop_time = 0.0f;
+float rx_value[6] = {0.05f,0.05f,0.15f,0.05f,0.0f,0.0f};//store the pulse times of 6 input pwm chanels from rx device
+									// rx_value[0]: target_x_angle/target_x_rate
+									// rx_value[1]: target_y_angle/target_y_rate
+									// rx_value[2]: throttle
+									// rx_value[3]: target_z_angle/target_z_rate
+									// rx_value[4]: (unused)
+									// rx_value[5]: (unused)
 //------- variables -------------------------------
 float pid_gain_vl[18];
 /*
@@ -116,10 +122,10 @@ void Send_pid_gain(void)
   }
 	
 	//------ send data to Processing via USART3 -------
-	USART3_put_char(255);//start byte
+	/*USART3_put_char(255);//start byte*/
 	for(i=0;i<9;i++)
 	{
-		USART3_put_char(temp_data[i]);
+		/*USART3_put_char(temp_data[i]);*/
 	}
 	//-------------------------------------------------
 	read_request=0;
@@ -142,15 +148,7 @@ void PID_x_update(void)
 	Ig_temp=pid_gain_vl[1]*gyro_x_errorI;
 	Dg_temp=pid_gain_vl[2]*delta_gyro_x_error;
 	//---------------------------------------------	
-	
-	//------- calculate PID out value for X axis ---
-	#ifdef _QUAD_PLUS_
-		PID_x=(int)CONSTRAIN(Pg_temp+Ig_temp+Dg_temp,PID_OUT_MAX);
-	#endif
-	
-	#ifdef _QUAD_X_
-		PID_x=(int)CONSTRAIN((Pg_temp+Ig_temp+Dg_temp)/1.414,PID_OUT_MAX);
-	#endif
+  PID_x=(int)CONSTRAIN((Pg_temp+Ig_temp+Dg_temp)/1.414,PID_OUT_MAX);
 	//----------------------------------------------
 	}
 	else// angle mode
@@ -166,13 +164,7 @@ void PID_x_update(void)
 	//D_imu_temp=CONSTRAIN(pid_gain_vl[5]*x_rate_temp,PG_MAX);	
 	D_imu_temp=CONSTRAIN(-pid_gain_vl[5]*gyro_x_rate,PG_MAX);	
 	//------- calculate PID out value for X axis ---
-	#ifdef _QUAD_PLUS_
-		PID_x=(int)CONSTRAIN(P_imu_temp+I_imu_temp+D_imu_temp,PID_OUT_MAX);
-	#endif
-		
-	#ifdef _QUAD_X_
-		PID_x=(int)CONSTRAIN((P_imu_temp+I_imu_temp+D_imu_temp)/1.414,PID_OUT_MAX);
-	#endif
+  PID_x=(int)CONSTRAIN((P_imu_temp+I_imu_temp+D_imu_temp)/1.414,PID_OUT_MAX);
 	//----------------------------------------------
 	}
 }
@@ -195,13 +187,7 @@ void PID_y_update(void)
 	//---------------------------------------------	
 	
 	//------- calculate PID out value for Y axis ---
-	#ifdef _QUAD_PLUS_
-		PID_y=(int)CONSTRAIN(Pg_temp+Ig_temp+Dg_temp,PID_OUT_MAX);
-	#endif
-		
-	#ifdef _QUAD_X_
-		PID_y=(int)CONSTRAIN((Pg_temp+Ig_temp+Dg_temp)/1.414,PID_OUT_MAX);
-	#endif
+  PID_y=(int)CONSTRAIN((Pg_temp+Ig_temp+Dg_temp)/1.414,PID_OUT_MAX);
 	//----------------------------------------------
 	}
 	else// angle mode
@@ -219,13 +205,7 @@ void PID_y_update(void)
 	//---------------------------------------------
 	
 	//------- calculate PID out value for Y axis ---
-	#ifdef _QUAD_PLUS_
-		PID_y= (int)CONSTRAIN(P_imu_temp+I_imu_temp+D_imu_temp,PID_OUT_MAX);
-	#endif
-	
-	#ifdef _QUAD_X_
-		PID_y= (int)CONSTRAIN((P_imu_temp+I_imu_temp+D_imu_temp)/1.414,PID_OUT_MAX);
-	#endif
+  PID_y= (int)CONSTRAIN((P_imu_temp+I_imu_temp+D_imu_temp)/1.414,PID_OUT_MAX);
 	//----------------------------------------------
 	}
 }
@@ -271,48 +251,24 @@ void MORTOR_output(void)
 //////	/						 \
 //////MT1(CCW)	   MT2(CW)
 	
-	//Quad + configuration	
-//		       mt1(CW)
-//		     ***(x)***
-//						 ^
-//						 |
-//						 |
-//						 |
-//						 |
-//mt2(y)<------0---------mt4
-//(CCW)				 |		(CCW)	
-//			       |
-//			       |
-//			       |
-//	         mt3(CW)
 	uint16_t temp_pwm[4];
 	uint8_t i;
 	if(rx_value[2]<0.04)
 	{
-		TIM2->CCR1=STOP_PWM;//pa0
-		TIM2->CCR2=STOP_PWM;//pa1
-		TIM2->CCR3=STOP_PWM;//pa2
-		TIM2->CCR4=STOP_PWM;//pa3
+		TIM4->CCR1=STOP_PWM;//pa0
+		TIM4->CCR2=STOP_PWM;//pa1
+		TIM4->CCR3=STOP_PWM;//pa2
+		TIM4->CCR4=STOP_PWM;//pa3
 		GPIOB->ODR&=~(1<<2);
 		//printf("stop\r");
 	}
 	else
 	{		
-		#ifdef _QUAD_PLUS_
-		temp_pwm[0]=(uint16_t)(rx_value[2]*PWM_RANGE)+MIN_PWM-PID_y+PID_z-(uint16_t)pid_gain_vl[16];//trim this motor
-		temp_pwm[1]=(uint16_t)(rx_value[2]*PWM_RANGE)+MIN_PWM+PID_x-PID_z-(uint16_t)pid_gain_vl[15];//trim this motor 
-		temp_pwm[2]=(uint16_t)(rx_value[2]*PWM_RANGE)+MIN_PWM+PID_y+PID_z+(uint16_t)pid_gain_vl[16];//trim this motor 
-		temp_pwm[3]=(uint16_t)(rx_value[2]*PWM_RANGE)+MIN_PWM-PID_x-PID_z+(uint16_t)pid_gain_vl[15];//trim this motor 
-		//printf("quad +\r");
-		#endif
-		
-		#ifdef _QUAD_X_
 		temp_pwm[0]=(uint16_t)(rx_value[2]*PWM_RANGE)+MIN_PWM+PID_x+PID_y+PID_z-(uint16_t)pid_gain_vl[17];
 		temp_pwm[1]=(uint16_t)(rx_value[2]*PWM_RANGE)+MIN_PWM-PID_x+PID_y-PID_z-(uint16_t)pid_gain_vl[17];
 		temp_pwm[2]=(uint16_t)(rx_value[2]*PWM_RANGE)+MIN_PWM-PID_x-PID_y+PID_z+(uint16_t)pid_gain_vl[17]; 
 		temp_pwm[3]=(uint16_t)(rx_value[2]*PWM_RANGE)+MIN_PWM+PID_x-PID_y-PID_z+(uint16_t)pid_gain_vl[17];
 		//printf("quad X\r");
-		#endif
 
 		for(i=0;i<4;i++)
 		{
@@ -320,10 +276,10 @@ void MORTOR_output(void)
 			if(temp_pwm[i]>MAX_PWM)temp_pwm[i]=MAX_PWM;
 		}
 		
-		TIM2->CCR1=temp_pwm[0];//pa0
-		TIM2->CCR2=temp_pwm[1];//pa1
-		TIM2->CCR3=temp_pwm[2];//pa2
-		TIM2->CCR4=temp_pwm[3];//pa3
+		TIM4->CCR1=temp_pwm[0];//pa0
+		TIM4->CCR2=temp_pwm[1];//pa1
+		TIM4->CCR3=temp_pwm[2];//pa2
+		TIM4->CCR4=temp_pwm[3];//pa3
 		//printf("running\r");
 		GPIOB->ODR|=1<<2;
 	}
@@ -331,47 +287,15 @@ void MORTOR_output(void)
 	if(rx_value[2]>0.0)
 	{
 		temp_pwm[0]=(uint16_t)(rx_value[2]*5000);
-		TIM2->CCR1=temp_pwm[0];//pa0
-		TIM2->CCR2=temp_pwm[0];//pa1
-		TIM2->CCR3=temp_pwm[0];//pa2
-		TIM2->CCR4=temp_pwm[0];//pa3
+		TIM4->CCR1=temp_pwm[0];//pa0
+		TIM4->CCR2=temp_pwm[0];//pa1
+		TIM4->CCR3=temp_pwm[0];//pa2
+		TIM4->CCR4=temp_pwm[0];//pa3
 		printf("%0.1f %d \r",rx_value[2],temp_pwm[0]);
 	}
 	*/
 }
-//-----------------------right motor done --------------------------------
 	
-
-//-----usart3 intr service prg-------------
-void USART3_IRQHandler(void)//when we have an interrupt on USART
-{
-	 if((USART_GetITStatus(USART3,USART_IT_RXNE))!=RESET)//if match receive complete interrupt
-	 {
-		 USART_ClearITPendingBit(USART3,USART_IT_RXNE);//clear the flag bit for the next time
-		 //-------------------------------------		 
-		 rx3_temp= USART_ReceiveData(USART3);	
-		 
-		 if(rx3_temp>209)// reading pid gain request
-		 {
-			 page=rx3_temp-210;
-			 read_request=1;
-		 }
-		 else if(rx3_temp>199 && rx3_temp<210)// sending pid gain request
-		 {
-			 page=rx3_temp-200;
-			 pid_pt=0;
-		 }
-		 else// pid gain temp data from Processing
-		 {
-			 pid_temp[pid_pt]=rx3_temp;
-			 pid_pt++;
-				
-		 }
-	 }
-	 
-}
- 
-//----------------+-----------------------
 
 
 

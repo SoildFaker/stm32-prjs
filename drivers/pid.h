@@ -1,18 +1,10 @@
 #ifndef _PID_H_
 #define _PID_H_
 
-#include "stm32f10x.h"
-#include "math.h"
-#include "stdio.h"
-#include "usart3.h"
 
+#include "conf.h"
 
 //-----constants -----------------------------------
-#define MIN(a, b)			(((a) < (b)) ? (a) : (b))
-#define MAX(a, b)			(((a) > (b)) ? (a) : (b))
-#define MINMAX(x, min, max)	(MIN(MAX((x), (min)), (max)))
-#define CONSTRAIN(x, a)		(MINMAX(x, -(a), (a)))
-
 #define IG_MAX 400.0
 #define I_MAX 200.0
 #define PG_MAX 800.0
@@ -21,7 +13,11 @@
 #define PID_Z_MAX	500
 #define PID_Z_MIN 180
 #define MAX_GYRO_ERROR 350.0
-
+#define MAX_TARGET_ANGLE_M2 60.0//20.0*2
+#define MAX_TARGET_ANGLE		30.0//20.0*2
+#define MAX_TARGET_RATE_M2 200.0//100.0*2
+#define MAX_TARGET_RATE 	 100.0
+#define TARGET_Z_RATE 150
 //------- Quad mode --------
 #define _QUAD_X_
 //#define _QUAD_PLUS_
@@ -45,6 +41,7 @@ extern float Pg_temp,Ig_temp,Dg_temp;
 extern float P_imu_temp,I_imu_temp,D_imu_temp;
 
 extern float PID_x,PID_y,PID_z;
+extern float loop_time;
 //-------------------------------------------------
 
 

@@ -31,6 +31,8 @@
 #include "nvic.h"
 #include "mpu6050.h"
 #include "kalman.h"
+#include "motor.h"
+#include "pid.h"
 
 //#include <stdio.h>
 #include <stdlib.h>
@@ -42,11 +44,11 @@
 //串口通讯接口 GPIOA
 #define  GPIO_RxPin               GPIO_Pin_3              
 #define  GPIO_TxPin               GPIO_Pin_2              
-//PWM电调接口 GPIOA
-#define  CW1_Pin                  GPIO_Pin_4
-#define  CW2_Pin                  GPIO_Pin_5
-#define  CCW1_Pin                 GPIO_Pin_7
-#define  CCW2_Pin                 GPIO_Pin_6
+//PWM电调接口 GPIOB
+#define  CW1_Pin                  GPIO_Pin_6
+#define  CW2_Pin                  GPIO_Pin_7
+#define  CCW1_Pin                 GPIO_Pin_8
+#define  CCW2_Pin                 GPIO_Pin_9
 //超声波测距接口 GPIOA
 #define  TRIG_Pin                 GPIO_Pin_1
 #define  ECHO_Pin                 GPIO_Pin_0
@@ -75,6 +77,7 @@ void RCC_Conf(void);
 void TIMER_Conf(void);
 void GPIO_Conf(void);
 void NVIC_Conf(void);
+void PWM_Conf(void);
 /* #define USE_FULL_ASSERT    1 */
 
 /* Exported macro ------------------------------------------------------------*/

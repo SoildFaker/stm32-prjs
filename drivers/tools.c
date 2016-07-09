@@ -18,6 +18,7 @@ void UserInit(void)
   USART_Conf();
   I2C_Conf();
   NVIC_Conf();
+  PWM_Conf();
 }
  
 void print_int(int num, int mode, int flag)  
