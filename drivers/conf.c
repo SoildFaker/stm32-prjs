@@ -47,6 +47,7 @@ void RCC_Conf(void)
   //Timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIM2
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //配置RCC，使能TIM3
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 	
 }
 
@@ -97,13 +98,44 @@ void TIMER_Conf(void)
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
   TIM_Cmd(TIM2, ENABLE);// TIM2 enable counter [允许tim2计数]
 
-  TIM_TimeBaseStructure.TIM_Period = 50000;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
+  TIM_TimeBaseStructure.TIM_Period = 0xffff;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //初始化定时器3
   TIM_ClearFlag(TIM3, TIM_FLAG_Update);
   TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
   TIM_Cmd(TIM3, ENABLE);//允许tim3计数
 
 }
+
+void PWM_Conf(void)
+{
+	TIM_TimeBaseInitTypeDef TM4_TB_Config;
+	TIM_OCInitTypeDef TM4_OC_Config;
+	
+	//first, setup timebase structure
+	TM4_TB_Config.TIM_ClockDivision=TIM_CKD_DIV1 ;
+	TM4_TB_Config.TIM_CounterMode=TIM_CounterMode_Up;
+	TM4_TB_Config.TIM_Period=5000;//T=Period*t_step=2.5ms
+	TM4_TB_Config.TIM_Prescaler=36-1;//t_step=(Prescaler+1)/core_clock=0.5us
+	TIM_TimeBaseInit(TIM4,&TM4_TB_Config);
+	//second, setup output compare structure
+	TM4_OC_Config.TIM_OCMode=TIM_OCMode_PWM1;
+	TM4_OC_Config.TIM_OCPolarity=TIM_OCPolarity_High;
+	TM4_OC_Config.TIM_OutputState=TIM_OutputState_Enable ;
+	TM4_OC_Config.TIM_Pulse=0;
+	TIM_OC1Init(TIM4,&TM4_OC_Config);
+	TIM_OC2Init(TIM4,&TM4_OC_Config);
+	TIM_OC3Init(TIM4,&TM4_OC_Config);
+	TIM_OC4Init(TIM4,&TM4_OC_Config);
+	
+	//enable auto reload for OC_reg and ARR_reg
+	TIM_ARRPreloadConfig(TIM4,ENABLE);//can change T 
+	TIM_OC1PreloadConfig(TIM4,ENABLE);//can change t_on
+	TIM_OC2PreloadConfig(TIM4,ENABLE);//can change t_on
+	TIM_OC3PreloadConfig(TIM4,ENABLE);//can change t_on
+	TIM_OC4PreloadConfig(TIM4,ENABLE);//can change t_on
+	TIM_Cmd(TIM4,ENABLE);
+}
+
 
 void GPIO_Conf(void)
 {
@@ -132,6 +164,11 @@ void GPIO_Conf(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD; 
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
+  //PWM Motor
+	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Pin=CW1_Pin|CW2_Pin|CCW1_Pin|CCW2_Pin;
+	GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB,&GPIO_InitStructure);
 }
 
 // 系统中断控制
@@ -153,6 +190,13 @@ void NVIC_Conf(void)
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
+  
+  // TIM4
+  /*NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;*/
+  /*NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;*/
+  /*NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;*/
+  /*NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;*/
+  /*NVIC_Init(&NVIC_InitStructure);*/
 }
 
 

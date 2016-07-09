@@ -15,6 +15,7 @@ void UserInit(void)
   RCC_Conf();
   GPIO_Conf();
   TIMER_Conf();
+  PWM_Conf();
   USART_Conf();
   I2C_Conf();
   NVIC_Conf();

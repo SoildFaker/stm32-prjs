@@ -3,6 +3,7 @@
 
 uint16_t tim2_count=0;
 uint16_t tim3_count=0;
+uint16_t tim4_count=0;
 
 void NMI_Handler(void)
 {
@@ -147,6 +148,16 @@ void TIM3_IRQHandler(void)
     tim3_count++;
   }
 }
+
+void TIM4_IRQHandler(void)
+{
+  //检测是否发生溢出更新事件
+  if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET) {
+    TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
+    tim4_count++;
+  }
+}
+
 /**
   * @brief  This function handles RCC interrupt request. 
   * @param  None
