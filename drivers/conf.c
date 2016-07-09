@@ -98,7 +98,7 @@ void TIMER_Conf(void)
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
   TIM_Cmd(TIM2, ENABLE);// TIM2 enable counter [允许tim2计数]
 
-  TIM_TimeBaseStructure.TIM_Period = 50000;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
+  TIM_TimeBaseStructure.TIM_Period = 0xffff;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //初始化定时器3
   TIM_ClearFlag(TIM3, TIM_FLAG_Update);
   TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //打开中断 溢出中断  

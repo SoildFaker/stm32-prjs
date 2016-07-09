@@ -14,11 +14,11 @@ int main(void)
 
   mpu_6050_init();
   Motor_init();
+  Set_pid_gain_value();
 
   uint8_t a = 0;
-
   uint16_t dt = 0;
-GPIOB->ODR|=(1<<3);	
+
   while (1) {
     dt = TIM3->CNT;
     TIM3->CNT = 0;

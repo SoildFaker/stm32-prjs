@@ -15,10 +15,10 @@ void UserInit(void)
   RCC_Conf();
   GPIO_Conf();
   TIMER_Conf();
+  PWM_Conf();
   USART_Conf();
   I2C_Conf();
   NVIC_Conf();
-  PWM_Conf();
 }
  
 void print_int(int num, int mode, int flag)  
