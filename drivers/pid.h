@@ -40,6 +40,8 @@ extern float P_imu_temp,I_imu_temp,D_imu_temp;
 
 extern float PID_x,PID_y,PID_z;
 extern float loop_time;
+extern uint8_t control_mode;
+extern float rx_value[6];
 //-------------------------------------------------
 
 

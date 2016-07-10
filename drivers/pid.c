@@ -2,11 +2,14 @@
 #include "motor.h"
 #include "ahrs.h"
 #include "mpu6050.h"
+#include "tools.h"
 #include "stm32f10x.h"
 
-uint8_t control_mode = 1;
+uint8_t control_mode = 0;
 float loop_time = 0.0f;
+float height = 0.0f;
 float rx_value[6] = {0.00f,0.00f,0.28f,0.0f,0.0f,0.0f};//store the pulse times of 6 input pwm chanels from rx device
+
 									// rx_value[0]: target_x_angle/target_x_rate
 									// rx_value[1]: target_y_angle/target_y_rate
 									// rx_value[2]: throttle
@@ -274,10 +277,31 @@ void MORTOR_Output(void)
 			if(temp_pwm[i]>MAX_PWM)temp_pwm[i]=MAX_PWM;
 		}
 		
-		TIM4->CCR1=temp_pwm[0];//pa0
-		TIM4->CCR2=temp_pwm[1];//pa1
-		TIM4->CCR3=temp_pwm[2];//pa2
-		TIM4->CCR4=temp_pwm[3];//pa3
+    TIM4->CCR1=temp_pwm[0];//pa0
+    TIM4->CCR2=temp_pwm[1];//pa1
+    TIM4->CCR3=temp_pwm[2];//pa2
+    TIM4->CCR4=temp_pwm[3];//pa3
+    float height_temp = HCSR04_Get();
+    if(height_temp < 30){
+      if(height_temp > height){
+        rx_value[2] = rx_value[2]*0.99f;
+      }else{
+        rx_value[2] = rx_value[2]*1.01f;
+      }
+      if(rx_value[2]>0.8f){
+        rx_value[2] = 0.8f;
+      }
+    }else{
+      if(height_temp > height){
+        rx_value[2] = rx_value[2]*0.99f;
+      }else{
+        rx_value[2] = rx_value[2]*1.01f;
+      }
+      if(rx_value[2]<0.3f){
+        rx_value[2] = 0.3f;
+      }
+    }
+    height = HCSR04_Get();
 		//printf("running\r");
 		GPIOB->ODR|=1<<2;
 	}
