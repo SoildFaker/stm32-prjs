@@ -2,47 +2,44 @@
  * STM32F103C8 Quadrocopter
  */
 #include "tools.h"
-#include "conf.h"
+#include "mpu6050.h"
+#include "motor.h"
+#include "pid.h"
 
 /* Exported constants --------------------------------------------------------*/
-
+uint8_t State = 0;
 int main(void)
 {
   SystemInit();
   UserInit();
   DelayInit(72);
 
-  mpu_6050_init();
+  MPU6050_Init();
+  Motor_Init();
 
   uint8_t a = 0;
-
+  uint8_t b = 0;
   uint16_t dt = 0;
+  float c = rx_value[2];
 
   while (1) {
     dt = TIM3->CNT;
     TIM3->CNT = 0;
-    mpu6050_get_value();
-    get_acc_value();
-    get_gyro_rate();
-    //ahrs computing ---------------          
-    MadgwickAHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180,
-                      acc_x_temp,acc_y_temp,acc_z_temp);
-    getRollPitchYaw();
+    State_Update();             // 状态信息更新 Pitch, Roll, Yaw , etc.
+    PID_Update((float)dt*1e-6);        // PID控制输入每次循环时间
+    MORTOR_Output();
+c = rx_value[2];
     a++;
     if ( a == 0 ){
-      myprintf("height:%f\tdt:%d\r\n", HCSR04_Get(), dt);
-      myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", rpy[0], rpy[1], rpy[2]);
+      /*myprintf("height:%f\trx:%f\r\n", HCSR04_Get(), c);*/
+      /*myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);*/
+      /*myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", rpy[0], rpy[1], rpy[2]);*/
+      b++;
+      if (b>5){
+        Motor_Init();
+         while(1);
+      }
     }
   }
   return 0;
 }
-
-
-#ifdef  DEBUG
-void assert_failed(u8* file, u32 line)
-{
-  while (1)
-  {
-  }
-}
-#endif

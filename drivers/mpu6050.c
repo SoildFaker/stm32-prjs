@@ -64,7 +64,7 @@ uint8_t test,i2c_sdata[20],i2c_rdata[20];
                          /*while(x && TIM2->CNT<6000)\*/
 //---------------- end of data for MPU 6050 -------------
 
-void mpu6050_write_block(uint8_t adr, uint8_t data[], uint8_t data_len)//okie
+void MPU6050_WriteBlock(uint8_t adr, uint8_t data[], uint8_t data_len)//okie
 {
   uint8_t i;
   // Send START condition 
@@ -93,7 +93,7 @@ void mpu6050_write_block(uint8_t adr, uint8_t data[], uint8_t data_len)//okie
   while(I2C_GetFlagStatus(MPU_I2Cx, I2C_FLAG_STOPF));
 }
 
-void mpu6050_read_block(uint8_t adr, uint8_t data[], uint8_t data_len)
+void MPU6050_ReadBlock(uint8_t adr, uint8_t data[], uint8_t data_len)
 //adr: addres of the first reg what we read from
 //data[]: array of data, which we store read data in
 //data_len: lenght of reading data
@@ -146,26 +146,26 @@ void mpu6050_read_block(uint8_t adr, uint8_t data[], uint8_t data_len)
   I2C_AcknowledgeConfig(MPU_I2Cx, ENABLE);
 }
 
-void mpu_6050_init(void)
+void MPU6050_Init(void)
 {
   //reset mpu6050
   i2c_sdata[0]=0x80;
-  mpu6050_write_block(Res107,i2c_sdata,1);
+  MPU6050_WriteBlock(Res107,i2c_sdata,1);
   DelayMs(10);
   
   //use internal clock
   i2c_sdata[0]=Res107_value;
-  mpu6050_write_block(Res107,i2c_sdata,1);
+  MPU6050_WriteBlock(Res107,i2c_sdata,1);
   DelayMs(10);
   
   // enable i2c master mode, arm uc will contrl the mpu6050 bypass auxilary bus
   i2c_sdata[0]=Res106_value;
-  mpu6050_write_block(Res106,i2c_sdata,1);
+  MPU6050_WriteBlock(Res106,i2c_sdata,1);
   DelayMs(10);
   
   //enable bypass i2c bus
   i2c_sdata[0]=Res55_value;
-  mpu6050_write_block(Res55,i2c_sdata,1);
+  MPU6050_WriteBlock(Res55,i2c_sdata,1);
   DelayMs(10);
   
   //config our meure mode, read the specific res for more info
@@ -173,17 +173,17 @@ void mpu_6050_init(void)
   i2c_sdata[1]=Res26_value;
   i2c_sdata[2]=Res27_value;
   i2c_sdata[3]=Res28_value;
-  mpu6050_write_block(Res25,i2c_sdata,4);
+  MPU6050_WriteBlock(Res25,i2c_sdata,4);
   DelayMs(10);
   //printf("mpu6050 init done\r");
   GPIOB->ODR|=1<<0;
 }
 
 
-void mpu6050_get_value(void)
+void MPU6050_Read(void)
 {
   
-  mpu6050_read_block(start_read_address,i2c_rdata,14);
+  MPU6050_ReadBlock(start_read_address,i2c_rdata,14);
   
   acc_x=(int16_t)(i2c_rdata[0]<<8|i2c_rdata[1]);
   acc_y=(int16_t)(i2c_rdata[2]<<8|i2c_rdata[3]);
@@ -195,14 +195,14 @@ void mpu6050_get_value(void)
 
 }
 
-void get_gyro_rate(void)
+void MPU_GetGyroRate(void)
 {
   gyro_x_rate=(float) (gyro_x-gyro_zero_x)/gyro_sensitivity;  
   gyro_y_rate=(float) (gyro_y-gyro_zero_y)/gyro_sensitivity;  
   gyro_z_rate=(float) (gyro_z-gyro_zero_z)/gyro_sensitivity;  
 }
 
-void get_acc_value(void)
+void MPU_GetAccValue(void)
 {
   acc_x_temp= (float)acc_x/acc_x_gain;
   acc_y_temp= (float)acc_y/acc_y_gain;

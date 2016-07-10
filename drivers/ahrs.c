@@ -1,28 +1,20 @@
-/*Implementation of Madgwick's IMU and AHRS algorithms.
-  See: http://www.x-io.co.uk/node/8#open_source_ahrs_and_imu_algorithms
-  Author SOH Madgwick*/
+/*
+ * 航姿参考系统，用来进行飞行姿态的测算
+ */
 
-/* Header files ***************************************************************/
 #include "ahrs.h"
-#include "kalman.h"
-#include "conf.h"
-#include <math.h>
 
-// Definitions
 
-#define sampleFreq  200.0f    // sample frequency in Hz
-#define betaDef   0.1f    // 2 * proportional gain
+#define sampleFreq  2000.0f // 采样频率
+#define betaDef     0.1f    // 比例系数
 
-// Variable definitions
-volatile float beta = betaDef;                // 2 * proportional gain (Kp)
-volatile float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;  // quaternion of sensor frame relative to auxiliary frame
+volatile float beta = betaDef;
+volatile float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;
 volatile float rpy[3],Eangle[3];
-/*float roll = 1.0f, pitch = 1.0f, yaw = 1.0f;*/
 
-// Function declarations
 float invSqrt(float x);
 
-// IMU algorithm update
+// 得到姿态数据
 void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
   float recipNorm;
   float s0, s1, s2, s3;
@@ -102,7 +94,7 @@ float invSqrt(float x)
   return y;
 }
 
-void getRollPitchYaw(void)
+void AHRS_GetRPY(void)
 { 
   float gx, gy, gz; // estimated gravity direction  
   gx = 2 * (q1*q3 - q0*q2);
@@ -114,7 +106,7 @@ void getRollPitchYaw(void)
   rpy[2] = atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1)*180 / M_PI;  
 }
 
-void getEangle(void)
+void AHRS_GetEangle(void)
 { 
   Eangle[0]=atan2(2*q0*q1+2*q2*q3,1-2*q1*q1-2*q2*q2)* 180/M_PI;
   Eangle[1]=asin(2*q0*q2-2*q3*q1)* 180/M_PI;
