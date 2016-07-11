@@ -193,7 +193,7 @@ void myprintf(const char *format, ...)
 
 float HCSR04_Get(void)
 {
-  float length;
+  float length = 0.0f;
 
   GPIO_WriteBit(GPIOA,GPIO_Pin_1,1);
   DelayUs(20);

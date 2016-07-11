@@ -42,6 +42,7 @@ extern float PID_x,PID_y,PID_z;
 extern float loop_time;
 extern uint8_t control_mode;
 extern float rx_value[6];
+extern float height;
 //-------------------------------------------------
 
 
@@ -53,6 +54,6 @@ void PID_SetGainValue(void);
 void PID_GetGainValue(void);
 void PID_SendGain(void);
 void MORTOR_Output(void);
-void keepHeight(void);
+void keepHeight(float height_temp);
 //-------------------------------------------------
 #endif
