@@ -26,12 +26,12 @@ void UserInit(void)
   NVIC_Conf();
 }
  
-void State_Update(void)
+void State_Update(float dt)
 {
   MPU6050_Read();
   MPU_GetAccValue();
   MPU_GetGyroRate();
-  MadgwickAHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp);
+  MadgwickAHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp,dt);
   AHRS_GetRPY();
 }
 

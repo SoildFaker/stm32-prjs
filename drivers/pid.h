@@ -54,6 +54,6 @@ void PID_SetGainValue(void);
 void PID_GetGainValue(void);
 void PID_SendGain(void);
 void MORTOR_Output(void);
-void keepHeight(float height_temp);
+void keepHeight(float height);
 //-------------------------------------------------
 #endif
