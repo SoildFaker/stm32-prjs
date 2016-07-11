@@ -4,9 +4,7 @@
 
 #include "ahrs.h"
 
-
-#define sampleFreq  2000.0f // 采样频率
-#define betaDef     0.1f    // 比例系数
+#define betaDef     1.5f    // 比例系数
 
 volatile float beta = betaDef;
 volatile float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;
@@ -15,7 +13,7 @@ volatile float rpy[3],Eangle[3];
 float invSqrt(float x);
 
 // 得到姿态数据
-void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
+void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az, float dt) {
   float recipNorm;
   float s0, s1, s2, s3;
   float qDot1, qDot2, qDot3, qDot4;
@@ -69,10 +67,10 @@ void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, flo
   }
 
   // Integrate rate of change of quaternion to yield quaternion
-  q0 += qDot1 * (1.0f / sampleFreq);
-  q1 += qDot2 * (1.0f / sampleFreq);
-  q2 += qDot3 * (1.0f / sampleFreq);
-  q3 += qDot4 * (1.0f / sampleFreq);
+  q0 += qDot1 * dt;
+  q1 += qDot2 * dt;
+  q2 += qDot3 * dt;
+  q3 += qDot4 * dt;
 
   // Normalise quaternion
   recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
