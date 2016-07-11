@@ -8,8 +8,7 @@
 uint8_t control_mode = 0;
 float loop_time = 0.0f;
 float height = 0.0f;
-float rx_value[6] = {0.00f,0.00f,0.28f,0.0f,0.0f,0.0f};//store the pulse times of 6 input pwm chanels from rx device
-
+float rx_value[6] = {0.00f,0.00f,0.50f,0.0f,0.0f,0.0f};//store the pulse times of 6 input pwm chanels from rx device
 									// rx_value[0]: target_x_angle/target_x_rate
 									// rx_value[1]: target_y_angle/target_y_rate
 									// rx_value[2]: throttle
@@ -299,13 +298,13 @@ void MORTOR_Output(void)
 	
 void keepHeight(float height_temp)
 {
-    if(height_temp < 30){
-      rx_value[2] = rx_value[2]*1.1f;
+    if(height_temp < 33){
+      rx_value[2] = rx_value[2]*1.03f;
       if(rx_value[2]>0.8f){
         rx_value[2] = 0.8f;
       }
     }else{
-      rx_value[2] = rx_value[2]*0.9f;
+      rx_value[2] = rx_value[2]*0.96f;
       if(rx_value[2]<0.3f){
         rx_value[2] = 0.3f;
       }
