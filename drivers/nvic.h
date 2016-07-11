@@ -7,6 +7,7 @@
 #include "conf.h"
 
 /* Exported types ------------------------------------------------------------*/
+extern uint16_t tim1_count;
 extern uint16_t tim2_count;
 extern uint16_t tim3_count;
 extern uint16_t tim4_count;
@@ -24,6 +25,7 @@ void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
 void RCC_IRQHandler(void);
+void TIM1_UP_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
 #endif /* __STM32F10x_IT_H */
