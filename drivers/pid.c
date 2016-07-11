@@ -250,7 +250,7 @@ void MORTOR_Output(void)
 //////		/		|		 \
 //////	 /		|			\
 //////	/						 \
-//////MT1(CCW)	   MT2(CW)
+//////MT1(CCW)	   MT2(CW)
 	
 	uint16_t temp_pwm[4];
 	uint8_t i;
@@ -281,27 +281,7 @@ void MORTOR_Output(void)
     TIM4->CCR2=temp_pwm[1];//pa1
     TIM4->CCR3=temp_pwm[2];//pa2
     TIM4->CCR4=temp_pwm[3];//pa3
-    float height_temp = HCSR04_Get();
-    if(height_temp < 30){
-      if(height_temp > height){
-        rx_value[2] = rx_value[2]*0.99f;
-      }else{
-        rx_value[2] = rx_value[2]*1.01f;
-      }
-      if(rx_value[2]>0.8f){
-        rx_value[2] = 0.8f;
-      }
-    }else{
-      if(height_temp > height){
-        rx_value[2] = rx_value[2]*0.99f;
-      }else{
-        rx_value[2] = rx_value[2]*1.01f;
-      }
-      if(rx_value[2]<0.3f){
-        rx_value[2] = 0.3f;
-      }
-    }
-    height = HCSR04_Get();
+    keepHeight();
 		//printf("running\r");
 		GPIOB->ODR|=1<<2;
 	}
@@ -318,6 +298,31 @@ void MORTOR_Output(void)
 	*/
 }
 	
+void keepHeight(void)
+{
+    float height_temp = HCSR04_Get();
+    if(height_temp < 30){
+      if(height_temp > height){
+        rx_value[2] = rx_value[2]*0.98f;
+      }else{
+        rx_value[2] = rx_value[2]*1.01f;
+      }
+      if(rx_value[2]>0.8f){
+        rx_value[2] = 0.8f;
+      }
+    }else{
+      if(height_temp > height){
+        rx_value[2] = rx_value[2]*0.99f;
+      }else{
+        rx_value[2] = rx_value[2]*1.02f;
+      }
+      if(rx_value[2]<0.3f){
+        rx_value[2] = 0.3f;
+      }
+    }
+    height = HCSR04_Get();
+
+}
 
 
 

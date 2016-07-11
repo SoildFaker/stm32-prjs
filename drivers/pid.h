@@ -53,5 +53,6 @@ void PID_SetGainValue(void);
 void PID_GetGainValue(void);
 void PID_SendGain(void);
 void MORTOR_Output(void);
+void keepHeight(void);
 //-------------------------------------------------
 #endif
