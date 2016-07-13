@@ -203,18 +203,10 @@ float HCSR04_Get(void)
   //计数器清0
   TIM2->CNT = 0;
   while(!GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && TIM2->CNT<1000);
-  timer_counter = 0;
   TIM2->CNT = 0;
-<<<<<<< HEAD
-  while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && timer_counter < 9);
-  TIM_Cmd(TIM2, DISABLE);
-
-  length = (0xffff*timer_counter+TIM2->CNT)/58.8;
-=======
   tim2_count = 0;
   while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && tim2_count < 9);
   length = (tim2_count*0xffff+TIM2->CNT)/58.8;
->>>>>>> dev
   return length;
 }
 

@@ -15,6 +15,7 @@ int main(void)
   UserInit();
   DelayInit(72);
 
+  
   MPU6050_Init();
   Motor_Init();
 
@@ -26,17 +27,14 @@ int main(void)
   TIM3->CNT = 0;
   rx_value[2] = 0.3f; 
   while (1) {
-    dt = abs(TIM3->CNT - dt);
-    State_Update((float)dt*1e-6);             // 状态信息更新 Pitch, Roll, Yaw , etc.
-    PID_Update((float)dt*1e-6);        // PID控制输入每次循环时间
-    MORTOR_Output();
     a++;
+        myprintf("height");
     if (stop == 0){
       if(a%10000==0){
         keepHeight(33.0f);
-        /*myprintf("height:%f\trx:%f\tcount1:%d\r\n", HCSR04_Get(), c, tim3_count);*/
-        /*myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);*/
-        /*myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", rpy[0], rpy[1], rpy[2]);*/
+        myprintf("height:%f\trx:%f\tcount1:%d\r\n", HCSR04_Get(), c, tim3_count);
+        myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);
+        myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", rpy[0], rpy[1], rpy[2]);
       }
       if (tim3_count>400){
         stop = 1;

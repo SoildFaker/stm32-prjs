@@ -1,5 +1,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "nvic.h"
+#include "conf.h"
 
 uint16_t tim1_count=0;
 uint16_t tim2_count=0;
@@ -151,11 +152,9 @@ void TIM2_IRQHandler(void)
 
 void TIM3_IRQHandler(void)
 {
-  //检测是否发生溢出更新事件
-  if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET) {
-    TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
-    tim3_count++;
-  }
+  State_Update((float)1/TIM3_Freq);             // 状态信息更新 Pitch, Roll, Yaw , etc.
+  PID_Update((float)1/TIM3_Freq);        // PID控制输入每次循环时间
+  MORTOR_Output();
 }
 
 void TIM4_IRQHandler(void)
