@@ -24,13 +24,3 @@ int main(void)
   }
   return 0;
 }
-
-
-#ifdef  DEBUG
-void assert_failed(u8* file, u32 line)
-{
-  while (1)
-  {
-  }
-}
-#endif

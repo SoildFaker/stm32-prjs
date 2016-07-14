@@ -252,13 +252,11 @@ void MPU6050_Init(void) {
 /* MPU6050内置DMP的初始化 */
 void DMP_Init(void)
 { 
-  struct int_param_s a;
-  
   u8 temp[1]={0};
   i2cRead(0x68,0x75,1,temp);
   myprintf("mpu_set_sensor complete ......\r\n");
   if(temp[0]!=0x68)NVIC_SystemReset();
-  if(!mpu_init(&a))
+  if(!mpu_init())
   {
   if(!mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL))
     myprintf("mpu_set_sensor complete ......\r\n");
@@ -289,7 +287,7 @@ void Read_DMP(void)
   long quat[4];
 
     dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more);   
-    if ( sensors & INV_WXYZ_QUAT )
+    if ( sensors & INV_WXYZ_QUAT || 1)
     {  
       q0=(float)quat[0] / q30;
       q1=(float)quat[1] / q30;

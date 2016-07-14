@@ -1,9 +1,7 @@
-/*
- $License:
-    Copyright (C) 2011-2012 InvenSense Corporation, All Rights Reserved.
-    See included License.txt for License information.
- $
- */
+/**************************************************************************
+×÷Õß£ºMini Balance 
+ÌÔ±¦µêÆÌ£ºhttp://shop114407458.taobao.com/
+**************************************************************************/
 /**
  *  @addtogroup  DRIVERS Sensor Driver Layer
  *  @brief       Hardware drivers to communicate with sensors via I2C.
@@ -14,17 +12,10 @@
  *      @details    All functions are preceded by the dmp_ prefix to
  *                  differentiate among MPL and general driver function calls.
  */
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include "inv_mpu.h"
-#include "inv_mpu_dmp_motion_driver.h"
-#include "dmpKey.h"
-#include "dmpmap.h"
+#include "conf.h"
 
 
+#define  MOTION_DRIVER_TARGET_MSP430
 /* The following functions must be defined for this platform:
  * i2c_write(unsigned char slave_addr, unsigned char reg_addr,
  *      unsigned char length, unsigned char const *data)
@@ -33,23 +24,13 @@
  * delay_ms(unsigned long num_ms)
  * get_ms(unsigned long *count)
  */
-#define EMPL_TARGET_STM32F4
-#define MPU6050
-#if defined EMPL_TARGET_STM32F4
-#include "i2c.h"   
-#include "tools.h"
-   
-#define i2c_write   i2cWrite
-#define i2c_read    i2cRead
+#if defined MOTION_DRIVER_TARGET_MSP430
+//#include "msp430.h"
+//#include "msp430_clock.h"
+#define delay_ms    delay_ms
 #define get_ms      get_ms
-
-#elif defined MOTION_DRIVER_TARGET_MSP430
-#include "msp430.h"
-#include "msp430_clock.h"
-#define delay_ms    msp430_delay_ms
-#define get_ms      msp430_get_clock_ms
-#define log_i(...)     do {} while (0)
-#define log_e(...)     do {} while (0)
+#define log_e    printf
+#define log_i    printf
 
 #elif defined EMPL_TARGET_MSP430
 #include "msp430.h"
@@ -74,7 +55,7 @@
 #define log_e       MPL_LOGE
 
 #else
-#error  Gyro driver is missing the system layer implementations.
+//#error  Gyro driver is missing the system layer implementations.
 #endif
 
 /* These defines are copied from dmpDefaultMPU6050.c in the general MPL
@@ -495,15 +476,22 @@ struct dmp_s {
     unsigned char packet_length;
 };
 
-static struct dmp_s dmp = {
-    .tap_cb = NULL,
-    .android_orient_cb = NULL,
-    .orient = 0,
-    .feature_mask = 0,
-    .fifo_rate = 0,
-    .packet_length = 0
+//static struct dmp_s dmp = {
+//    .tap_cb = NULL,
+//    .android_orient_cb = NULL,
+//    .orient = 0,
+//    .feature_mask = 0,
+//    .fifo_rate = 0,
+//    .packet_length = 0
+//};
+static struct dmp_s dmp={
+  NULL,
+  NULL,
+  0,
+  0,
+  0,
+  0
 };
-
 /**
  *  @brief  Load the DMP with this image.
  *  @return 0 if successful.
@@ -637,7 +625,7 @@ int dmp_set_accel_bias(long *bias)
 
     mpu_get_accel_sens(&accel_sens);
     accel_sf = (long long)accel_sens << 15;
-    /*__no_operation();*/
+    //__no_operation();
 
     accel_bias_body[0] = bias[dmp.orient & 3];
     if (dmp.orient & 4)
@@ -1269,10 +1257,6 @@ int dmp_read_fifo(short *gyro, short *accel, long *quat,
 {
     unsigned char fifo_data[MAX_PACKET_LENGTH];
     unsigned char ii = 0;
-
-    /* TODO: sensors[0] only changes when dmp_enable_feature is called. We can
-     * cache this value and save some cycles.
-     */
     sensors[0] = 0;
 
     /* Get a packet. */

@@ -127,10 +127,10 @@ void GPIO_Conf(void)
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   
 	//MPU6050-IIC
-	GPIO_InitStructure.GPIO_Pin = SCL_Pin | SDA_Pin;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz; 
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; 
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	/*GPIO_InitStructure.GPIO_Pin = SCL_Pin | SDA_Pin;*/
+	/*GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz; */
+	/*GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; */
+	/*GPIO_Init(GPIOB, &GPIO_InitStructure);*/
 	
 }
 
