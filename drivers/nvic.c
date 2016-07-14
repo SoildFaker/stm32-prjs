@@ -1,6 +1,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "nvic.h"
 #include "conf.h"
+#include "tools.h"
 
 uint16_t tim1_count=0;
 uint16_t tim2_count=0;
@@ -131,14 +132,6 @@ void SysTick_Handler(void)
 /******************************************************************************/
 /*            STM32F10x Peripherals Interrupt Handlers                        */
 /******************************************************************************/
-void TIM1_IRQHandler(void)
-{
-  //检测是否发生溢出更新事件
-  if(TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET) {
-    TIM_ClearITPendingBit(TIM1,TIM_IT_Update);
-    tim1_count++;
-  }
-}
 
 void TIM2_IRQHandler(void)
 {

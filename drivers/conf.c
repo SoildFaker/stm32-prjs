@@ -167,7 +167,7 @@ void GPIO_Conf(void)
 	//MPU6050-IIC
 	GPIO_InitStructure.GPIO_Pin = SCL_Pin | SDA_Pin;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz; 
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD; 
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; 
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
   //PWM Motor
@@ -192,12 +192,6 @@ void NVIC_Conf(void)
   NVIC_Init(&NVIC_InitStructure);
 
   NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-  
-  NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;

@@ -3,25 +3,41 @@
 
 #include "conf.h"
 
-//-------- variables ----------------------------
-extern int16_t gyro_x,gyro_y,gyro_z;
-extern int16_t acc_x,acc_y,acc_z;
-extern float gyro_x_rate,gyro_y_rate,gyro_z_rate;
-extern float acc_x_angle,acc_y_angle;
-extern float acc_x_temp,acc_y_temp,acc_z_temp;
-extern float z_angle;
-extern float dt,temp;
-extern uint8_t test,i2c_sdata[20],i2c_rdata[20];
-//-----------------------------------------------
+#define    SlaveAddressMPU   0x68      //定义器件5883在IIC总线中的从地址
 
+typedef unsigned char  uchar;
 
-//-------------- functions ----------------------
-void MPU6050_WriteBlock(uint8_t adr, uint8_t data[], uint8_t data_len);
-void MPU6050_ReadBlock(uint8_t adr, uint8_t data[], uint8_t data_len);
-void MPU6050_Init(void);
-void MPU6050_Read(void);
-void MPU_GetGyroRate(void);
-void MPU_GetAccValue(void);
-//void get_acce_angle(void);
-//-----------------------------------------------
+extern int accX, accY, accZ;
+extern int gyroX, gyroY, gyroZ;
+extern uchar    SlaveAddress;       //IIC写入时的地址字节数据，+1为读取
+extern uchar Single_ReadI2C(uchar REG_Address);                        //读取I2C数据
+extern void  Single_WriteI2C(uchar REG_Address,uchar REG_data);        //向I2C写入数据
+
+//****************************************
+// 定义MPU6050内部地址
+//****************************************
+#define    SMPLRT_DIV        0x19    //陀螺仪采样率，典型值：0x07(125Hz)
+#define    CONFIG            0x1A    //低通滤波频率，典型值：0x06(5Hz)
+#define    GYRO_CONFIG        0x1B    //陀螺仪自检及测量范围，典型值：0x18(不自检，2000deg/s)
+#define    ACCEL_CONFIG    0x1C    //加速计自检、测量范围及高通滤波频率，典型值：0x01(不自检，2G，5Hz)
+#define    ACCEL_XOUT_H    0x3B
+#define    ACCEL_XOUT_L    0x3C
+#define    ACCEL_YOUT_H    0x3D
+#define    ACCEL_YOUT_L    0x3E
+#define    ACCEL_ZOUT_H    0x3F
+#define    ACCEL_ZOUT_L    0x40
+#define    TEMP_OUT_H        0x41
+#define    TEMP_OUT_L        0x42
+#define    GYRO_XOUT_H        0x43
+#define    GYRO_XOUT_L        0x44    
+#define    GYRO_YOUT_H        0x45
+#define    GYRO_YOUT_L        0x46
+#define    GYRO_ZOUT_H        0x47
+#define    GYRO_ZOUT_L        0x48
+#define    PWR_MGMT_1        0x6B    //电源管理，典型值：0x00(正常启用)
+#define    WHO_AM_I        0x75    //IIC地址寄存器(默认数值0x68，只读)
+#define    MPU6050_Addr    0xD0    //IIC写入时的地址字节数据，+1为读取
+
+void MPU6050_Init();
+void MPU6050_Update();
 #endif
