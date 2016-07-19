@@ -5,14 +5,8 @@
 
 #define    SlaveAddressMPU   0x68      //定义器件5883在IIC总线中的从地址
 
-typedef unsigned char  uchar;
-
 extern int accX, accY, accZ;
 extern int gyroX, gyroY, gyroZ;
-extern uchar    SlaveAddress;       //IIC写入时的地址字节数据，+1为读取
-extern uchar Single_ReadI2C(uchar REG_Address);                        //读取I2C数据
-extern void  Single_WriteI2C(uchar REG_Address,uchar REG_data);        //向I2C写入数据
-
 //****************************************
 // 定义MPU6050内部地址
 //****************************************
@@ -36,7 +30,7 @@ extern void  Single_WriteI2C(uchar REG_Address,uchar REG_data);        //向I2C�
 #define    GYRO_ZOUT_L        0x48
 #define    PWR_MGMT_1        0x6B    //电源管理，典型值：0x00(正常启用)
 #define    WHO_AM_I        0x75    //IIC地址寄存器(默认数值0x68，只读)
-#define    MPU6050_Addr    0xD0    //IIC写入时的地址字节数据，+1为读取
+#define    MPU6050_Addr    0x68    //IIC写入时的地址字节数据，+1为读取
 
 void MPU6050_Init();
 void MPU6050_Update();

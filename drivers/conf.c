@@ -142,7 +142,6 @@ void PWM_Conf(void)
 	TIM_Cmd(TIM4,ENABLE);
 }
 
-
 void GPIO_Conf(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
@@ -166,7 +165,7 @@ void GPIO_Conf(void)
   
 	//MPU6050-IIC
 	GPIO_InitStructure.GPIO_Pin = SCL_Pin | SDA_Pin;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz; 
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; 
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
@@ -203,5 +202,4 @@ void NVIC_Conf(void)
   /*NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;*/
   /*NVIC_Init(&NVIC_InitStructure);*/
 }
-
 

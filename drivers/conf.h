@@ -26,13 +26,8 @@
 #include "stm32f10x_flash.h"
 #include "stm32f10x_usart.h"
 #include "stm32f10x.h"
-#include "ahrs.h"
 #include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
 #include "nvic.h"
-#include "mpu6050.h"
-#include "kalman.h"
-#include "motor.h"
-#include "pid.h"
 
 //#include <stdio.h>
 #include <stdlib.h>
