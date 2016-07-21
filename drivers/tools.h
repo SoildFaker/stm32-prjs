@@ -5,7 +5,7 @@
 
 float HCSR04_Get(void);
 void State_Update(float dt);
-void PID_Update(float time);
+void PID_Update(float dt);
 uint8_t UsartPut(uint8_t ch);
 void getAttitude(float* AccelGyro);
 uint8_t UsartGet(void);

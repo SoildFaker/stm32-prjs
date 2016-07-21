@@ -6,8 +6,6 @@
 #include "stm32f10x.h"
 
 uint8_t control_mode = 0;
-float loop_time = 0.0f;
-float height = 0.0f;
 float rx_value[6] = {0.00f,0.00f,0.50f,0.0f,0.0f,0.0f};//store the pulse times of 6 input pwm chanels from rx device
                   // rx_value[0]: target_x_angle/target_x_rate
                   // rx_value[1]: target_y_angle/target_y_rate
@@ -128,14 +126,14 @@ void PID_SendGain(void)
 /*
   PID update for X axis
 */
-void PIDx_Update(void)
+void PIDx_Update(float dt)
 {
   if(control_mode) {
     //------ update PID value for gyroscope -------
     last_gyro_x_error=gyro_x_error;
     gyro_x_error=CONSTRAIN(rx_value[0]-gyro_x_rate,MAX_GYRO_ERROR);     
-    gyro_x_errorI=CONSTRAIN(gyro_x_error*loop_time+gyro_x_errorI,IG_MAX); 
-    delta_gyro_x_error=(gyro_x_error-last_gyro_x_error)/loop_time;
+    gyro_x_errorI=CONSTRAIN(gyro_x_error*dt+gyro_x_errorI,IG_MAX); 
+    delta_gyro_x_error=(gyro_x_error-last_gyro_x_error)/dt;
       
     Pg_temp=CONSTRAIN(pid_gain_vl[0]*gyro_x_error,PG_MAX);
     Ig_temp=pid_gain_vl[1]*gyro_x_errorI;
@@ -146,9 +144,9 @@ void PIDx_Update(void)
   }else{ // angle mode 
     //------ update PID value for imu       -------
     last_imu_x_error=imu_x_error; 
-    imu_x_error=CONSTRAIN(rx_value[0]-rpy[0],MAX_TARGET_ANGLE);
-    imu_x_errorI=CONSTRAIN(imu_x_error*loop_time+imu_x_errorI,I_MAX);
-    //x_rate_temp=((imu_x_error-last_imu_x_error)/loop_time-gyro_x_rate*3)/4;//combine gyro data and angle_error_data for D controller
+    imu_x_error=CONSTRAIN(rx_value[0]-roll,MAX_TARGET_ANGLE);
+    imu_x_errorI=CONSTRAIN(imu_x_error*dt+imu_x_errorI,I_MAX);
+    //x_rate_temp=((imu_x_error-last_imu_x_error)/dt-gyro_x_rate*3)/4;//combine gyro data and angle_error_data for D controller
       
     P_imu_temp=pid_gain_vl[3]*imu_x_error;
     I_imu_temp=pid_gain_vl[4]*imu_x_errorI;
@@ -162,14 +160,14 @@ void PIDx_Update(void)
 /*
   PID update for Y axis
 */
-void PIDy_Update(void)
+void PIDy_Update(float dt)
 {
   if(control_mode) {
     //------ update PID value for gyroscope -------
     last_gyro_y_error=gyro_y_error;
     gyro_y_error=CONSTRAIN(rx_value[1]-gyro_y_rate,MAX_GYRO_ERROR);     
-    gyro_y_errorI=CONSTRAIN(gyro_y_error*loop_time+gyro_y_errorI,IG_MAX); 
-    delta_gyro_y_error=(gyro_y_error-last_gyro_y_error)/loop_time;
+    gyro_y_errorI=CONSTRAIN(gyro_y_error*dt+gyro_y_errorI,IG_MAX); 
+    delta_gyro_y_error=(gyro_y_error-last_gyro_y_error)/dt;
       
     Pg_temp=CONSTRAIN(pid_gain_vl[6]*gyro_y_error,PG_MAX);
     Ig_temp=pid_gain_vl[7]*gyro_y_errorI;
@@ -182,9 +180,9 @@ void PIDy_Update(void)
   }else{ // angle mode
     //------ update PID value for imu       -------
     last_imu_y_error=imu_y_error; 
-    imu_y_error=CONSTRAIN(rx_value[1]-rpy[1],MAX_TARGET_ANGLE);
-    imu_y_errorI=CONSTRAIN(imu_y_error*loop_time+imu_y_errorI,I_MAX);
-    //y_rate_temp=((imu_y_error-last_imu_y_error)/loop_time-gyro_y_rate*3)/4;//combine gyro data and angle_error_data for D controller
+    imu_y_error=CONSTRAIN(rx_value[1]-pitch,MAX_TARGET_ANGLE);
+    imu_y_errorI=CONSTRAIN(imu_y_error*dt+imu_y_errorI,I_MAX);
+    //y_rate_temp=((imu_y_error-last_imu_y_error)/dt-gyro_y_rate*3)/4;//combine gyro data and angle_error_data for D controller
       
     P_imu_temp=pid_gain_vl[9]*imu_y_error;
     I_imu_temp=pid_gain_vl[10]*imu_y_errorI;
@@ -201,7 +199,7 @@ void PIDy_Update(void)
 /*
   PID update for z axis
 */
-void PIDz_Update(void)
+void PIDz_Update(float dt)
 {
   if(rx_value[3]==0){
     //auto hold mode, increas pid_z_out_temp 0.5 by one step to prevent ocilation
@@ -214,7 +212,7 @@ void PIDz_Update(void)
   //--------- update PD value for z gyro -----------------------
   last_gyro_z_error=gyro_z_error;
   gyro_z_error=CONSTRAIN(rx_value[3]-gyro_z_rate,MAX_GYRO_ERROR);
-  delta_gyro_z_error=(gyro_z_error-last_gyro_z_error)/loop_time;
+  delta_gyro_z_error=(gyro_z_error-last_gyro_z_error)/dt;
   
   Pg_temp=CONSTRAIN(pid_gain_vl[12]*gyro_z_error,PG_MAX);
   Dg_temp=pid_gain_vl[14]*delta_gyro_z_error;

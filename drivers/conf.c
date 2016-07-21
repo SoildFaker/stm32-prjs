@@ -102,7 +102,6 @@ void TIMER_Conf(void)
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //初始化定时器3
   TIM_ClearFlag(TIM3, TIM_FLAG_Update);
   TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
-  TIM_Cmd(TIM3, ENABLE);//允许tim3计数
 
   TIM_TimeBaseStructure.TIM_Prescaler = 7200-1;  //时钟预分频数 例如:时钟频率=72/(时钟预分频+1)  
   TIM_TimeBaseStructure.TIM_Period = 10000;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
@@ -192,8 +191,8 @@ void NVIC_Conf(void)
   NVIC_Init(&NVIC_InitStructure);
 
   NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
   

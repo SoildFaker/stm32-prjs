@@ -10,13 +10,13 @@
 #define pitch_angle_off_set -2.9361
 
 // Variable declaration
-extern volatile float beta;				// algorithm gain
-extern volatile float q0, q1, q2, q3;	// quaternion of sensor frame relative to auxiliary frame
-extern volatile float rpy[3],Eangle[3];
+extern float beta;				// algorithm gain
+extern volatile float roll, pitch, yaw;
 
 // Function declarations
-void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float dt);
-void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az, float dt);
+void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float dt);
+void AHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az, float dt);
 void AHRS_GetRPY(void);
 void AHRS_GetEangle(void);
+void AHRS_Init(void);
 #endif

@@ -39,7 +39,6 @@ extern float Pg_temp,Ig_temp,Dg_temp;
 extern float P_imu_temp,I_imu_temp,D_imu_temp;
 
 extern float PID_x,PID_y,PID_z;
-extern float loop_time;
 extern uint8_t control_mode;
 extern float rx_value[6];
 extern float height;
@@ -47,9 +46,9 @@ extern float height;
 
 
 //------------- functions -------------------------
-void PIDx_Update(void);
-void PIDy_Update(void);
-void PIDz_Update(void);
+void PIDx_Update(float dt);
+void PIDy_Update(float dt);
+void PIDz_Update(float dt);
 void PID_SetGainValue(void);
 void PID_GetGainValue(void);
 void PID_SendGain(void);

@@ -33,17 +33,16 @@ void State_Update(float dt)
   MPU6050_Read();
   MPU_GetAccValue();
   MPU_GetGyroRate();
-  MadgwickAHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp,dt);
+  AHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp,dt);
   AHRS_GetRPY();
 }
 
-void PID_Update(float time)
+void PID_Update(float dt)
 {
-  loop_time = time;
   PID_GetGainValue();
-  PIDx_Update();
-  PIDy_Update();
-  PIDz_Update();
+  PIDx_Update(dt);
+  PIDy_Update(dt);
+  PIDz_Update(dt);
 }
 
 void print_int(int num, int mode, int flag)  
