@@ -21,11 +21,14 @@ void UserInit(void)
 {
   RCC_Conf();
   GPIO_Conf();
+  SPI_Conf();
   TIMER_Conf();
   PWM_Conf();
   USART_Conf();
   I2C_Conf();
   NVIC_Conf();
+
+  DelayInit(72);
 }
  
 void State_Update(float dt)
@@ -39,7 +42,6 @@ void State_Update(float dt)
 
 void PID_Update(float dt)
 {
-  PID_GetGainValue();
   PIDx_Update(dt);
   PIDy_Update(dt);
   PIDz_Update(dt);
@@ -197,7 +199,7 @@ float HCSR04_Get(void)
   float length = 0.0f;
 
   GPIO_WriteBit(GPIOA,GPIO_Pin_1,1);
-  DelayUs(20);
+  delay_us(20);
   GPIO_WriteBit(GPIOA,GPIO_Pin_1,0);
   //计数器清0
   TIM2->CNT = 0;
@@ -224,7 +226,7 @@ int get_tick_count(unsigned long *count)
 
 //延时nus
 //nus为要延时的us数.
-void DelayUs(u32 nus)
+void delay_us(u32 nus)
 {
 	u32 temp;
 	SysTick->LOAD=nus*fac_us; //时间加载
@@ -239,7 +241,7 @@ void DelayUs(u32 nus)
 }
 
 //延时nms
-void DelayMs(u16 nms)
+void delay_ms(u16 nms)
 {
 	u32 temp;
 	SysTick->LOAD=(u32)nms*fac_ms;//时间加载(SysTick->LOAD为24bit)

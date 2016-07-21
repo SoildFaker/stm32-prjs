@@ -153,9 +153,6 @@ void TIM2_IRQHandler(void)
 
 void TIM3_IRQHandler(void)
 {
-  State_Update(1.0f/TIM3_Freq);             // 状态信息更新 Pitch, Roll, Yaw , etc.
-  PID_Update(1.0f/TIM3_Freq);        // PID控制输入每次循环时间
-  MORTOR_Output();
   if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET) {
     TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
     tim3_count++;

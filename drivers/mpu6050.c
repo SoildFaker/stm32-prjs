@@ -5,10 +5,7 @@
 int16_t gyro_x,gyro_y,gyro_z;
 int16_t acc_x,acc_y,acc_z;
 float gyro_x_rate,gyro_y_rate,gyro_z_rate;
-float acc_x_angle,acc_y_angle;
 float acc_x_temp,acc_y_temp,acc_z_temp;
-float z_angle;
-float dt,temp;
 uint8_t test,i2c_sdata[20],i2c_rdata[20];
 
 void MPU6050_WriteBlock(uint8_t adr, uint8_t data[], uint8_t data_len)//okie
@@ -32,7 +29,7 @@ void MPU6050_WriteBlock(uint8_t adr, uint8_t data[], uint8_t data_len)//okie
   {
     I2C_SendData(MPU_I2Cx,data[i]);
     while(!I2C_CheckEvent(MPU_I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
-    DelayMs(1);
+    delay_ms(1);
   }
   
   // send stop condition and wait until done 
@@ -98,22 +95,22 @@ void MPU6050_Init(void)
   //reset mpu6050
   i2c_sdata[0]=0x80;
   MPU6050_WriteBlock(Res107,i2c_sdata,1);
-  DelayMs(10);
+  delay_ms(10);
   
   //use internal clock
   i2c_sdata[0]=Res107_value;
   MPU6050_WriteBlock(Res107,i2c_sdata,1);
-  DelayMs(10);
+  delay_ms(10);
   
   // enable i2c master mode, arm uc will contrl the mpu6050 bypass auxilary bus
   i2c_sdata[0]=Res106_value;
   MPU6050_WriteBlock(Res106,i2c_sdata,1);
-  DelayMs(10);
+  delay_ms(10);
   
   //enable bypass i2c bus
   i2c_sdata[0]=Res55_value;
   MPU6050_WriteBlock(Res55,i2c_sdata,1);
-  DelayMs(10);
+  delay_ms(10);
   
   //config our meure mode, read the specific res for more info
   i2c_sdata[0]=Res25_value;
@@ -121,7 +118,7 @@ void MPU6050_Init(void)
   i2c_sdata[2]=Res27_value;
   i2c_sdata[3]=Res28_value;
   MPU6050_WriteBlock(Res25,i2c_sdata,4);
-  DelayMs(10);
+  delay_ms(10);
   //printf("mpu6050 init done\r");
   GPIOB->ODR|=1<<0;
 }
@@ -135,7 +132,7 @@ void MPU6050_Read(void)
   acc_x=(int16_t)(i2c_rdata[0]<<8|i2c_rdata[1]);
   acc_y=(int16_t)(i2c_rdata[2]<<8|i2c_rdata[3]);
   acc_z=(int16_t)(i2c_rdata[4]<<8|i2c_rdata[5]);
-  temp=(float)((int16_t)(i2c_rdata[6]<<8|i2c_rdata[7]))/340+36.53;
+  /*temp=(float)((int16_t)(i2c_rdata[6]<<8|i2c_rdata[7]))/340+36.53;*/
   gyro_x=(int16_t)(i2c_rdata[8]<<8|i2c_rdata[9]);
   gyro_y=(int16_t)(i2c_rdata[10]<<8|i2c_rdata[11]);
   gyro_z=(int16_t)(i2c_rdata[12]<<8|i2c_rdata[13]);
@@ -155,39 +152,3 @@ void MPU_GetAccValue(void)
   acc_y_temp= (float)acc_y/acc_y_gain;
   acc_z_temp= (float)acc_z/acc_z_gain;// [acc_z]=g=9.8 m/s.s
 }
-/************************************************************************/
-/* change acceleron value to degree         
-    Just use this for Kalman filter, don't need it for AHRS alogrithm
-*/
-/************************************************************************/
-/*
-void get_acce_angle(void)
-{
-  acc_x_temp= (float)acc_x/acc_x_gain;
-  acc_y_temp= (float)acc_y/acc_y_gain;
-  acc_z_temp= (float)acc_z/acc_z_gain;// [acc_z]=g=9.8 m/s.s
-  acc_x_angle=(180/M_PI)*atan(acc_y_temp/sqrt(pow(acc_x_temp,2)+pow(acc_z_temp,2)));
-  acc_y_angle=(180/M_PI)*atan(-acc_x_temp/sqrt(pow(acc_y_temp,2)+pow(acc_z_temp,2)));
-  
-  if(acc_z<0)//kit bi dao nguoc: dung de tinh toan goc 0~(+-180) degrees
-  {
-    if(acc_x_angle<0)
-    {
-      acc_x_angle=-180-acc_x_angle;// 0>= acc_x_angle> -180
-    }
-    else
-    {
-      acc_x_angle=180-acc_x_angle;//0 =< acc_x_angle =< 180
-    }
-    
-    if(acc_y_angle<0)
-    {
-      acc_y_angle=-180-acc_y_angle;// 0>= acc_x_angle> -180
-    }
-    else
-    {
-      acc_y_angle=180-acc_y_angle;//0 =< acc_x_angle =< 180
-    }
-  }
-}
-*/

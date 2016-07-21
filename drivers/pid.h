@@ -20,27 +20,16 @@
 #define _QUAD_X_
 //#define _QUAD_PLUS_
 //--------------------------
+#define MIN(a, b)			(((a) < (b)) ? (a) : (b))
+#define MAX(a, b)			(((a) > (b)) ? (a) : (b))
+#define MINMAX(x, min, max)	(MIN(MAX((x), (min)), (max)))
+#define CONSTRAIN(x, a)		(MINMAX(x, -(a), (a)))
 //-------------------------------------------------
 
 //------- variables -------------------------------
-extern uint8_t page,pid_pt,pid_temp[9],read_request;
-extern int temp_data[9];
-extern int temp_gain_vl;
-
-extern float gyro_x_errorI,gyro_y_errorI;
-extern float gyro_x_error,last_gyro_x_error,delta_gyro_x_error,x_rate_temp;
-extern float gyro_y_error,last_gyro_y_error,delta_gyro_y_error,y_rate_temp;
-extern float gyro_z_error,last_gyro_z_error,delta_gyro_z_error,pid_z_out_temp;
-
-extern float imu_x_error,imu_x_target,last_imu_x_error,imu_x_errorI;
-extern float imu_y_error,imu_y_target,last_imu_y_error,imu_y_errorI;
-
-extern float Pg_temp,Ig_temp,Dg_temp;
-extern float P_imu_temp,I_imu_temp,D_imu_temp;
-
-extern float PID_x,PID_y,PID_z;
-extern uint8_t control_mode;
+extern float PIDx,PIDy,PIDz;
 extern float rx_value[6];
+extern float throttle;
 extern float height;
 //-------------------------------------------------
 
@@ -49,9 +38,7 @@ extern float height;
 void PIDx_Update(float dt);
 void PIDy_Update(float dt);
 void PIDz_Update(float dt);
-void PID_SetGainValue(void);
 void PID_GetGainValue(void);
-void PID_SendGain(void);
 void MORTOR_Output(void);
 void keepHeight(float height);
 //-------------------------------------------------

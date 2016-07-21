@@ -17,6 +17,4 @@ extern volatile float roll, pitch, yaw;
 void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float dt);
 void AHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az, float dt);
 void AHRS_GetRPY(void);
-void AHRS_GetEangle(void);
-void AHRS_Init(void);
 #endif

@@ -5,7 +5,7 @@
 #include "ahrs.h"
 #include "mpu6050.h"
 
-#define betaDef     2.5f    // 比例系数
+#define betaDef     1.5f    // 比例系数
 
 float beta = betaDef;
 float volatile q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;
@@ -189,11 +189,6 @@ float invSqrt(float x)
   return y;
 }
 
-void AHRS_Init(void)
-{
-  MPU6050_Init();
-
-}
 
 void AHRS_GetRPY(void)
 { 

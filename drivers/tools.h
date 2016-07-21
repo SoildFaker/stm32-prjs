@@ -15,7 +15,7 @@ void print_str( char const *str );
 void print_float( float num );
 void DelayInit(u8 SYSCLK);
 int get_tick_count(unsigned long *count);
-void DelayUs(u32 nus);
-void DelayMs(u16 nms);
+void delay_us(u32 nus);
+void delay_ms(u16 nms);
 void UserInit(void);
 #endif /* ifndef __TOOLS */
