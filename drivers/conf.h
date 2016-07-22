@@ -47,6 +47,10 @@
 #define GPIO_RxPin              GPIO_Pin_3              
 #define GPIO_TxPin              GPIO_Pin_2              
 //光流传感接口 GPIOA
+#define NSS_Pin                 GPIO_Pin_4
+#define SCLK_Pin                GPIO_Pin_5
+#define MISO_Pin                GPIO_Pin_6
+#define MOSI_Pin                GPIO_Pin_7
 //PWM电调接口 GPIOB
 #define CW1_Pin                 GPIO_Pin_6
 #define CW2_Pin                 GPIO_Pin_7

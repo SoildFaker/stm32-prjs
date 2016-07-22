@@ -6,6 +6,7 @@
 #include "mpu6050.h"
 #include "flow.h"
 #include "nvic.h"
+#include "conf.h"
 #include "pid.h"
 
 /* Exported constants --------------------------------------------------------*/
@@ -30,7 +31,6 @@ int main(void)
     dt = TIM3->CNT;
     TIM3->CNT = 0;
     if (stop == 0){
-      keepHeight(33.0f);
       State_Update((float)1e-6*dt);      // 状态信息更新 Pitch, Roll, Yaw , etc.
       PID_Update((float)1e-6*dt);        // PID控制输入每次循环时间
       MORTOR_Output();

@@ -46,7 +46,7 @@ void ADNS3080_Init(void)
   delay_ms(10);
   Write_srom();
   ADNS_Configuration();
-  myprintf("%d\n",read_register(0x1f));   //查看是否下载成功
+  myprintf("?:%d\n",read_register(0x1f));   //查看是否下载成功
 }
 
 void ADNS_Configuration(void)
@@ -231,7 +231,8 @@ void read_pixel_burst(void)//爆发读图像
 }
 
 uint8_t SPI_SendReceive(uint8_t data)     //SPI1的收发
-{     
+{
+
   while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);  //while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET); 
   SPI_I2S_SendData(SPI1, data); 
   while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);

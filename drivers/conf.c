@@ -38,7 +38,7 @@ void RCC_Conf(void)
   //开启AFIO时钟
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
   //SPI
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1,ENABLE);	//开端口时钟、SPI时钟
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1,ENABLE);	//SPI时钟
 	//Enable clock source for i2c
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
   //Enable GPIO timer
@@ -190,7 +190,7 @@ void GPIO_Conf(void)
 	GPIO_Init(GPIOB,&GPIO_InitStructure);
 
   //SPI Optical flow
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6| GPIO_Pin_7;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6| GPIO_Pin_7;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;	//复用推挽输出
   GPIO_Init(GPIOA, &GPIO_InitStructure);
