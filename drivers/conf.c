@@ -28,8 +28,7 @@ void RCC_Conf(void)
     //使能PLL时钟
     RCC_PLLCmd(ENABLE);  
     //等待PLL时钟就绪
-    while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
-    //配置系统时钟 = PLL时钟
+    while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET); //配置系统时钟 = PLL时钟
     RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK); 
     //检查PLL时钟是否作为系统时钟
     while(RCC_GetSYSCLKSource() != 0x08);
@@ -191,12 +190,14 @@ void GPIO_Conf(void)
 
   //SPI Optical flow
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6| GPIO_Pin_7;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;	//复用推挽输出
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0| GPIO_Pin_1;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+  GPIO_InitStructure.GPIO_Mode =GPIO_Mode_Out_PP; //推挽输出
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
   GPIO_InitStructure.GPIO_Mode =GPIO_Mode_Out_PP; //推挽输出
   GPIO_Init(GPIOB, &GPIO_InitStructure);
 }

@@ -6,10 +6,8 @@
 #include "conf.h"
 #include <stdarg.h>  
 
-static u8  fac_us=0;//us延时倍乘数
-static u16 fac_ms=0;//ms延时倍乘数
-
-extern uint16_t timer_counter;
+static uint8_t  fac_us=0;//us延时倍乘数
+static uint16_t fac_ms=0;//ms延时倍乘数
 
 va_list args;  
   

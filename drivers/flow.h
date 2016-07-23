@@ -2,7 +2,7 @@
 #define __FLOW_H value
 
 #include "stm32f10x.h"
-#define H  200 //毫米
+#define H  150 //毫米
 
 #define  ON_CS()    {GPIO_ResetBits(GPIOA,GPIO_Pin_4);}//delay_us(1);
 #define  OFF_CS()   {GPIO_SetBits(GPIOA,GPIO_Pin_4);}//delay_us(1);
@@ -30,6 +30,10 @@
 #define	Pixel_Burst	         0x40
 #define	Motion_Burst         0x50
 #define	SROM_Load	         0x60
+
+extern int X,Y;
+extern int dx,dy;
+
 void Write_srom(void);
 void ADNS3080_Init(void);
 void ADNS_Configuration(void);
@@ -39,10 +43,7 @@ u8 read_register(u8 adress);
 u8 read_busy(void);//ÐŽÖ¡ÂÊµÄÅÐÃŠ
 void clear_motion(void);
 u16 read_fraps(void); //¶ÁÖ¡ÂÊ
-float read_average_pixel(void);	  //¶ÁÆœŸùÏñËØ
-void read_pixel(void);//¶ÁÏñËØ
-void read_pixel_burst(void);//burst·š¶ÁÏñËØ
-void Read_Data_burst(void);
+void ADNS3080_Read(void);
 uint8_t SPI_SendReceive(uint8_t data);
 
 #endif /* ifndef __FLOW_H */

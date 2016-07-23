@@ -4,6 +4,9 @@
 #include "srom.h"
 #include "stm32f10x_spi.h"
 
+int X = 0,Y = 0;
+int dx = 0,dy = 0;
+
 void ADNS3080_reset(void)  //ADNS3080 复位（高）
 {
   GPIO_ResetBits(GPIOB,GPIO_Pin_1); 
@@ -46,7 +49,6 @@ void ADNS3080_Init(void)
   delay_ms(10);
   Write_srom();
   ADNS_Configuration();
-  myprintf("?:%d\n",read_register(0x1f));   //查看是否下载成功
 }
 
 void ADNS_Configuration(void)
@@ -125,109 +127,41 @@ uint16_t read_fraps(void) //读帧率
 
 void Read_Data_burst(void)
 {
-  static int SumX;
-  static int SumY;
-  int sum_x,sum_y;
   unsigned char move=0;
-  int  x=0;
-  int  y=0;
+  int sum_x = 0,sum_y = 0;
   //burst读。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。
   ON_CS();
   SPI_SendReceive(0x50);   
   delay_us(75);
   move=SPI_SendReceive(0xFF);             
-  x=SPI_SendReceive(0xFF);
-  y=SPI_SendReceive(0xFF);
-  if(x&0x80)
-    {
+  dx=SPI_SendReceive(0xFF);
+  dy=SPI_SendReceive(0xFF);
+  if(dx&0x80) {
     //x的二补码转换 
-    x -= 1;
-    x = ~x; 
-    x=(-1)*x;
-    x-=256;
-    }
-  if(y&0x80)
-    {
-    //y的二补码转换 
-    y -= 1;
-    y = ~y; 
-    y=(-1)*y;
-    y-=256;
-    } 
-  SumX=SumX+x;             //累加X读入的移动数据
-  SumY=SumY+y;       //累加Y读入的移动数据
-  OFF_CS();
-  delay_us(4);
-  OFF_CS();
-  sum_x=(25.4*(float)SumX *H)/(12*1600);//距离=d_x*(25.4/1600)*n   其中n=像高:物高=8毫米:物长
-  sum_y=(25.4*(float)SumY *H)/(12*1600);
-  if(move&0x10!=1)
-  if(move&0x80)
-  {
-  myprintf("%d,%d|%d,%d\r\n",sum_x,sum_y,x,y);
+    dx -= 1;
+    dx = ~dx; 
+    dx=(-1)*dx;
+    dx-=256;
   }
-    else
-    {
-      x=0;
-      y=0;
-    }
-  x=0;
-  y=0;
-}
-
-float read_average_pixel(void)   //读平均像素
-{
-  float temp;
-  ON_CS();
-  temp=SPI_SendReceive(Pixel_Sum);
-  delay_us(76);
-  temp=SPI_SendReceive(0xff);
-  temp=temp*256/900;
-  OFF_CS();
-  return temp;
-}
-
-void read_pixel(void)
-{
-  uint8_t i,j ,regValue, pixelValue,test=1;  
-  writr_register(Frame_Capture,0x83); 
-  delay_us(1010);//等待3帧 (1/3000)*1000000*3+10 =1010us
-  //显示数据  30*30=900
-  for(i=0;i<30;i++){//列
-    for(j=0;j<30;j++){//行
-      regValue=read_register(Frame_Capture);  //读像素
-      if( test && ((regValue&0x40)==0)) { //找不到第一个像素
-        myprintf("Read pixel fail");       
-      }
-      test=0;
-      pixelValue =(regValue<<2);
-      while(!(USART1->SR&(1<<6)));
-      USART1->DR=pixelValue;                               
-      delay_us(50);
-    }
-   }
-  ADNS3080_reset();//重启运行
-}
-
-void read_pixel_burst(void)//爆发读图像
-{
-  int i,j;
-  writr_register(Frame_Capture,0x83); 
-  delay_us(1010);//等待3帧 (1/3000)*1000000*3+10 =1010us
-  //开始burst读
-  ON_CS();
-  SPI_SendReceive(0x40);   
-  delay_us(75);
-  for(i=0;i<30;i++) {
-    for(j=0;j<30;j++) {
-      while(!(USART1->SR&(1<<6)));
-      USART1->DR=(SPI_SendReceive(0xFF)<<2); 
-      //delay_us(10);
-    }
+  if(dy&0x80) {
+    //y的二补码转换 
+    dy -= 1;
+    dy = ~dy; 
+    dy=(-1)*dy;
+    dy-=256;
   } 
+  X=X+dx;             //累加X读入的移动数据
+  Y=Y+dy;       //累加Y读入的移动数据
   OFF_CS();
   delay_us(4);
-  OFF_CS();            
+  OFF_CS();
+  sum_x=(25.4*(float)X *H)/(12*1600);//距离=d_x*(25.4/1600)*n   其中n=像高:物高=8毫米:物长
+  sum_y=(25.4*(float)Y *H)/(12*1600);
+  myprintf("X:%d\tY:%d\r\n",sum_x,sum_y);
+  if(move&0x10==1 || !move&0x80) {
+    dx=0;
+    dy=0;
+  }
 }
 
 uint8_t SPI_SendReceive(uint8_t data)     //SPI1的收发
