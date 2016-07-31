@@ -31,16 +31,15 @@ int main(void)
     dt = TIM3->CNT;
     TIM3->CNT = 0;
     if (stop == 0){
-      /*State_Update((float)1e-6*dt);      // 状态信息更新 Pitch, Roll, Yaw , etc.*/
-      /*PID_Update((float)1e-6*dt);        // PID控制输入每次循环时间*/
-      /*MORTOR_Output();*/
-      /*a++;*/
+      State_Update((float)1e-6*dt);      // 状态信息更新 Pitch, Roll, Yaw , etc.
+      PID_Update((float)1e-6*dt);        // PID控制输入每次循环时间
+      MORTOR_Output();
+      a++;
       if (a == 0){
         /*myprintf("height:%f\tthrottle:%f\tdt:%d\r\n", HCSR04_Get(), throttle, dt);*/
         /*myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);*/
-        /*myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", roll, pitch, yaw);*/
-        Read_Data_burst();
-        delay_ms(200);
+        myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", roll, pitch, yaw);
+        ADNS3080_Read();
       }
       if (tim3_count>400){
         stop = 0;

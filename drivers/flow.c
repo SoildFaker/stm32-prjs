@@ -125,7 +125,7 @@ uint16_t read_fraps(void) //读帧率
   return ((Frame_Period_Max_Bound_Upper1 << 8) | Frame_Period_Max_Bound_Lower1);
 }
 
-void Read_Data_burst(void)
+void ADNS3080_Read(void)
 {
   unsigned char move=0;
   int sum_x = 0,sum_y = 0;
