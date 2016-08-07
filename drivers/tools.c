@@ -2,13 +2,13 @@
 #include "pid.h"
 #include "mpu6050.h"
 #include "stm32f10x_usart.h"
+#include "flow.h"
 #include "stm32f10x.h"
 #include "conf.h"
 #include <stdarg.h>  
 
 static uint8_t  fac_us=0;//us延时倍乘数
 static uint16_t fac_ms=0;//ms延时倍乘数
-
 va_list args;  
   
 char sign[] = { '0','1','2','3','4','5',  
@@ -36,6 +36,7 @@ void State_Update(float dt)
   MPU_GetGyroRate();
   AHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp,dt);
   AHRS_GetRPY();
+  ADNS3080_Read();
 }
 
 void PID_Update(float dt)

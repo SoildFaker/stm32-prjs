@@ -22,6 +22,7 @@ int main(void)
   uint8_t stop = 0;
   uint8_t dt = 0;
   uint8_t a = 0;
+  float height = 0.0f;
 
   throttle = 0.3f; 
 
@@ -36,10 +37,14 @@ int main(void)
       MORTOR_Output();
       a++;
       if (a == 0){
-        /*myprintf("height:%f\tthrottle:%f\tdt:%d\r\n", HCSR04_Get(), throttle, dt);*/
-        /*myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);*/
+        height = HCSR04_Get();
+        
+        PIDzp_Update(dt);
+        myprintf("============================================================\r\n");
+        myprintf("height:%f\tthrottle:%f\tdt:%d\r\n", HCSR04_Get(), throttle, dt);
+        myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);
         myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", roll, pitch, yaw);
-        ADNS3080_Read();
+        myprintf("X:%d\tY:%d\tZ:%f\r\n", X, Y, height);
       }
       if (tim3_count>400){
         stop = 0;

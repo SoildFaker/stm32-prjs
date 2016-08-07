@@ -157,7 +157,6 @@ void ADNS3080_Read(void)
   OFF_CS();
   sum_x=(25.4*(float)X *H)/(12*1600);//距离=d_x*(25.4/1600)*n   其中n=像高:物高=8毫米:物长
   sum_y=(25.4*(float)Y *H)/(12*1600);
-  myprintf("X:%d\tY:%d\r\n",sum_x,sum_y);
   if(move&0x10==1 || !move&0x80) {
     dx=0;
     dy=0;
