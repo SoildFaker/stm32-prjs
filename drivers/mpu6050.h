@@ -3,8 +3,6 @@
 
 #include "conf.h"
 
-#define    SlaveAddressMPU   0x68      //定义器件5883在IIC总线中的从地址
-
 extern int accX, accY, accZ;
 extern int gyroX, gyroY, gyroZ;
 //****************************************

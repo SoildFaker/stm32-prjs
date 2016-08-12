@@ -3,6 +3,7 @@
 #include "kalman.h"
 #include "mag3110.h"
 #include "stm32f10x_usart.h"
+#include "flow.h"
 #include "stm32f10x.h"
 #include "conf.h"
 #include <stdarg.h>  
@@ -21,11 +22,9 @@ float magOffset[3] = { (MAG0MAX + MAG0MIN) / 2, (MAG1MAX + MAG1MIN) / 2, (MAG2MA
 double magGain[3];
 
 
-static u8  fac_us=0;//us延时倍乘数
-static u16 fac_ms=0;//ms延时倍乘数
-
-extern uint16_t timer_counter;
-
+static uint8_t  fac_us=0;//us延时倍乘数
+static uint16_t fac_ms=0;//ms延时倍乘数
+float height = 0.0f;
 va_list args;  
   
 char sign[] = { '0','1','2','3','4','5',  
@@ -36,11 +35,14 @@ void UserInit(void)
 {
   RCC_Conf();
   GPIO_Conf();
+  SPI_Conf();
   TIMER_Conf();
   PWM_Conf();
   USART_Conf();
   /*I2C_Conf();*/
   NVIC_Conf();
+
+  DelayInit(72);
 }
 
 void Main_Update(void)
@@ -152,74 +154,21 @@ void Main_Update(void)
 //  delay(10);
 }
  
-void State_Update(void)
+void State_Update(float dt)
 {
-  /* Set Kalman and gyro starting angle */
-  MPU6050_Update();
-  MAG3110_Update();
-  updatePitchRoll();
-  updateYaw();
-  
-  setAngle(&kalmanX,roll); // First set roll starting angle
-  gyroXangle = roll;
-  compAngleX = roll;
-  
-  setAngle(&kalmanY,pitch); // Then pitch
-  gyroYangle = pitch;
-  compAngleY = pitch;
-  
-  setAngle(&kalmanZ,yaw); // And finally yaw
-  gyroZangle = yaw;
-  compAngleZ = yaw;
+  MPU6050_Read();
+  MPU_GetAccValue();
+  MPU_GetGyroRate();
+  AHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp,dt);
+  AHRS_GetRPY();
+  ADNS3080_Read();
 }
 
-//****************************************
-//根据加速计刷新Pitch和Roll数据
-//这里采用两种方法计算roll和pitch，如果最上面没有#define RESTRICT_PITCH就采用第二种计算方法
-//****************************************
-void updatePitchRoll(void)
+void PID_Update(float dt)
 {
-  // Source: http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf eq. 25 and eq. 26
-  // atan2 outputs the value of -π to π (radians) - see http://en.wikipedia.org/wiki/Atan2
-  // It is then converted from radians to degrees
-  #ifdef RESTRICT_PITCH // Eq. 25 and 26
-  roll = atan2(accY,accZ) * RAD_TO_DEG;
-  pitch = atan(-accX / sqrt(accY * accY + accZ * accZ)) * RAD_TO_DEG;
-  #else // Eq. 28 and 29
-  roll = atan(accY / sqrt(accX * accX + accZ * accZ)) * RAD_TO_DEG;
-  pitch = atan2(-accX, accZ) * RAD_TO_DEG;
-  #endif
-}
-//****************************************
-//根据磁力计刷新Yaw角
-//****************************************
-void updateYaw(void)
-{
-  double rollAngle,pitchAngle,Bfy,Bfx;  
-  
-  magX *= -1; // Invert axis - this it done here, as it should be done after the calibration
-  magZ *= -1;
-  
-  magX *= magGain[0];
-  magY *= magGain[1];
-  magZ *= magGain[2];
-  
-  magX -= magOffset[0];
-  magY -= magOffset[1];
-  magZ -= magOffset[2];
-  
-  
-  rollAngle  = kalAngleX * DEG_TO_RAD;
-  pitchAngle = kalAngleY * DEG_TO_RAD;
-  
-  Bfy = magZ * sin(rollAngle) - magY * cos(rollAngle);
-  Bfx = magX * cos(pitchAngle) + magY * sin(pitchAngle) * sin(rollAngle) + magZ * sin(pitchAngle) * cos(rollAngle);
-  yaw = atan2(-Bfy, Bfx) * RAD_TO_DEG;
-  
-  yaw *= -1;
-}
-void PID_Update(void)
-{
+  PIDx_Update(dt);
+  PIDy_Update(dt);
+  PIDz_Update(dt);
 }
 
 void print_int(int num, int mode, int flag)  
@@ -374,7 +323,7 @@ float HCSR04_Get(void)
   float length = 0.0f;
 
   GPIO_WriteBit(GPIOA,GPIO_Pin_1,1);
-  DelayUs(20);
+  delay_us(20);
   GPIO_WriteBit(GPIOA,GPIO_Pin_1,0);
   //计数器清0
   TIM2->CNT = 0;
@@ -383,6 +332,7 @@ float HCSR04_Get(void)
   tim2_count = 0;
   while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && tim2_count < 9);
   length = (tim2_count*0xffff+TIM2->CNT)/58.8;
+  height = length;
   return length;
 }
 
@@ -401,7 +351,7 @@ int get_tick_count(unsigned long *count)
 
 //延时nus
 //nus为要延时的us数.
-void DelayUs(u32 nus)
+void delay_us(u32 nus)
 {
 	u32 temp;
 	SysTick->LOAD=nus*fac_us; //时间加载
@@ -416,7 +366,7 @@ void DelayUs(u32 nus)
 }
 
 //延时nms
-void DelayMs(u16 nms)
+void delay_ms(u16 nms)
 {
 	u32 temp;
 	SysTick->LOAD=(u32)nms*fac_ms;//时间加载(SysTick->LOAD为24bit)

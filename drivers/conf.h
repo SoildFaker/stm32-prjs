@@ -15,7 +15,7 @@
 //#include "stm32f10x_pwr.h"
 //#include "stm32f10x_rtc.h"
 //#include "stm32f10x_sdio.h"
-//#include "stm32f10x_spi.h"
+#include "stm32f10x_spi.h"
 //#include "stm32f10x_wwdg.h"
 //#include "stm32f10x_dma.h"
 #include "stm32f10x_i2c.h"
@@ -28,6 +28,9 @@
 #include "stm32f10x.h"
 #include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
 #include "nvic.h"
+#include "mpu6050.h"
+#include "kalman.h"
+#include "pid.h"
 
 //#include <stdio.h>
 #include <stdlib.h>
@@ -36,35 +39,39 @@
 #include <string.h>
 
 /* Constant ------------------------------------------------------------------*/
-//串口通讯接口 GPIOA
-#define  GPIO_RxPin               GPIO_Pin_3              
-#define  GPIO_TxPin               GPIO_Pin_2              
-//PWM电调接口 GPIOB
-#define  CW1_Pin                  GPIO_Pin_6
-#define  CW2_Pin                  GPIO_Pin_7
-#define  CCW1_Pin                 GPIO_Pin_8
-#define  CCW2_Pin                 GPIO_Pin_9
 //超声波测距接口 GPIOA
-#define  TRIG_Pin                 GPIO_Pin_1
-#define  ECHO_Pin                 GPIO_Pin_0
+#define TRIG_Pin                GPIO_Pin_1
+#define ECHO_Pin                GPIO_Pin_0
+//串口通讯接口 GPIOA
+#define GPIO_RxPin              GPIO_Pin_3              
+#define GPIO_TxPin              GPIO_Pin_2              
+//光流传感接口 GPIOA
+#define NSS_Pin                 GPIO_Pin_4
+#define SCLK_Pin                GPIO_Pin_5
+#define MISO_Pin                GPIO_Pin_6
+#define MOSI_Pin                GPIO_Pin_7
+//PWM电调接口 GPIOB
+#define CW1_Pin                 GPIO_Pin_6
+#define CW2_Pin                 GPIO_Pin_7
+#define CCW1_Pin                GPIO_Pin_8
+#define CCW2_Pin                GPIO_Pin_9
 //陀螺仪IIC接口 GPIOB
-#define  SDA_Pin                  GPIO_Pin_11
-#define  SCL_Pin                  GPIO_Pin_10
-#define  MPU_I2Cx                 I2C2
-#define  I2C_Speed                100000
+#define SDA_Pin                 GPIO_Pin_11
+#define SCL_Pin                 GPIO_Pin_10
+#define MPU_I2Cx                I2C2
+#define I2C_Speed               100000
 
-#define  TRUE                     1
-#define  FALSE                    0
+#define TRUE                    1
+#define FALSE                   0
+
+#define STOP_PWM                1600
+#define MIN_PWM                 2000
+#define MAX_PWM                 3600
+#define PWM_RANGE               2000
 
 #define M_PI  3.14159265358979323846  /* pi */
-#define TIM3_Freq                 500
 #define SYSCLK_FREQ_72MHz
 #define _DLIB_PRINTF_SPECIFIER_FLOAT
-
-#define MIN(a, b)			(((a) < (b)) ? (a) : (b))
-#define MAX(a, b)			(((a) > (b)) ? (a) : (b))
-#define MINMAX(x, min, max)	(MIN(MAX((x), (min)), (max)))
-#define CONSTRAIN(x, a)		(MINMAX(x, -(a), (a)))
 
 /* functions -----------------------------------------------------------------*/
 void USART_Conf(void);
@@ -74,6 +81,7 @@ void TIMER_Conf(void);
 void GPIO_Conf(void);
 void NVIC_Conf(void);
 void PWM_Conf(void);
+void SPI_Conf(void);
 /* #define USE_FULL_ASSERT    1 */
 
 /* Exported macro ------------------------------------------------------------*/

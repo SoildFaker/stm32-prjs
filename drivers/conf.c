@@ -28,8 +28,7 @@ void RCC_Conf(void)
     //使能PLL时钟
     RCC_PLLCmd(ENABLE);  
     //等待PLL时钟就绪
-    while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
-    //配置系统时钟 = PLL时钟
+    while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET); //配置系统时钟 = PLL时钟
     RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK); 
     //检查PLL时钟是否作为系统时钟
     while(RCC_GetSYSCLKSource() != 0x08);
@@ -37,6 +36,8 @@ void RCC_Conf(void)
   
   //开启AFIO时钟
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+  //SPI
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1,ENABLE);	//SPI时钟
 	//Enable clock source for i2c
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
   //Enable GPIO timer
@@ -93,23 +94,34 @@ void TIMER_Conf(void)
   TIM_TimeBaseStructure.TIM_Period = 0xffff;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0; ////时间分割值  
   TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
+
+/******************************************************************************/
   TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure); //初始化定时器2
   TIM_ClearFlag(TIM2, TIM_FLAG_Update);
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
   TIM_Cmd(TIM2, ENABLE);// TIM2 enable counter [允许tim2计数]
 
-  TIM_TimeBaseStructure.TIM_Period = 1000000/TIM3_Freq;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //初始化定时器3
   TIM_ClearFlag(TIM3, TIM_FLAG_Update);
   TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
-  TIM_Cmd(TIM3, ENABLE);//允许tim3计数
+  TIM_Cmd(TIM3, ENABLE);//主更新
+}
 
-  TIM_TimeBaseStructure.TIM_Prescaler = 7200-1;  //时钟预分频数 例如:时钟频率=72/(时钟预分频+1)  
-  TIM_TimeBaseStructure.TIM_Period = 10000;//自动重装载寄存器周期的值(定时时间)累计 0xFFFF个频率后产生个更新或者中断(也是说定时时间到)
-  TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure); //初始化定时器3
-  TIM_ClearFlag(TIM1, TIM_FLAG_Update);
-  TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE); //打开中断 溢出中断  
-  TIM_Cmd(TIM1, ENABLE);
+void SPI_Conf(void)
+{
+  SPI_InitTypeDef   SPI_InitStructure;
+
+  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex; //设置SPI为双线双向全双工模式
+  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;	 //主机模式
+  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;//发送、接收8位帧结构
+  SPI_InitStructure.SPI_CPOL =SPI_CPOL_High ; //始终悬空高  // SPI_CPOL_Low//始终悬空低 
+  SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;//第2个时钟沿捕获 //SPI_CPHA_1Edge第1个时钟沿捕获 
+  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;	 //硬件控制NSS信号（ss） 置成软件时,NSS脚可以他用	  // SPI_NSS_Hard 
+  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;  //预分频值为64
+  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB; //数据传输由最高位开始	   //SD卡高位先传送
+  SPI_InitStructure.SPI_CRCPolynomial = 7;	 //定义了CRC值计算的多项式为7
+  SPI_Init(SPI1, &SPI_InitStructure); 
+  SPI_Cmd(SPI1,ENABLE); 
 }
 
 void PWM_Conf(void)
@@ -174,6 +186,19 @@ void GPIO_Conf(void)
 	GPIO_InitStructure.GPIO_Pin=CW1_Pin|CW2_Pin|CCW1_Pin|CCW2_Pin;
 	GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB,&GPIO_InitStructure);
+
+  //SPI Optical flow
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6| GPIO_Pin_7;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;	//复用推挽输出
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+  GPIO_InitStructure.GPIO_Mode =GPIO_Mode_Out_PP; //推挽输出
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
+  GPIO_InitStructure.GPIO_Mode =GPIO_Mode_Out_PP; //推挽输出
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 
 // 系统中断控制
@@ -191,15 +216,9 @@ void NVIC_Conf(void)
   NVIC_Init(&NVIC_InitStructure);
 
   NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
-  // TIM4
-  /*NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;*/
-  /*NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;*/
-  /*NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;*/
-  /*NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;*/
-  /*NVIC_Init(&NVIC_InitStructure);*/
 }
 

@@ -1,4 +1,3 @@
-# NUEDC
 # Working Around
 Basically this project is developing on Archlinux(amd64) with STLINK V2 & OpenOCD supports.
 ##Materials needed
