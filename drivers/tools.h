@@ -2,6 +2,7 @@
 #define __TOOLS value
 
 #include "stm32f10x.h"
+extern float height;
 
 float HCSR04_Get(void);
 void State_Update(float dt);

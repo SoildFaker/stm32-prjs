@@ -9,6 +9,7 @@
 
 static uint8_t  fac_us=0;//us延时倍乘数
 static uint16_t fac_ms=0;//ms延时倍乘数
+float height = 0.0f;
 va_list args;  
   
 char sign[] = { '0','1','2','3','4','5',  
@@ -207,6 +208,7 @@ float HCSR04_Get(void)
   tim2_count = 0;
   while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) && tim2_count < 9);
   length = (tim2_count*0xffff+TIM2->CNT)/58.8;
+  height = length;
   return length;
 }
 

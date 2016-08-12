@@ -1,12 +1,13 @@
 #include "pid.h"
 #include "ahrs.h"
 #include "mpu6050.h"
+#include "flow.h"
 #include "tools.h"
 #include "stm32f10x.h"
 
 float rx_value[6] = {
   0.0f,0.0f,0.0f,//roll, pitch, yaw
-  0.0f,0.0f,0.0f //x,y,z point
+  0.0f,0.0f,30.0f //x,y,z point
 };
 float throttle = 0.50f;
 float ERRz,_ERRz,ERRzD,PIDz_Out;
@@ -14,9 +15,14 @@ float ERRz,_ERRz,ERRzD,PIDz_Out;
 float ERRx,_ERRx,ERRxI;
 float ERRy,_ERRy,ERRyI;
 
+float ERRxp,_ERRxp,ERRxpI;
+float ERRyp,_ERRyp,ERRypI;
+float ERRzp,_ERRzp,ERRzpI;
+
 float P_Temp,I_Temp,D_Temp;
 
 float PIDx,PIDy,PIDz;
+float PIDxp,PIDyp,PIDzp;
 
 float PID_Value[21]={
   7.077, 0.002, 0.016,//x coordinate PID
@@ -30,16 +36,44 @@ float PID_Value[21]={
 
 void PIDxp_Update(float dt)
 {
+  _ERRxp=ERRxp;
+  ERRxp=CONSTRAIN(rx_value[3]-X, MAX_DELTA_X);
+  ERRxpI=CONSTRAIN(ERRxp*dt+ERRxpI, I_P_MAX);
 
+  P_Temp=PID_Value[0]*ERRxp;
+  I_Temp=PID_Value[1]*ERRxpI;
+  D_Temp=CONSTRAIN(-PID_Value[3]*dx,PG_MAX);
+
+  PIDxp=(int)CONSTRAIN((P_Temp+I_Temp+D_Temp),PID_OUT_MAX);
 }
 void PIDyp_Update(float dt)
 {
+  _ERRyp=ERRyp;
+  ERRyp=CONSTRAIN(rx_value[4]-Y, MAX_DELTA_Y);
+  ERRypI=CONSTRAIN(ERRyp*dt+ERRypI, I_P_MAX);
 
+  P_Temp=PID_Value[6]*ERRyp;
+  I_Temp=PID_Value[7]*ERRypI;
+  D_Temp=CONSTRAIN(-PID_Value[8]*dy,PG_MAX);
+
+  PIDyp=(int)CONSTRAIN((P_Temp+I_Temp+D_Temp),PID_OUT_MAX);
 }
 
 void PIDzp_Update(float dt)
 {
+  float RateZ = 0.0f;
+  float tempz = 0.00003f;
+  _ERRzp=ERRzp;
+  ERRzp=CONSTRAIN(rx_value[5]-height, MAX_DELTA_Z);
+  ERRzpI=CONSTRAIN(ERRzp*dt+ERRzpI, I_H_MAX);
+  RateZ=CONSTRAIN((ERRzp-_ERRzp)/dt,MAX_Z_RATE);
 
+  P_Temp=PID_Value[12]*ERRzp;
+  I_Temp=PID_Value[13]*ERRzpI;
+  D_Temp=CONSTRAIN(PID_Value[14]*RateZ,PG_MAX);
+
+  PIDzp=(int)CONSTRAIN((P_Temp+I_Temp+D_Temp)+150,PID_H_OUT_MAX);
+  throttle=PIDzp;
 }
 
 void PIDx_Update(float dt)
@@ -132,24 +166,4 @@ void MORTOR_Output(void)
   }
 }
   
-void keepHeight(float height)
-{
-  float height_temp = 0.0f;
-  height_temp = HCSR04_Get();
-    if(height_temp < height){
-      throttle = throttle*1.03f;
-      if(throttle>0.9f){
-        throttle = 0.9f;
-      }
-    }else{
-      throttle = throttle*0.98f;
-      if(throttle<0.3f){
-        throttle = 0.3f;
-      }
-    }
-
-}
-
-
-
 
