@@ -7,7 +7,7 @@
 
 float rx_value[6] = {
   0.0f,0.0f,0.0f,//roll, pitch, yaw
-  0.0f,0.0f,30.0f //x,y,z point
+  0.0f,0.0f,20.0f //x,y,z point
 };
 float throttle = 0.50f;
 float ERRz,_ERRz,ERRzD,PIDz_Out;
@@ -23,13 +23,14 @@ float P_Temp,I_Temp,D_Temp;
 
 float PIDx,PIDy,PIDz;
 float PIDxp,PIDyp,PIDzp;
+float RateX,RateY,RateZ;
 
 float PID_Value[21]={
   7.077, 0.002, 0.016,//x coordinate PID
   5.640, 0.003, 4.081,//yoll PID
   7.085, 0.002, 0.016,//y coordinate PID
   5.643, 0.003, 4.081,//pitch PID
-  7.023, 0.002, 0.016,//z coordinate PID
+  0.523, 5.022, 0.016,//z coordinate PID
   8.060, 0.000, 0.007,//yaw PID
   35.00, 35.00, 10.00 //
 };
@@ -61,8 +62,7 @@ void PIDyp_Update(float dt)
 
 void PIDzp_Update(float dt)
 {
-  float RateZ = 0.0f;
-  float tempz = 0.00003f;
+  float tempz = 0.003f;
   _ERRzp=ERRzp;
   ERRzp=CONSTRAIN(rx_value[5]-height, MAX_DELTA_Z);
   ERRzpI=CONSTRAIN(ERRzp*dt+ERRzpI, I_H_MAX);
@@ -72,8 +72,11 @@ void PIDzp_Update(float dt)
   I_Temp=PID_Value[13]*ERRzpI;
   D_Temp=CONSTRAIN(PID_Value[14]*RateZ,PG_MAX);
 
-  PIDzp=(int)CONSTRAIN((P_Temp+I_Temp+D_Temp)+150,PID_H_OUT_MAX);
-  throttle=PIDzp;
+  PIDzp=(int)STRAIN((P_Temp+I_Temp+D_Temp)+150.0,0,PID_H_OUT_MAX);
+  /*myprintf("ErrZ:%f\tErrZI:%f\tRateZ:%f\t\r\n",ERRzp,ERRzpI,RateZ);*/
+  /*myprintf("P:%f\tI:%f\tD:%f\t\r\n",P_Temp,I_Temp,D_Temp);*/
+  /*myprintf("PID:%f\r\n",PIDzp);*/
+  throttle=tempz*PIDzp;
 }
 
 void PIDx_Update(float dt)

@@ -6,11 +6,11 @@
 #define IG_MAX 400.0
 #define I_MAX 200.0
 #define I_P_MAX 200.0
-#define I_H_MAX 2000.0
+#define I_H_MAX 200.0
 #define PG_MAX 800.0
 //#define DG_MAX 400.0
 #define PID_OUT_MAX 1200.0
-#define PID_H_OUT_MAX 1200.0
+#define PID_H_OUT_MAX 1200
 #define PID_Z_MAX	500
 #define PID_Z_MIN 180
 #define MAX_GYRO_ERROR 350.0
@@ -20,7 +20,7 @@
 #define MAX_TARGET_RATE 	 100.0
 #define MAX_DELTA_X     50.0
 #define MAX_DELTA_Y     50.0
-#define MAX_DELTA_Z     10.0
+#define MAX_DELTA_Z     50.0
 #define MAX_Z_RATE     500.0
 #define TARGET_Z_RATE 150
 //------- Quad mode --------
@@ -31,6 +31,7 @@
 #define MAX(a, b)			(((a) > (b)) ? (a) : (b))
 #define MINMAX(x, min, max)	(MIN(MAX((x), (min)), (max)))
 #define CONSTRAIN(x, a)		(MINMAX(x, -(a), (a)))
+#define STRAIN(x, a, b)		(MINMAX(x, -(a), (b)))
 //-------------------------------------------------
 
 //------- variables -------------------------------
