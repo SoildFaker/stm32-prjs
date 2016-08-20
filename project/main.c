@@ -42,17 +42,17 @@ int main(void)
         height = HCSR04_Get();
         
         PIDzp_Update((float)1e-6*idt);
-        /*myprintf("============================================================\r\n");*/
+        myprintf("============================================================\r\n");
         /*myprintf("height:%f\tthrottle:%f\tdt:%d\tidt:%d\r\n", HCSR04_Get(), throttle, dt, idt);*/
-        /*myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);*/
-        /*myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", roll, pitch, yaw);*/
+        myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);
+        myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", roll, pitch, yaw);
         /*myprintf("X:%d\tY:%d\tZ:%f\r\n", X, Y, height);*/
         /*myprintf("TIM3:%d\r\n",tim3_count);*/
         idt=0;
         b++;
       }
       if (b>14){
-        stop = 1;
+        stop = 0;
       }
     }else{
       throttle = 0.0f; 
