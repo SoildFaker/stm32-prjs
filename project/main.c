@@ -51,7 +51,7 @@ int main(void)
         idt=0;
         b++;
       }
-      if (b>12){
+      if (b>14){
         stop = 1;
       }
     }else{

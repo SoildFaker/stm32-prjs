@@ -27,9 +27,9 @@ float RateX,RateY,RateZ;
 
 float PID_Value[21]={
   7.077, 0.002, 0.016,//x coordinate PID
-  5.640, 0.003, 4.081,//yoll PID
+  9.640, 0.003, 5.081,//yoll PID
   7.085, 0.002, 0.016,//y coordinate PID
-  5.643, 0.003, 4.081,//pitch PID
+  9.643, 0.003, 5.081,//pitch PID
   0.523, 5.022, 0.016,//z coordinate PID
   8.060, 0.000, 0.007,//yaw PID
   35.00, 35.00, 10.00 //
@@ -109,7 +109,7 @@ void PIDz_Update(float dt)
 {
   if(rx_value[2]==0){
     //auto hold mode, increas PIDz_Out 0.5 by one step to prevent ocilation
-    PIDz_Out+=1;
+    PIDz_Out+=0.5;
     if(PIDz_Out>PID_Z_MAX)PIDz_Out=PID_Z_MAX;
   }else{
     // control z axis, just need small output
