@@ -5,7 +5,7 @@
 #include "ahrs.h"
 #include "mpu6050.h"
 
-#define betaDef     1.5f    // 比例系数
+#define betaDef     1.2f    // 比例系数
 
 float beta = betaDef;
 float volatile q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;

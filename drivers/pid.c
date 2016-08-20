@@ -23,13 +23,14 @@ float P_Temp,I_Temp,D_Temp;
 
 float PIDx,PIDy,PIDz;
 float PIDxp,PIDyp,PIDzp;
+float RateX,RateY,RateZ;
 
 float PID_Value[21]={
   7.077, 0.002, 0.016,//x coordinate PID
-  5.640, 0.003, 4.081,//yoll PID
+  9.640, 0.003, 5.081,//yoll PID
   7.085, 0.002, 0.016,//y coordinate PID
-  5.643, 0.003, 4.081,//pitch PID
-  7.023, 0.002, 0.016,//z coordinate PID
+  9.643, 0.003, 5.081,//pitch PID
+  0.223, 0.922, 0.016,//z coordinate PID
   8.060, 0.000, 0.007,//yaw PID
   35.00, 35.00, 10.00 //
 };
@@ -61,8 +62,7 @@ void PIDyp_Update(float dt)
 
 void PIDzp_Update(float dt)
 {
-  float RateZ = 0.0f;
-  float tempz = 0.00003f;
+  float tempz = 0.003f;
   _ERRzp=ERRzp;
   ERRzp=CONSTRAIN(rx_value[5]-height, MAX_DELTA_Z);
   ERRzpI=CONSTRAIN(ERRzp*dt+ERRzpI, I_H_MAX);
@@ -72,8 +72,11 @@ void PIDzp_Update(float dt)
   I_Temp=PID_Value[13]*ERRzpI;
   D_Temp=CONSTRAIN(PID_Value[14]*RateZ,PG_MAX);
 
-  PIDzp=(int)CONSTRAIN((P_Temp+I_Temp+D_Temp)+150,PID_H_OUT_MAX);
-  throttle=PIDzp;
+  PIDzp=(int)STRAIN((P_Temp+I_Temp+D_Temp)+150.0,0,PID_H_OUT_MAX);
+  /*myprintf("ErrZ:%f\tErrZI:%f\tRateZ:%f\t\r\n",ERRzp,ERRzpI,RateZ);*/
+  /*myprintf("P:%f\tI:%f\tD:%f\t\r\n",P_Temp,I_Temp,D_Temp);*/
+  /*myprintf("PID:%f\r\n",PIDzp);*/
+  throttle=tempz*PIDzp;
 }
 
 void PIDx_Update(float dt)
@@ -106,7 +109,7 @@ void PIDz_Update(float dt)
 {
   if(rx_value[2]==0){
     //auto hold mode, increas PIDz_Out 0.5 by one step to prevent ocilation
-    PIDz_Out+=1;
+    PIDz_Out+=0.5;
     if(PIDz_Out>PID_Z_MAX)PIDz_Out=PID_Z_MAX;
   }else{
     // control z axis, just need small output
@@ -147,10 +150,10 @@ void MORTOR_Output(void)
   }
   else
   {   
-    pwm[0]=(uint16_t)(throttle*PWM_RANGE)+MIN_PWM+PIDx+PIDy+PIDz-(uint16_t)PID_Value[21];
-    pwm[1]=(uint16_t)(throttle*PWM_RANGE)+MIN_PWM-PIDx+PIDy-PIDz-(uint16_t)PID_Value[21];
-    pwm[2]=(uint16_t)(throttle*PWM_RANGE)+MIN_PWM-PIDx-PIDy+PIDz+(uint16_t)PID_Value[21]; 
-    pwm[3]=(uint16_t)(throttle*PWM_RANGE)+MIN_PWM+PIDx-PIDy-PIDz+(uint16_t)PID_Value[21];
+    pwm[0]=(uint16_t)(throttle*PWM_RANGE)+MIN_PWM+PIDx+PIDy-PIDz-(uint16_t)PID_Value[21];
+    pwm[1]=(uint16_t)(throttle*PWM_RANGE)+MIN_PWM-PIDx+PIDy+PIDz-(uint16_t)PID_Value[21];
+    pwm[2]=(uint16_t)(throttle*PWM_RANGE)+MIN_PWM-PIDx-PIDy-PIDz+(uint16_t)PID_Value[21]; 
+    pwm[3]=(uint16_t)(throttle*PWM_RANGE)+MIN_PWM+PIDx-PIDy+PIDz+(uint16_t)PID_Value[21];
 
     for(i=0;i<4;i++)
     {
