@@ -39,7 +39,7 @@ int main(void)
       MORTOR_Output();
       a++;
       idt+=dt;
-      if (a%1000 == 0){
+      if (a%200 == 0){
         height = HCSR04_Get();
         
         PIDzp_Update((float)1e-6*idt);
@@ -52,11 +52,13 @@ int main(void)
         idt=0;
         b++;
       }
-      if (b>8){
+      if (b>30){
         stop = 1;
       }
     }else{
-      throttle -= 0.00005f; 
+      throttle -= 0.0005f; 
+      State_Update((float)1e-6*dt);      // 状态信息更新 Pitch, Roll, Yaw , etc.
+      PID_Update((float)1e-6*dt);        // PID控制输入每次循环时间
       MORTOR_Output();
     }
   }
