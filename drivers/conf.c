@@ -37,19 +37,19 @@ void RCC_Conf(void)
   //开启AFIO时钟
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
   //SPI
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1,ENABLE);	//SPI时钟
-	//Enable clock source for i2c
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1,ENABLE);   //SPI时钟
+  //Enable clock source for i2c
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
   //Enable GPIO timer
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
   //Enable serial timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
   //Timer
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //配置RCC，使能TIM2
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //配置RCC，使能TIM3
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-	
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+  
 }
 
 // 串口相关配置
@@ -72,17 +72,17 @@ void USART_Conf(void)
 // I2C通讯的配置，主要用来和陀螺仪芯片通讯
 void I2C_Conf(void)
 {
-	I2C_InitTypeDef I2C_InitStructure;
-	
-	//Configuration I2C
-	I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
-	I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-	I2C_InitStructure.I2C_ClockSpeed = I2C_Speed;
-	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
-	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
-	I2C_InitStructure.I2C_OwnAddress1 = 0x01;
-	I2C_Init(MPU_I2Cx,&I2C_InitStructure);
-	I2C_Cmd(MPU_I2Cx,ENABLE);
+  I2C_InitTypeDef I2C_InitStructure;
+  
+  //Configuration I2C
+  I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
+  I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+  I2C_InitStructure.I2C_ClockSpeed = I2C_Speed;
+  I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
+  I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
+  I2C_InitStructure.I2C_OwnAddress1 = 0x01;
+  I2C_Init(MPU_I2Cx,&I2C_InitStructure);
+  I2C_Cmd(MPU_I2Cx,ENABLE);
 }
 // 定时器设置 
 void TIMER_Conf(void)
@@ -112,46 +112,46 @@ void SPI_Conf(void)
   SPI_InitTypeDef   SPI_InitStructure;
 
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex; //设置SPI为双线双向全双工模式
-  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;	 //主机模式
+  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;  //主机模式
   SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;//发送、接收8位帧结构
   SPI_InitStructure.SPI_CPOL =SPI_CPOL_High ; //始终悬空高  // SPI_CPOL_Low//始终悬空低 
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;//第2个时钟沿捕获 //SPI_CPHA_1Edge第1个时钟沿捕获 
-  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;	 //硬件控制NSS信号（ss） 置成软件时,NSS脚可以他用	  // SPI_NSS_Hard 
+  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;  //硬件控制NSS信号（ss） 置成软件时,NSS脚可以他用   // SPI_NSS_Hard 
   SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;  //预分频值为64
-  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB; //数据传输由最高位开始	   //SD卡高位先传送
-  SPI_InitStructure.SPI_CRCPolynomial = 7;	 //定义了CRC值计算的多项式为7
+  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB; //数据传输由最高位开始  //SD卡高位先传送
+  SPI_InitStructure.SPI_CRCPolynomial = 7;   //定义了CRC值计算的多项式为7
   SPI_Init(SPI1, &SPI_InitStructure); 
   SPI_Cmd(SPI1,ENABLE); 
 }
 
 void PWM_Conf(void)
 {
-	TIM_TimeBaseInitTypeDef TM4_TB_Config;
-	TIM_OCInitTypeDef TM4_OC_Config;
-	
-	//first, setup timebase structure
-	TM4_TB_Config.TIM_ClockDivision=TIM_CKD_DIV1 ;
-	TM4_TB_Config.TIM_CounterMode=TIM_CounterMode_Up;
-	TM4_TB_Config.TIM_Period=5000;//T=Period*t_step=2.5ms
-	TM4_TB_Config.TIM_Prescaler=36-1;//t_step=(Prescaler+1)/core_clock=0.5us
-	TIM_TimeBaseInit(TIM4,&TM4_TB_Config);
-	//second, setup output compare structure
-	TM4_OC_Config.TIM_OCMode=TIM_OCMode_PWM1;
-	TM4_OC_Config.TIM_OCPolarity=TIM_OCPolarity_High;
-	TM4_OC_Config.TIM_OutputState=TIM_OutputState_Enable ;
-	TM4_OC_Config.TIM_Pulse=0;
-	TIM_OC1Init(TIM4,&TM4_OC_Config);
-	TIM_OC2Init(TIM4,&TM4_OC_Config);
-	TIM_OC3Init(TIM4,&TM4_OC_Config);
-	TIM_OC4Init(TIM4,&TM4_OC_Config);
-	
-	//enable auto reload for OC_reg and ARR_reg
-	TIM_ARRPreloadConfig(TIM4,ENABLE);//can change T 
-	TIM_OC1PreloadConfig(TIM4,ENABLE);//can change t_on
-	TIM_OC2PreloadConfig(TIM4,ENABLE);//can change t_on
-	TIM_OC3PreloadConfig(TIM4,ENABLE);//can change t_on
-	TIM_OC4PreloadConfig(TIM4,ENABLE);//can change t_on
-	TIM_Cmd(TIM4,ENABLE);
+  TIM_TimeBaseInitTypeDef TM4_TB_Config;
+  TIM_OCInitTypeDef TM4_OC_Config;
+  
+  //first, setup timebase structure
+  TM4_TB_Config.TIM_ClockDivision=TIM_CKD_DIV1 ;
+  TM4_TB_Config.TIM_CounterMode=TIM_CounterMode_Up;
+  TM4_TB_Config.TIM_Period=5000;//T=Period*t_step=2.5ms
+  TM4_TB_Config.TIM_Prescaler=36-1;//t_step=(Prescaler+1)/core_clock=0.5us
+  TIM_TimeBaseInit(TIM4,&TM4_TB_Config);
+  //second, setup output compare structure
+  TM4_OC_Config.TIM_OCMode=TIM_OCMode_PWM1;
+  TM4_OC_Config.TIM_OCPolarity=TIM_OCPolarity_High;
+  TM4_OC_Config.TIM_OutputState=TIM_OutputState_Enable ;
+  TM4_OC_Config.TIM_Pulse=0;
+  TIM_OC1Init(TIM4,&TM4_OC_Config);
+  TIM_OC2Init(TIM4,&TM4_OC_Config);
+  TIM_OC3Init(TIM4,&TM4_OC_Config);
+  TIM_OC4Init(TIM4,&TM4_OC_Config);
+  
+  //enable auto reload for OC_reg and ARR_reg
+  TIM_ARRPreloadConfig(TIM4,ENABLE);//can change T 
+  TIM_OC1PreloadConfig(TIM4,ENABLE);//can change t_on
+  TIM_OC2PreloadConfig(TIM4,ENABLE);//can change t_on
+  TIM_OC3PreloadConfig(TIM4,ENABLE);//can change t_on
+  TIM_OC4PreloadConfig(TIM4,ENABLE);//can change t_on
+  TIM_Cmd(TIM4,ENABLE);
 }
 
 
@@ -176,21 +176,21 @@ void GPIO_Conf(void)
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   
-	//MPU6050-IIC
-	GPIO_InitStructure.GPIO_Pin = SCL_Pin | SDA_Pin;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz; 
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD; 
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	
+  //MPU6050-IIC
+  GPIO_InitStructure.GPIO_Pin = SCL_Pin | SDA_Pin;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz; 
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD; 
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  
   //PWM Motor
-	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Pin=CW1_Pin|CW2_Pin|CCW1_Pin|CCW2_Pin;
-	GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
-	GPIO_Init(GPIOB,&GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_PP;
+  GPIO_InitStructure.GPIO_Pin=CW1_Pin|CW2_Pin|CCW1_Pin|CCW2_Pin;
+  GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
+  GPIO_Init(GPIOB,&GPIO_InitStructure);
 
   //SPI Optical flow
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6| GPIO_Pin_7;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;	//复用推挽输出
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;   //复用推挽输出
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
