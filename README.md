@@ -12,3 +12,4 @@ If you are using Archlinux just run the following command to install a GCC ARM E
 ##Flash & Hardware Debuging
 OpenOCD:  
 Install it from pacman.Click [here](https://github.com/ntfreak/openocd) for more guidance.  STLinkV2:  Clone [this](https://github.com/texane/stlink) repo and follow its installation guidance.  
+
