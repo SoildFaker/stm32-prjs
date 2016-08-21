@@ -7,7 +7,7 @@
 
 float rx_value[6] = {
   0.0f,0.0f,0.0f,//roll, pitch, yaw
-  0.0f,0.0f,30.0f //x,y,z point
+  0.0f,0.0f,50.0f //x,y,z point
 };
 float throttle = 0.50f;
 float ERRz,_ERRz,ERRzD,PIDz_Out;
@@ -30,7 +30,7 @@ float PID_Value[21]={
   9.640, 0.003, 5.081,//yoll PID
   7.085, 0.002, 0.016,//y coordinate PID
   9.643, 0.003, 5.081,//pitch PID
-  0.203, 3.022, 0.016,//z coordinate PID
+  0.403, 3.522, 0.016,//z coordinate PID
   8.060, 0.000, 0.007,//yaw PID
   35.00, 35.00, 10.00 //
 };
