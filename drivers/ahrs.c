@@ -193,11 +193,16 @@ float invSqrt(float x)
 void AHRS_GetRPY(void)
 { 
   float gx, gy, gz; // estimated gravity direction  
+  float real_pitch,real_roll;
   gx = 2 * (q1*q3 - q0*q2);
   gy = 2 * (q0*q1 + q2*q3);
   gz = q0*q0 - q1*q1 - q2*q2 + q3*q3;  
   
-  roll = atan(gy / sqrt(gx*gx + gz*gz))  * 180/M_PI - roll_angle_off_set;
-  pitch = -atan(gx / sqrt(gy*gy + gz*gz))  * 180/M_PI - pitch_angle_off_set;
+  roll = atan(gy * invSqrt(gx*gx + gz*gz)) * 180/M_PI - roll_angle_off_set;
+  real_roll = atan(acc_y * invSqrt(acc_x*acc_x + acc_z*acc_z)) * 180/M_PI - roll_angle_off_set;
+  roll = (2*real_roll + 1*roll)/3;
+  pitch = -atan(gx * invSqrt(gy*gy + gz*gz)) * 180/M_PI - pitch_angle_off_set;
+  real_pitch = -atan(acc_x * invSqrt(acc_y*acc_y + acc_z*acc_z)) * 180/M_PI - pitch_angle_off_set;
+  pitch = (2*real_pitch + 1*pitch)/3;
   yaw = atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1)*180 / M_PI;  
 }

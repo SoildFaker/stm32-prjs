@@ -9,8 +9,8 @@
 #define I_H_MAX 200.0
 #define PG_MAX 800.0
 //#define DG_MAX 400.0
-#define PID_X_MAX	500
-#define PID_Y_MAX	500
+#define PID_X_MAX	50.0
+#define PID_Y_MAX	50.0
 #define PID_OUT_MAX 1200.0
 #define PID_H_OUT_MAX 1200.0
 #define PID_Z_MAX	500
