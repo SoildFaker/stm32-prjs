@@ -24,6 +24,7 @@ INCLUDE  = -Icmsis -Ilib/inc -Idrivers
 
 # Linker 
 LSCRIPT = STM32F103XB.ld
+#LSCRIPT = STM32F407ZE.ld
 
 # C Flags
 GCFLAGS  = -Wall -fno-common -mcpu=$(CPU) -mthumb --specs=nosys.specs -g -Wa,-ahlms=$(addprefix $(OBJDIR)/,$(notdir $(<:.c=.lst)))
@@ -37,6 +38,9 @@ ASFLAGS += -mcpu=$(CPU)
 OCDFLAGS = -f /usr/share/openocd/scripts/interface/stlink-v2.cfg \
 		   -f /usr/share/openocd/scripts/target/stm32f1x.cfg \
 		   -f openocd.cfg
+#OCDFLAGS = -f /usr/share/openocd/scripts/interface/jlink.cfg \
+		   #-f /usr/share/openocd/scripts/target/stm32f4x.cfg \
+		   #-f openocd.cfg
 
 # Tools
 CC = arm-none-eabi-gcc

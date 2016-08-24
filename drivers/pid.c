@@ -26,18 +26,18 @@ float PIDxp,PIDyp,PIDzp;
 float RateX,RateY,RateZ;
 
 float PID_Value[21]={
-  0.177, 0.000, 5.016,//x coordinate PID
-  9.640, 0.003, 5.081,//yoll PID
-  0.185, 0.000, 5.016,//y coordinate PID
-  9.643, 0.003, 5.081,//pitch PID
-  0.203, 1.222, 0.016,//z coordinate PID
+  1.877, 0.005, 4.016,//x coordinate PID
+  8.240, 0.003, 5.081,//yoll PID
+  1.877, 0.005, 4.016,//y coordinate PID
+  8.243, 0.003, 5.081,//pitch PID
+  0.203, 1.002, 0.016,//z coordinate PID
   8.060, 0.000, 0.007,//yaw PID
   35.00, 35.00, 10.00 //
 };
 
 void PIDxp_Update(float dt)
 {
-  float tempx = -0.08f;
+  float tempx = 0.04f;
   _ERRxp=ERRxp;
   ERRxp=CONSTRAIN(rx_value[3]-X, MAX_DELTA_X);
   ERRxpI=CONSTRAIN(ERRxp*dt+ERRxpI, I_P_MAX);
@@ -48,12 +48,12 @@ void PIDxp_Update(float dt)
 
   PIDxp=(int)CONSTRAIN((P_Temp+I_Temp+D_Temp),PID_X_MAX);
 
-  rx_value[1]=tempx*PIDxp;
+  rx_value[0]=tempx*PIDxp;
 }
 
 void PIDyp_Update(float dt)
 {
-  float tempy = -0.08f;
+  float tempy = 0.04f;
   _ERRyp=ERRyp;
   ERRyp=CONSTRAIN(rx_value[4]-Y, MAX_DELTA_Y);
   ERRypI=CONSTRAIN(ERRyp*dt+ERRypI, I_P_MAX);
@@ -63,7 +63,7 @@ void PIDyp_Update(float dt)
   D_Temp=CONSTRAIN(-PID_Value[8]*dy,PG_MAX);
 
   PIDyp=(int)CONSTRAIN((P_Temp+I_Temp+D_Temp),PID_Y_MAX);
-  rx_value[0]=tempy*PIDyp;
+  rx_value[1]=tempy*PIDyp;
 }
 
 void PIDzp_Update(float dt)
@@ -115,7 +115,7 @@ void PIDz_Update(float dt)
 {
   if(rx_value[2]==0){
     //auto hold mode, increas PIDz_Out 0.5 by one step to prevent ocilation
-    PIDz_Out+=0.5;
+    PIDz_Out+=0.8;
     if(PIDz_Out>PID_Z_MAX)PIDz_Out=PID_Z_MAX;
   }else{
     // control z axis, just need small output

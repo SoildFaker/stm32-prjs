@@ -200,9 +200,9 @@ void AHRS_GetRPY(void)
   
   roll = atan(gy * invSqrt(gx*gx + gz*gz)) * 180/M_PI - roll_angle_off_set;
   real_roll = atan(acc_y * invSqrt(acc_x*acc_x + acc_z*acc_z)) * 180/M_PI - roll_angle_off_set;
-  roll = (2*real_roll + 1*roll)/3;
+  roll = (3*real_roll + 5*roll)/8;
   pitch = -atan(gx * invSqrt(gy*gy + gz*gz)) * 180/M_PI - pitch_angle_off_set;
   real_pitch = -atan(acc_x * invSqrt(acc_y*acc_y + acc_z*acc_z)) * 180/M_PI - pitch_angle_off_set;
-  pitch = (2*real_pitch + 1*pitch)/3;
+  pitch = (3*real_pitch + 5*pitch)/8;
   yaw = atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1)*180 / M_PI;  
 }

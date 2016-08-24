@@ -9,8 +9,8 @@
 #define I_H_MAX 200.0
 #define PG_MAX 800.0
 //#define DG_MAX 400.0
-#define PID_X_MAX	50.0
-#define PID_Y_MAX	50.0
+#define PID_X_MAX	180.0
+#define PID_Y_MAX	180.0
 #define PID_OUT_MAX 1200.0
 #define PID_H_OUT_MAX 1200.0
 #define PID_Z_MAX	500
@@ -20,8 +20,8 @@
 #define MAX_TARGET_ANGLE		30.0//20.0*2
 #define MAX_TARGET_RATE_M2 200.0//100.0*2
 #define MAX_TARGET_RATE 	 100.0
-#define MAX_DELTA_X     50.0
-#define MAX_DELTA_Y     50.0
+#define MAX_DELTA_X     100.0
+#define MAX_DELTA_Y     100.0
 #define MAX_DELTA_Z     50.0
 #define MAX_Z_RATE     500.0
 #define TARGET_Z_RATE 150

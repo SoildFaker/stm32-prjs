@@ -37,8 +37,8 @@ int main(void)
       State_Update((float)1e-6*dt);      // 状态信息更新 Pitch, Roll, Yaw , etc.
       PID_Update((float)1e-6*dt);        // PID控制输入每次循环时间
       MORTOR_Output();
-      /*PIDxp_Update((float)1e-6*dt);*/
-      /*PIDyp_Update((float)1e-6*dt);*/
+      PIDxp_Update((float)1e-6*dt);
+      PIDyp_Update((float)1e-6*dt);
       a++;
       idt+=dt;
       if (a%200 == 0){
@@ -50,7 +50,7 @@ int main(void)
         /*myprintf("C1:%d\tC2:%d\tC3:%d\tC4:%d\r\n", TIM4->CCR1, TIM4->CCR2, TIM4->CCR3, TIM4->CCR4);*/
         /*myprintf("roll:%f\tpitch:%f\tyaw:%f\r\n", roll, pitch, yaw);*/
         /*myprintf("r:%f\tp:%f\r\n", rx_value[0], rx_value[1]);*/
-        /*myprintf("X:%d\tY:%d\tZ:%f\r\n", X, Y, height);*/
+        /*myprintf("X:%d\tY:%d\tZ:%fdx:%d\tdy:%d\r\n", X, Y, height, dx, dy);*/
         /*myprintf("TIM3:%d\r\n",tim3_count);*/
         idt=0;
         b++;
