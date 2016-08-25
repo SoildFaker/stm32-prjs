@@ -6,6 +6,7 @@ extern float height;
 
 float HCSR04_Get(void);
 void State_Update(float dt);
+void Motor_Init(void);
 void PID_Update(float dt);
 uint8_t UsartPut(uint8_t ch);
 void getAttitude(float* AccelGyro);

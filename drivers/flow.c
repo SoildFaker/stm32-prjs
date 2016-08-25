@@ -2,10 +2,12 @@
 #include "conf.h"
 #include "tools.h"
 #include "srom.h"
+#include "pid.h"
 #include "stm32f10x_spi.h"
 
-int X = 0,Y = 0;
-int dx = 0,dy = 0;
+float X = 0.0f,Y = 0.0f;
+float rdx = 0.0,rdy = 0.0;
+volatile uint8_t surface_quality = 0;
 
 void ADNS3080_reset(void)  //ADNS3080 复位（高）
 {
@@ -128,39 +130,38 @@ uint16_t read_fraps(void) //读帧率
 void ADNS3080_Read(void)
 {
   unsigned char move=0;
-  int sum_x = 0,sum_y = 0;
-  //burst读。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。
+  int dx,dy;
   ON_CS();
   SPI_SendReceive(0x50);   
   delay_us(75);
   move=SPI_SendReceive(0xFF);             
   dx=SPI_SendReceive(0xFF);
   dy=SPI_SendReceive(0xFF);
-  if(dx&0x80) {
-    //x的二补码转换 
-    dx -= 1;
-    dx = ~dx; 
-    dx=(-1)*dx;
-    dx-=256;
-  }
-  if(dy&0x80) {
-    //y的二补码转换 
-    dy -= 1;
-    dy = ~dy; 
-    dy=(-1)*dy;
-    dy-=256;
-  } 
-  X=X+dx;             //累加X读入的移动数据
-  Y=Y+dy;       //累加Y读入的移动数据
-  OFF_CS();
-  delay_us(4);
-  OFF_CS();
-  sum_x=(25.4*(float)X *H)/(12*1600);//距离=d_x*(25.4/1600)*n   其中n=像高:物高=8毫米:物长
-  sum_y=(25.4*(float)Y *H)/(12*1600);
+  surface_quality=SPI_SendReceive(0xFF);
   if(move&0x10==1 || !move&0x80) {
     dx=0;
     dy=0;
+  }else{
+    if(dx&0x80) {
+      //x的二补码转换 
+      dx -= 1;
+      dx = ~dx; 
+      dx=(-1)*dx;
+      dx-=256;
+    }
+    if(dy&0x80) {
+      //y的二补码转换 
+      dy -= 1;
+      dy = ~dy; 
+      dy=(-1)*dy;
+      dy-=256;
+    } 
   }
+  rdx=(float)dx*avg_height*CONV_FACTOR;
+  rdy=(float)dy*avg_height*CONV_FACTOR;
+  X=X+rdx;             //累加X读入的移动数据
+  Y=Y+rdy;       //累加Y读入的移动数据
+  OFF_CS();
 }
 
 uint8_t SPI_SendReceive(uint8_t data)     //SPI1的收发

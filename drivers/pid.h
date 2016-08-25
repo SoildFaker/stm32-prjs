@@ -20,8 +20,8 @@
 #define MAX_TARGET_ANGLE		30.0//20.0*2
 #define MAX_TARGET_RATE_M2 200.0//100.0*2
 #define MAX_TARGET_RATE 	 100.0
-#define MAX_DELTA_X     100.0
-#define MAX_DELTA_Y     100.0
+#define MAX_DELTA_X     150.0
+#define MAX_DELTA_Y     150.0
 #define MAX_DELTA_Z     50.0
 #define MAX_Z_RATE     500.0
 #define TARGET_Z_RATE 150
@@ -39,7 +39,13 @@
 extern float PIDx,PIDy,PIDz;
 extern float rx_value[6];
 extern float throttle;
-extern float height;
+extern float avg_height;
+extern float ERRz,_ERRz,ERRzD,PIDz_Out;
+extern float ERRx,_ERRx,ERRxI;
+extern float ERRy,_ERRy,ERRyI;
+extern float ERRxp,_ERRxp,ERRxpI;
+extern float ERRyp,_ERRyp,ERRypI;
+extern float ERRzp,_ERRzp,ERRzpI;
 //-------------------------------------------------
 
 

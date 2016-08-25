@@ -40,6 +40,21 @@ void State_Update(float dt)
   ADNS3080_Read();
 }
 
+void Motor_Init(void)
+{
+
+  TIM4->CCR1=4000;
+  TIM4->CCR2=4000;
+  TIM4->CCR3=4000;
+  TIM4->CCR4=4000;
+  delay_ms(2500);
+  TIM4->CCR1=2000;
+  TIM4->CCR2=2000;
+  TIM4->CCR3=2000;
+  TIM4->CCR4=2000;
+  delay_ms(2500);
+}
+
 void PID_Update(float dt)
 {
   PIDx_Update(dt);
