@@ -3,7 +3,7 @@ Basically this project is developing on Archlinux(amd64) with STLINK V2 & OpenOC
 ##Materials needed
 To move forward you will require the following materials:
 - A computer running Linux of course, If you run Windows only, please don't be dissuaded. Manufacturer support is actually better for Windows since you can Google for it. And also there are lots of admiring IDEs on Windows to you.
-- A STLinkV2 Clone. Looks link a USB flash disk.
+- A STLinkV2 Clone. Looks like a USB flash disk.
 - A development board with STM32F103C8 chip.
 
 ##Compiling & Software Debugging 
