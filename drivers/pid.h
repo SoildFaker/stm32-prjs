@@ -12,7 +12,7 @@
 #define PID_X_MAX	180.0
 #define PID_Y_MAX	180.0
 #define PID_OUT_MAX 1200.0
-#define PID_H_OUT_MAX 1200.0
+#define PID_H_OUT_MAX 333.0
 #define PID_Z_MAX	500
 #define PID_Z_MIN 180
 #define MAX_GYRO_ERROR 350.0

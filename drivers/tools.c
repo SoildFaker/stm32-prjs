@@ -37,7 +37,7 @@ void State_Update(float dt)
   MPU_GetGyroRate();
   AHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp,dt);
   AHRS_GetRPY();
-  ADNS3080_Read();
+  /*ADNS3080_Read();*/
 }
 
 void Motor_Init(void)

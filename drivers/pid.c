@@ -28,11 +28,11 @@ float PIDxp,PIDyp,PIDzp;
 float RateX,RateY,RateZ;
 
 float PID_Value[21]={
-  4.877, 0.005, 4.016,//x coordinate PID
-  8.240, 0.003, 5.081,//yoll PID
-  4.877, 0.005, 4.016,//y coordinate PID
-  8.243, 0.003, 5.081,//pitch PID
-  0.203, 12.502, 0.006,//z coordinate PID
+  2.877, 0.005, 4.016,//x coordinate PID
+  9.240, 0.003, 5.081,//yoll PID
+  2.877, 0.005, 4.016,//y coordinate PID
+  9.243, 0.003, 5.081,//pitch PID
+  0.203, 2.502, 0.006,//z coordinate PID
   8.060, 0.000, 0.007,//yaw PID
   35.00, 35.00, 10.00 //
 };
