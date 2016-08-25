@@ -37,7 +37,22 @@ void State_Update(float dt)
   MPU_GetGyroRate();
   AHRSupdateIMU(gyro_x_rate*M_PI/180,gyro_y_rate*M_PI/180,gyro_z_rate*M_PI/180, acc_x_temp,acc_y_temp,acc_z_temp,dt);
   AHRS_GetRPY();
-  ADNS3080_Read();
+  /*ADNS3080_Read();*/
+}
+
+void Motor_Init(void)
+{
+
+  TIM4->CCR1=4000;
+  TIM4->CCR2=4000;
+  TIM4->CCR3=4000;
+  TIM4->CCR4=4000;
+  delay_ms(2500);
+  TIM4->CCR1=2000;
+  TIM4->CCR2=2000;
+  TIM4->CCR3=2000;
+  TIM4->CCR4=2000;
+  delay_ms(2500);
 }
 
 void PID_Update(float dt)

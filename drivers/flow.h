@@ -30,9 +30,11 @@
 #define	Pixel_Burst	         0x40
 #define	Motion_Burst         0x50
 #define	SROM_Load	         0x60
+#define CONV_FACTOR     0.0057
 
-extern int X,Y;
-extern int dx,dy;
+extern float X,Y;
+extern float rdx,rdy;
+extern volatile uint8_t surface_quality;
 
 void Write_srom(void);
 void ADNS3080_Init(void);

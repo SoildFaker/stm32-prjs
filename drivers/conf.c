@@ -197,6 +197,10 @@ void GPIO_Conf(void)
   GPIO_InitStructure.GPIO_Mode =GPIO_Mode_Out_PP; //推挽输出
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+  GPIO_InitStructure.GPIO_Mode =GPIO_Mode_Out_PP; //推挽输出
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
   GPIO_InitStructure.GPIO_Mode =GPIO_Mode_Out_PP; //推挽输出
   GPIO_Init(GPIOB, &GPIO_InitStructure);
@@ -222,5 +226,4 @@ void NVIC_Conf(void)
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 }
-
 
