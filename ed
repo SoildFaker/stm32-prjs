@@ -1,3 +1,0 @@
-#!/bin/sh
-source ~/Documents/code/STM/stm32-quadrocopter/incpath.sh
-nohup emacs >/dev/null 2>&1 &
