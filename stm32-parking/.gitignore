@@ -1,0 +1,6 @@
+obj/
+bk/
+bin/
+*.bk
+*.o
+*.lst
